@@ -6,6 +6,7 @@
 % start_x           : the start position of the DMP
 % goal_x            : the goal position of the DMP
 % duration          : the duration of the DMP
+% Ts                : sampling time
 % std               : standard deviation of added noise for parameters
 % repetitions       : repetitions of movement before learning update
 % cost_function     : name of the cost function to use
@@ -14,13 +15,14 @@
 % n_reuse           : number of re-used trials per update
 % n_rfs             : number of basis functions used
 
-start_x             [pi/6;(2*pi/3)]
-goal_x              [0.2203;0.6767]
+start               [0]
+goal                [1]
 duration            2
+Ts                  0.01
 controller          'perfect_controller'
-reference           'ref_trajectory_cart'
+ref                 'ref_step'
 std                 50
-repetitions         10
+reps                10
 n_reuse             5
 n_rfs               40
 loss_tol            0.1

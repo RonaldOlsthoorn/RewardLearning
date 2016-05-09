@@ -1,5 +1,4 @@
-%--------------------------------------------------------------------------
-function protocol=readProtocol(protocol_name)
+function protocol=read_protocol(protocol_name)
 % parses the protocol file <protocol_name> -- the format of the
 % protocol is explained in the file
 

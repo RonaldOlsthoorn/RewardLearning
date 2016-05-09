@@ -1,18 +1,15 @@
-function printProgress(D, D_eval,R, R_eval,figID)
+function print_progress(S, S_eval, D, R, R_total, ro_par, figID)
 % Plots the intermediate results of the running PI2 algorithm
 % D: struct containing the roll-outs (noise included)
 % D_eval: struct containing the noise-less roll-outs
 % figID: ID (number) used as figure ID
 
-global n_dmps;
-global par;
-global dcps;
 
-for i=1:D.reps
+for i=1:ro_par.reps
     legendInfo{i} = sprintf('rep_%d',i);
 end
 
-t = D_eval.t;
+t = S_eval.t;
 
 % figure(double(figID));
 % set(double(figID), 'units','normalized','outerposition',[0 0 1 1]);
@@ -132,27 +129,24 @@ t = D_eval.t;
 % ylabel(sprintf('scaled exp(R)'));
 % legend(legendInfo);
 
+qq = zeros(S.n_end , ro_par.reps);
 
+for k=1:ro_par.reps
+    
+   qq(:,k) = S.rollouts(k).q(:,1);
+   
+end
 
 figure(double(figID));
 set(double(figID), 'units','normalized','outerposition',[0 0 1 1]);
 clf;
 
 
-% calculate the noise-less end-effector trajectory
-qq = [D_eval.rollouts(1).q(:,1)'
-    zeros(1,D_eval.n_end)
-    D_eval.rollouts(1).q(:,3)'
-    zeros(1,D_eval.n_end)];
-
-[x_end] = forward_kinematics(qq, par);
-
-
 % plot the noise-less end-effector trajectory
 subplot(2,2,1);
 hold on;
-plot(t(1:D.n_end) , x_end(1,1:D.n_end));
-plot(t(1:D.n_end),D_eval.ref.r(1,1:D.n_end));
+plot(t(1:S.n_end), S_eval.rollouts(1).q(:,1));
+plot(t(1:S.n_end), S_eval.ref.r(1,1:S.n_end));
 hold off;
 xlabel('t');
 ylabel('x');
@@ -161,27 +155,17 @@ axis('equal')
 % plot the noise-less end-effector trajectory
 subplot(2,2,2);
 hold on;
-plot(t(1:D.n_end) , x_end(3,1:D.n_end));
-plot(t(1:D.n_end),D_eval.ref.r(2,1:D.n_end));
+plot(t(1:S.n_end), qq);
+plot(t(1:S.n_end), S.ref.r(1,1:S.n_end));
 hold off;
 xlabel('t');
 ylabel('y');
 axis('equal');
 
 subplot(2,2,3);
-plot(t(1:D.n_end),R_eval(1:D.n_end));
+plot(t(1:S.n_end),R(1:S.n_end));
 xlabel('time [s]');
 ylabel('Cost');
-axis('square');
-
-% plot the noise-less end-effector trajectory
-subplot(2,2,4);
-hold on;
-plot(x_end(1,1:D.n_end), x_end(3,1:D.n_end));
-plot(D_eval.ref.r(1,1:D.n_end),D_eval.ref.r(2,1:D.n_end));
-hold off;
-xlabel('x');
-ylabel('y');
 axis('square');
 
 drawnow;

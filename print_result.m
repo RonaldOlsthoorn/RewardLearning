@@ -1,4 +1,4 @@
-function  printResult(D, D_eval, R, R_eval, R_total)
+function  print_result(D, D_eval, R, R_eval, R_total)
 % Present the result of the complete PI2 algorithm.
 % D: struct containing the last set of roll-outs
 % D_eval: struct containing the noise-less evaluation of the 
