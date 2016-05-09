@@ -2,6 +2,8 @@ function [ S, S_eval, D, ro_par, ro_par_eval, rm_par ] = init( p )
 % create the big data matrix for the roll-out data: We simply store all roll-out data in
 % this matrix and evalute it late efficiently in vectorized from for learning updates
 
+rng(10);
+
 % roll out parameters
 ro_par.start = p.start;
 ro_par.goal = p.goal;
