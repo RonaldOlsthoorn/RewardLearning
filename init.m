@@ -29,7 +29,7 @@ rm_par.improve_tol = p.improve_tol;
 rm_par.af = p.af;
 rm_par.rating_error = p.rating_error;
 rm_par.n_ff = 4;  % move this parameter
-rm_par.weights = [1 0 0 0];
+rm_par.weights = [1000 0 0 0];
 
 global n_dmps
 

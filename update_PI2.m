@@ -16,7 +16,7 @@ maxS = max(R_cum,[],2);
 minS = min(R_cum,[],2);
 
 h = 10; % this is the scaling parameters in side of the exp() function (see README.pdf)
-expS = exp(h*(R_cum - minS*ones(1,n_reps))./...
+expS = exp(-h*(R_cum - minS*ones(1,n_reps))./...
     ((maxS-minS+1e-20)*ones(1,n_reps)));
 
 % the probabilty of a trajectory

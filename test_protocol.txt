@@ -17,11 +17,11 @@
 
 start               [0]
 goal                [1]
-duration            2
+duration            8
 Ts                  0.01
-controller          'perfect_controller'
+controller          'lousy_controller'
 ref                 'ref_step'
-std                 50
+std                 600
 reps                10
 n_reuse             5
 n_rfs               40

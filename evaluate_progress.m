@@ -1,5 +1,5 @@
 function [ R_eval, Weights ] = evaluate_progress(S, S_eval, D, R, ...
-                                           ro_par_eval, rm_par, i )
+                                           ro_par_eval, ro_par, rm_par, i )
 
 global dcps
 
@@ -15,7 +15,7 @@ Weights(i,:) = dcps(1).w';
 % visualization: plot at the start and end of the updating
 if mod(i,10)== 1,
     fprintf('%5d.Cost = %f \n',i,sum(R_eval));
-    print_progress(S, S_eval, D, R, R_eval, ro_par_eval, i)
+    print_progress(S, S_eval, D, R, R_eval, ro_par, i)
 end
 
 end

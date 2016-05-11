@@ -34,15 +34,15 @@ while converged(rm_par)~=1,
     % run learning roll-outs with a noise annealing multiplier
     ro_par.noise_mult =  exp(-0.05*(i-1));
     ro_par.noise_mult = max([0.1 ro_par.noise_mult]);
-    
+        
     % sampling
     S = run_rollouts(S, ro_par);
     R = compute_reward(S, ro_par, rm_par);
     
     [ R_eval, W ] = evaluate_progress( S, S_eval, D, R, ...
-                                    ro_par_eval, rm_par, i );
+                                   ro_par_eval, ro_par, rm_par, i );
                                 
-    R_total = [R_total, sum(R)];
+    R_total = [R_total, sum(R_eval)];
     DMP_Weights = [DMP_Weights, W'];
        
     if (i > 1 && ro_par.n_reuse > 0)
