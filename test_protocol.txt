@@ -17,7 +17,7 @@
 
 start               [0]
 goal                [1]
-duration            8
+duration            4
 Ts                  0.01
 controller          'lousy_controller'
 ref                 'ref_step'

@@ -199,4 +199,13 @@ bar(dcps(1).w);
 ylabel('theta');
 axis('tight');
 
+subplot(2,4,8);
+hold on;
+plot(t(1:S.n_end), S_eval.rollouts(1).q(:,1));
+plot(t(1:S.n_end), S_eval.rollouts(1).dmp.xd(:,1));
+plot(t(1:S.n_end), S.ref.r(1,:));
+hold off;
+xlabel('t');
+ylabel('xd');
+
 drawnow;

@@ -29,10 +29,10 @@ DMP_Weights = zeros(ro_par.n_rfs,1); % used to store weight trace
 
 i=1;
 
-while converged(rm_par)~=1,
+while converged(rm_par, i)~=1,
     
     % run learning roll-outs with a noise annealing multiplier
-    ro_par.noise_mult =  exp(-0.05*(i-1));
+    ro_par.noise_mult =  double(100 - i+1)/double(100);
     ro_par.noise_mult = max([0.1 ro_par.noise_mult]);
         
     % sampling
