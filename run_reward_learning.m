@@ -22,14 +22,14 @@ p = read_protocol(protocol_name);
 global n_dmps;
 n_dmps = 1;
 
-[S, S_eval, D, ro_par, ro_par_eval, rm_par] = init(p);
+[S, S_eval, ro_par, ro_par_eval, rm] = init(p);
 
 R_total = zeros(1,2); % used to store the learning trace
 DMP_Weights = zeros(ro_par.n_rfs,1); % used to store weight trace
 
 i=1;
 
-while converged(rm_par, i)~=1,
+while converged(rm, i)~=1,
     
     % run learning roll-outs with a noise annealing multiplier
     ro_par.noise_mult =  double(100 - i+1)/double(100);
@@ -37,10 +37,10 @@ while converged(rm_par, i)~=1,
         
     % sampling
     S = run_rollouts(S, ro_par);
-    R = compute_reward(S, ro_par, rm_par);
+    R = compute_reward(S, ro_par, rm);
     
     [ R_eval, W ] = evaluate_progress( S, S_eval, D, R, ...
-                                   ro_par_eval, ro_par, rm_par, i );
+                                   ro_par_eval, ro_par, rm, i );
                                 
     R_total = [R_total, sum(R_eval)];
     DMP_Weights = [DMP_Weights, W'];
@@ -51,7 +51,7 @@ while converged(rm_par, i)~=1,
     
     % perform the PI2 update
     update_PI2(S, R, ro_par);
-    update_reward(S, rm_par);
+    update_reward(S, rm);
     
     i=i+1;
 end

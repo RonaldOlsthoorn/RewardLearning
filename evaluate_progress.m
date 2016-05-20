@@ -1,5 +1,5 @@
 function [ R_eval, Weights ] = evaluate_progress(S, S_eval, D, R, ...
-                                           ro_par_eval, ro_par, rm_par, i )
+                                           ro_par_eval, ro_par, rm, i )
 
 global dcps
 
@@ -7,7 +7,7 @@ global dcps
 S_eval=run_rollouts(S_eval, ro_par_eval);
 
 % compute all costs in batch from, as this is faster in matlab
-R_eval = compute_reward( S_eval, ro_par_eval, rm_par );
+R_eval = compute_reward( S_eval, ro_par_eval, rm );
 
 % store the noise-less reward and the weights
 Weights(i,:) = dcps(1).w';
