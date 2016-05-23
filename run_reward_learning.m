@@ -22,7 +22,8 @@ p = read_protocol(protocol_name);
 global n_dmps;
 n_dmps = 1;
 
-[S, S_eval, ro_par, ro_par_eval, rm] = init(p);
+[ S, S_eval, ro_par, ro_par_eval, ...
+    sim_par, rm ] = init(p);
 
 R_total = zeros(1,2); % used to store the learning trace
 DMP_Weights = zeros(ro_par.n_rfs,1); % used to store weight trace
@@ -34,24 +35,34 @@ while converged(rm, i)~=1,
     % run learning roll-outs with a noise annealing multiplier
     ro_par.noise_mult =  double(100 - i+1)/double(100);
     ro_par.noise_mult = max([0.1 ro_par.noise_mult]);
-        
-    % sampling
-    S = run_rollouts(S, ro_par);
-    R = compute_reward(S, ro_par, rm);
     
-    [ R_eval, W ] = evaluate_progress( S, S_eval, D, R, ...
-                                   ro_par_eval, ro_par, rm, i );
+    % first batch, collect full nr of roll-outs
+    if(i==1)
+        S = run_rollouts(S, ro_par, sim_par, ro_par.reps);
+    else
+        % after that mix new roll-outs with reused rollouts
+        S = run_rollouts(S, ro_par, sim_par, ro_par.reps - ro_par.n_reuse);
+    end
+    
+    R = compute_reward(S, ro_par, rm);
+        
+    rm = update_database(S, R, rm, ro_par.reps);
+    
+    [ R_eval, W ] = evaluate_progress( S, S_eval, R, ...
+                                   ro_par_eval, ro_par, sim_par, rm, i );
                                 
     R_total = [R_total, sum(R_eval)];
     DMP_Weights = [DMP_Weights, W'];
-       
-    if (i > 1 && ro_par.n_reuse > 0)
-        S = importance_sampling(S, R, ro_par.n_reuse);
-    end
+            
+    % update reward model
+    update_reward(S, rm);
     
     % perform the PI2 update
     update_PI2(S, R, ro_par);
-    update_reward(S, rm);
+    
+    if (i > 1 && ro_par.n_reuse > 0)
+        S = importance_sampling(S, R, ro_par.n_reuse);
+    end
     
     i=i+1;
 end

@@ -1,4 +1,4 @@
-function print_progress(S, S_eval, D, R, R_total, ro_par, figID)
+function print_progress(S, S_eval, R, R_total, ro_par, figID)
 % Plots the intermediate results of the running PI2 algorithm
 % D: struct containing the roll-outs (noise included)
 % D_eval: struct containing the noise-less roll-outs

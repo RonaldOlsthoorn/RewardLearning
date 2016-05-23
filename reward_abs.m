@@ -13,7 +13,7 @@ ref = S.ref.r';
 for k=1:ro_par.reps,
         
     % Cost during trajectory
-    r  = abs(S.rollouts(k).q(1:n,1)-ref(1:n,1));   
-    R(:,k) = -r;
+    r  = -abs(S.rollouts(k).q(1:n,1)-ref(1:n,1));   
+    R(:,k) = r;
 end
 

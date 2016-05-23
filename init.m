@@ -1,4 +1,4 @@
-function [ S, S_eval, ro_par, ro_par_eval, rm ] = init( p )
+function [ S, S_eval, ro_par, ro_par_eval, sim_par, rm ] = init( p )
 % create the big data matrix for the roll-out data: We simply store all roll-out data in
 % this matrix and evalute it late efficiently in vectorized from for learning updates
 
@@ -8,10 +8,7 @@ rng(10);
 ro_par.start        = p.start;
 ro_par.goal         = p.goal;
 ro_par.duration     = p.duration;
-ro_par.controller   = str2func(p.controller);
-ro_par.wrapflag     = 0;
 ro_par.Ts           = p.Ts;
-ro_par.par          = read_par;
 ro_par.std          = p.std;
 ro_par.n_reuse      = p.n_reuse;
 ro_par.reps         = p.reps;
@@ -23,6 +20,11 @@ ro_par_eval.reps    = 1;     % only one repetition for evaluation
 ro_par_eval.std     = 0;     
 ro_par_eval.n_reuse = 0;
 
+sim_par.wrapflag     = 0;
+sim_par.arm         = read_par;
+sim_par.controller  = str2func(p.controller);
+sim_par.Ts          = p.Ts;
+
 % reward model parameters
 rm.loss_tol     = p.loss_tol;
 rm.improve_tol  = p.improve_tol;
@@ -30,15 +32,6 @@ rm.af           = p.af;
 rm.rating_error = p.rating_error;
 rm.n_ff         = 4;  % move this parameter
 rm.weights      = [1000 0 0 0];
-
-rm.Database(1).eps_theta    = zeros(ro_par.n_rfs,1);
-rm.Database(1).outcome      = zeros(rm.n_ff,1);
-
-
-% Container for the set of expert ratings
-rm.D(1).outcome     = zeros(rm.n_ff,1);
-rm.D(1).reward      = 0;
-
 
 global n_dmps
 

@@ -1,18 +1,13 @@
-function S=run_rollouts(S, ro_par)
-% a dedicated function to run muultiple roll-outs using the specifictions in D. 
+function S = run_rollouts(S, ro_par, sim_par, n_ro)
+% A dedicated function to run muultiple roll-outs using the specifictions in D. 
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
 
 global n_dmps;
 
-start = ro_par.n_reuse + 1;  % take into account the reused roll-outs.
-if (ro_par.noise_mult == 1)    % indicates very first batch of rollouts.
-    start = 1;       
-end
+S = gen_epsilon(S, ro_par, n_ro);
 
-S = gen_epsilon(S, start, ro_par);
-
-for k=start:ro_par.reps, % Run DMPs
+for k=1:n_ro, % Run DMPs
     
     % reset the DMP
     for j=1:n_dmps,
@@ -33,19 +28,18 @@ for k=start:ro_par.reps, % Run DMPs
     
 end
 
-for k=start:ro_par.reps, % Run the robotic arm    
+for k=1:n_ro, % Run the robotic arm   
+    
     q = [ro_par.start(1);0;0];  
     
     for n=1:S.n_end,
         
-        % integrate simulated 2 DoF robot arm with inverse dynamics control
-        % based on DMP output -- essentially, this just perfectly realizes
-        % the DMP output, but one could add noise to this equation to make
-        % it more interesting.
-        
+        % integrate simulated 1 DoF robot arm with a lousy PID controller
+        % based on DMP output -- essentially, this try realize
+        % the DMP output, miserably failing at it.
         r = S.rollouts(k).dmp(1).xd(n,:)';
         
-        [q_next] = f_closed_loop(q, r, ro_par);        
+        [q_next] = f_closed_loop(q, r, sim_par);        
         q = q_next';
         
         S.rollouts(k).q(n,:) = q';    % store the state

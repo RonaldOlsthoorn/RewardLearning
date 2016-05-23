@@ -1,14 +1,14 @@
 function update_PI2(S, R, ro_par)
 % D is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
-n_rfs = ro_par.n_rfs;;
+n_rfs = ro_par.n_rfs;
 global dcps;
 
-n_reps = ro_par.reps;        % number of roll-outs
-n_end = S.n_end;        % final time step 
+n_reps = ro_par.reps;       % number of roll-outs
+n_end = S.n_end;            % final time step 
 
 % compute the accumulate cost
-R_cum = rot90(rot90(cumsum(rot90(rot90(R)))));
+R_cum = rot90(rot90(cumsum(rot90(rot90(-1.*R)))));
 
 % compute the exponentiated cost with the special trick to automatically
 % adjust the lambda scaling parameter

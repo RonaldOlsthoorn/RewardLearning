@@ -1,5 +1,13 @@
 function [ w ] = update_reward( S , rm)
 
-w=0;
+
+find_nominee = true;
+
+while find_nominee
+
+   max_outcome = find_max_outcome(S, rm); 
+    
+end
+
 end
 
