@@ -1,6 +1,13 @@
-function [ S ] = importance_sampling( S, R, n_reuse )
+function [ S ] = importance_sampling( S, ro_par, n_reuse )
 % reuse of roll-out: the n_reuse best trials and re-evalute them the
 % next update in the spirit of importance sampling
+
+R = zeros(S.n_end, ro_par.reps);
+
+for k=1:ro_par.reps
+    R(:,k) = S.rollouts(k).R;
+end    
+
 
 sum_r = sum(R,1);
 [~,inds]=sort(sum_r);

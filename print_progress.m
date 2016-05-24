@@ -1,9 +1,16 @@
-function print_progress(S, S_eval, R, R_total, ro_par, figID)
+function print_progress(S, S_eval, ro_par, figID)
 % Plots the intermediate results of the running PI2 algorithm
 % D: struct containing the roll-outs (noise included)
 % D_eval: struct containing the noise-less roll-outs
 % figID: ID (number) used as figure ID
 
+R_eval = S_eval.rollouts(1).R;
+
+R = zeros(S.n_end, ro_par.reps);
+
+for k=1:ro_par.reps
+    R(:,k) = S.rollouts(k).R;
+end    
 
 for i=1:ro_par.reps
     legendInfo{i} = sprintf('rep_%d',i);
@@ -169,7 +176,7 @@ xlabel('time [s]');
 ylabel('epsilon');
 
 subplot(2,4,4);
-plot(t(1:S.n_end),R(1:S.n_end));
+plot(t(1:S.n_end),R_eval(1:S.n_end));
 xlabel('time [s]');
 ylabel('Cost');
 

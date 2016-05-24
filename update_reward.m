@@ -1,6 +1,5 @@
 function [ w ] = update_reward( S , rm)
 
-
 find_nominee = true;
 
 while find_nominee

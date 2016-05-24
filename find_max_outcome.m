@@ -1,3 +1,3 @@
-function max_outcome = find_max_outcome(S, rm)
+function max_outcome = find_max_outcome(S, rm); 
 
-u = 
+end

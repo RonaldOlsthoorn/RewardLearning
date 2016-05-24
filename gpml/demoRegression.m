@@ -2,7 +2,7 @@ disp('See http://www.gaussianprocess.org/gpml/code/matlab/doc/ for details.')
 disp('Hit any key to continue...'); pause
 
 disp(' '); disp('clear all, close all')
-clear all, close all
+clear, close all
 write_fig = 0;
 disp(' ')
 
@@ -44,7 +44,7 @@ disp(' ')
 disp('z = linspace(-1.9, 1.9, 101)'';')
 z = linspace(-1.9, 1.9, 101)';
 disp('[m s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);')
-[m s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);
+[m, s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);
 
 figure(2)
 set(gca, 'FontSize', 24)
@@ -75,7 +75,7 @@ exp(hyp2.lik)
 disp('nlml2 = gp(hyp2, @infExact, [], covfunc, likfunc, x, y)')
 nlml2 = gp(hyp2, @infExact, [], covfunc, likfunc, x, y)
 disp('[m s2] = gp(hyp2, @infExact, [], covfunc, likfunc, x, y, z);')
-[m s2] = gp(hyp2, @infExact, [], covfunc, likfunc, x, y, z);
+[m, s2] = gp(hyp2, @infExact, [], covfunc, likfunc, x, y, z);
 
 disp(' ')
 figure(3)
@@ -98,7 +98,7 @@ hyp.cov = [0; 0]; hyp.mean = [0; 0]; hyp.lik = log(0.1);
 disp('hyp = minimize(hyp, @gp, -100, @infExact, meanfunc, covfunc, likfunc, x, y);')
 hyp = minimize(hyp, @gp, -100, @infExact, meanfunc, covfunc, likfunc, x, y);
 disp('[m s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);')
-[m s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);
+[m, s2] = gp(hyp, @infExact, meanfunc, covfunc, likfunc, x, y, z);
 
 figure(4)
 set(gca, 'FontSize', 24)
@@ -122,7 +122,7 @@ nu = fix(n/2); u = linspace(-1.3,1.3,nu)';
 disp('covfuncF = {@covFITC, {covfunc}, u};')
 covfuncF = {@covFITC, {covfunc}, u};
 disp('[mF s2F] = gp(hyp, @infFITC, meanfunc, covfuncF, likfunc, x, y, z);')
-[mF s2F] = gp(hyp, @infFITC, meanfunc, covfuncF, likfunc, x, y, z);
+[mF, s2F] = gp(hyp, @infFITC, meanfunc, covfuncF, likfunc, x, y, z);
 
 figure(5)
 set(gca, 'FontSize', 24)

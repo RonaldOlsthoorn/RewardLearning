@@ -44,24 +44,24 @@ while converged(rm, i)~=1,
         S = run_rollouts(S, ro_par, sim_par, ro_par.reps - ro_par.n_reuse);
     end
     
-    R = compute_reward(S, ro_par, rm);
+    S = compute_reward(S, ro_par, rm);
         
-    rm = update_database(S, R, rm, ro_par.reps);
+    rm = update_database(S, ro_par, rm, ro_par.reps);
     
-    [ R_eval, W ] = evaluate_progress( S, S_eval, R, ...
-                                   ro_par_eval, ro_par, sim_par, rm, i );
+    [ S_eval, W ] = evaluate_progress( S, S_eval, ro_par_eval, ...
+                                            ro_par, sim_par, rm, i );
                                 
-    R_total = [R_total, sum(R_eval)];
+    R_total = [R_total, sum(S_eval.rollouts(1).R)];
     DMP_Weights = [DMP_Weights, W'];
             
     % update reward model
-    update_reward(S, rm);
+    % update_reward(S, rm);
     
     % perform the PI2 update
-    update_PI2(S, R, ro_par);
+    update_PI2(S, ro_par);
     
     if (i > 1 && ro_par.n_reuse > 0)
-        S = importance_sampling(S, R, ro_par.n_reuse);
+        S = importance_sampling(S, ro_par, ro_par.n_reuse);
     end
     
     i=i+1;

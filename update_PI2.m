@@ -1,11 +1,17 @@
-function update_PI2(S, R, ro_par)
+function update_PI2(S, ro_par)
 % D is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
 n_rfs = ro_par.n_rfs;
 global dcps;
 
 n_reps = ro_par.reps;       % number of roll-outs
-n_end = S.n_end;            % final time step 
+n_end = S.n_end;            % final time step
+
+R = zeros(n_end, n_reps);
+
+for k=1:n_reps
+    R(:,k) = S.rollouts(k).R;
+end
 
 % compute the accumulate cost
 R_cum = rot90(rot90(cumsum(rot90(rot90(-1.*R)))));
@@ -32,7 +38,7 @@ for j=1:n_dmps,
         % compute g'*eps in vector form
         gTeps = sum(S.rollouts(k).dmp(j).bases.*(S.rollouts(k).dmp(j).theta_eps-ones(n_end,1)*dcps(j).w'),2);
         %gTeps = sum(D.rollouts(k).dmp(j).bases.*(D.rollouts(k).dmp(j).eps),2);
-
+        
         % compute g'g
         gTg  = sum(S.rollouts(k).dmp(j).bases.*S.rollouts(k).dmp(j).bases,2);
         
