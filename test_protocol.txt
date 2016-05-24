@@ -28,4 +28,4 @@ n_rfs               40
 loss_tol            0.1
 improve_tol         0.1
 af                  'acquisition_function'
-rating_error        1
+rating_noise        1

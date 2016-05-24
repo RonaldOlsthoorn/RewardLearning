@@ -40,7 +40,6 @@ rm.hyp.cov = [0; 0];
 rm.likfunc = @likGauss; 
 rm.hyp.lik = log(0.1);
 
-
 global n_dmps
 
 % S contains the roll out samples

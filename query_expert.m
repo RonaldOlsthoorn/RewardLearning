@@ -1,4 +1,4 @@
-function [ R_expert ] = expert_rating( outcome, noise )
+function [ R_expert ] = query_expert( outcome, noise )
 % Outcome: column vector containing the outcomes (aka feature functions
 % for reward function) of a trajectory
 % noise: standard deviation of the expert rating uncertainty
