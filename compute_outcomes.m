@@ -1,11 +1,13 @@
-function [ outcomes ] = compute_outcomes( S, ro_par )
+function [ outcomes ] = compute_outcomes( S, rm, ro_par )
 % Computes the outcomes (feature functions of the reward model) of the 
 % reward model.
 
-outcomes(:,:,1) = reward_err2(S, ro_par );
-outcomes(:,:,2) = reward_abs(S, ro_par );
-outcomes(:,:,3) = reward_overshoot(S, ro_par );
-outcomes(:,:,4) = reward_settling_time(S, ro_par );
+outcomes = zeros(S.n_end, ro_par.reps, rm.n_ff);
+
+for j=1:length(rm.outcome_handles)
+    outcomes(:,:,j) = rm.outcome_handles{j}(S, rm, ro_par);  
+end
 
 end
+
 

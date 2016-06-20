@@ -12,7 +12,7 @@ ro_par.Ts           = p.Ts;
 ro_par.std          = p.std;
 ro_par.n_reuse      = p.n_reuse;
 ro_par.reps         = p.reps;
-ro_par.n_rfs        = p.n_rfs;
+ro_par.n_dmp_bf     = p.n_dmp_bf;
 ro_par.noise_mult   = 1;
 
 ro_par_eval         = ro_par;
@@ -29,15 +29,16 @@ sim_par.Ts          = p.Ts;
 % reward model parameters
 rm.loss_tol     = p.loss_tol;
 rm.improve_tol  = p.improve_tol;
-rm.af           = p.af;
-rm.rating_error = p.rating_error;
-rm.n_ff         = 4;  % move this parameter
-rm.weights      = [1000 0 0 0];
+rm.af           = str2func(p.af);
+rm.rating_noise = p.rating_noise;
+rm.n_reward_bf  = p.n_reward_bf;
+rm.n_ff         = 2*rm.n_reward_bf+2;
 
-rm.meanfunc = @meanZero;
-rm.covfunc = @covSEiso; 
-rm.hyp.cov = [0; 0]; 
-rm.likfunc = @likGauss; 
+rm.meanfunc = {@meanSum, {@meanLinear, @meanConst}}; 
+rm.covfunc = @covSEard; 
+rm.likfunc = @likGauss;
+rm.hyp.cov = [zeros(rm.n_ff,1); 0]; 
+rm.hyp.mean = [ones(rm.n_ff,1); 1];
 rm.hyp.lik = log(0.1);
 
 global n_dmps
@@ -46,16 +47,19 @@ global n_dmps
 S.t             = 0:p.Ts:(p.duration-p.Ts); % time vector
 S.n_end         = length(S.t);              % length of total simulation
 S.rollouts.dmp(1:n_dmps) = struct(...
-    'xd',zeros(S.n_end,3),...               % DMP desired state
-    'bases',zeros(S.n_end,p.n_rfs),...      % DMP bases function vector
-    'eps',zeros(S.n_end,p.n_rfs),...        % DMP noisy parameters
-    'theta_eps',zeros(S.n_end,p.n_rfs),...  % DMP noisy parameters+kernel weights
-    'psi',zeros(S.n_end,p.n_rfs));          % DMP Gaussian kernels
+    'xd',zeros(S.n_end,3),...                  % DMP desired state
+    'bases',zeros(S.n_end,p.n_dmp_bf),...      % DMP bases function vector
+    'eps',zeros(S.n_end,p.n_dmp_bf),...        % DMP noisy parameters
+    'theta_eps',zeros(S.n_end,p.n_dmp_bf),...  % DMP noisy parameters+kernel weights
+    'psi',zeros(S.n_end,p.n_dmp_bf));          % DMP Gaussian kernels
 
 S.rollouts.q        = zeros(S.n_end,3);          % point mass pos
 S.rollouts.u        = zeros(S.n_end,2*n_dmps);   % point mass command
 S.rollouts.outcomes = zeros(S.n_end, rm.n_ff);
-S.rollouts.R        = zeros(S.n_end, 1);
+S.rollouts.r        = zeros(S.n_end, 1);
+S.rollouts.R        = 0;
+
+
 
 % initialize the reference, if used.
 if strcmp('none', p.ref)
@@ -71,7 +75,7 @@ S.rollouts(1:ro_par.reps) = S.rollouts;  % one data structure for each repetitio
 
 for i=1:n_dmps,                     % initialize DMPs
     dcp('clear',i);
-    dcp('init',i,ro_par.n_rfs,sprintf('pi2_dmp_%d',i),0);
+    dcp('init',i,ro_par.n_dmp_bf,sprintf('pi2_dmp_%d',i),0);
     
     % use the in-built function to initialize the dcp with reference trajectory
     dcp('Batch_Fit',i,ro_par.duration,ro_par.Ts,S.ref.r(i,:)',S.ref.r_d(i,:)',S.ref.r_dd(i,:)');
@@ -83,5 +87,8 @@ S.psi       = dcp('run_psi',1, ro_par.duration, ro_par.Ts); % Obtain basis funct
 S_eval.psi  = S.psi;
 dcp('reset_state',1,ro_par.start(1));
 dcp('set_goal',1,ro_par.goal(1),1);
+
+rm.activation = init_activation(S, rm);
+rm.outcome_handles = init_outcome_handles(rm);
 
 end

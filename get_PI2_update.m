@@ -1,5 +1,4 @@
-function update_PI2(S, ro_par)
-
+function w = get_PI2_update(S, ro_par)
 % D is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
 n_dmp_bf = ro_par.n_dmp_bf;
@@ -8,11 +7,14 @@ global dcps;
 n_reps = ro_par.reps;       % number of roll-outs
 n_end = S.n_end;            % final time step
 
-R_cum = zeros(n_end, n_reps);
+R = zeros(n_end, n_reps);
 
 for k=1:n_reps
-    R_cum(:,k) = -S.rollouts(k).r;
+    R(:,k) = S.rollouts(k).R;
 end
+
+% compute the accumulate cost
+R_cum = rot90(rot90(cumsum(rot90(rot90(-1.*R)))));
 
 % compute the exponentiated cost with the special trick to automatically
 % adjust the lambda scaling parameter
@@ -66,9 +68,10 @@ W = W./(ones(n_end,1)*sum(W,1));
 dtheta = reshape(sum(dtheta.*repmat(reshape(W,[1,n_end,n_dmp_bf]),[n_dmps 1 1]),2),n_dmps,n_dmp_bf);
 
 % and update the parameters by directly accessing the dcps data structure
+w = zeros(ro_par.n_dmp_bf, n_dmps);
 
 for i=1:n_dmps,
     
-    dcps(i).w = dcps(i).w + dtheta(i,:)';
+    w(:,i) = dcps(i).w + dtheta(i,:)';
     
 end

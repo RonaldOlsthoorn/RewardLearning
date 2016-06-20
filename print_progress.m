@@ -138,13 +138,13 @@ t = S_eval.t;
 
 yy = zeros(S.n_end , ro_par.reps);
 xd = zeros(S.n_end , ro_par.reps);
-ee = zeros(S.n_end , ro_par.n_rfs*ro_par.reps);
+ee = zeros(S.n_end , ro_par.n_dmp_bf*ro_par.reps);
 
 for k=1:ro_par.reps
     
     yy(:,k) = S.rollouts(k).q(:,1);
     xd(:,k) = S.rollouts(k).dmp.xd(:,1);
-    ee(:,(k-1)*ro_par.n_rfs+1:k*ro_par.n_rfs) = S.rollouts(k).dmp.eps;
+    ee(:,(k-1)*ro_par.n_dmp_bf+1:k*ro_par.n_dmp_bf) = S.rollouts(k).dmp.eps;
     
 end
 
@@ -175,27 +175,27 @@ plot(t(1:S.n_end),ee);
 xlabel('time [s]');
 ylabel('epsilon');
 
-subplot(2,4,4);
-plot(t(1:S.n_end),R_eval(1:S.n_end));
-xlabel('time [s]');
-ylabel('Cost');
-
-R_cum = rot90(rot90(cumsum(rot90(rot90(R)))));
-
-subplot(2,4,5);
-plot(t,R_cum);
-ylabel(sprintf('R=sum(r)'));
-
-% the eponentiated and rescaled cumulative reward (the same for all DMPs)
-maxS = max(R_cum,[],2);
-minS = min(R_cum,[],2);
-
-h = 10;
-
-expS = exp(-h*(R_cum - minS*ones(1,ro_par.reps))./((maxS-minS)*ones(1,ro_par.reps)));
-subplot(2,4,6);
-plot(t,expS);
-ylabel(sprintf('scaled exp(R)'));
+% subplot(2,4,4);
+% plot(t(1:S.n_end),R_eval(1:S.n_end));
+% xlabel('time [s]');
+% ylabel('Cost');
+% 
+% R_cum = rot90(rot90(cumsum(rot90(rot90(R)))));
+% 
+% subplot(2,4,5);
+% plot(t,R_cum);
+% ylabel(sprintf('R=sum(r)'));
+% 
+% % the eponentiated and rescaled cumulative reward (the same for all DMPs)
+% maxS = max(R_cum,[],2);
+% minS = min(R_cum,[],2);
+% 
+% h = 10;
+% 
+% expS = exp(-h*(R_cum - minS*ones(1,ro_par.reps))./((maxS-minS)*ones(1,ro_par.reps)));
+% subplot(2,4,6);
+% plot(t,expS);
+% ylabel(sprintf('scaled exp(R)'));
 
 global dcps;
 

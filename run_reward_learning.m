@@ -26,7 +26,11 @@ n_dmps = 1;
     sim_par, rm ] = init(p);
 
 R_total = zeros(1,2); % used to store the learning trace
-DMP_Weights = zeros(ro_par.n_rfs,1); % used to store weight trace
+DMP_Weights = zeros(ro_par.n_dmp_bf,1); % used to store weight trace
+
+% before we run the main loop, we need 1 demo to initialize the reward
+% model
+rm = run_first_demo(S, rm, ro_par, sim_par);
 
 i=1;
 
@@ -44,18 +48,17 @@ while converged(rm, i)~=1,
         S = run_rollouts(S, ro_par, sim_par, ro_par.reps - ro_par.n_reuse);
     end
     
-    S = compute_reward(S, ro_par, rm);
-        
+    S = compute_reward(S, ro_par, rm);        
     rm = update_database(S, ro_par, rm, ro_par.reps);
     
-    [ S_eval, W ] = evaluate_progress( S, S_eval, ro_par_eval, ...
-                                            ro_par, sim_par, rm, i );
+%    [ S_eval, W ] = evaluate_progress( S, S_eval, ro_par_eval, ...
+%                                            ro_par, sim_par, rm, i );
                                 
-    R_total = [R_total, sum(S_eval.rollouts(1).R)];
-    DMP_Weights = [DMP_Weights, W'];
+%     R_total = [R_total, sum(S_eval.rollouts(1).R)];
+%     DMP_Weights = [DMP_Weights, W'];
             
     % update reward model
-    % update_reward(S, rm);
+    update_reward(S, rm, ro_par);
     
     % perform the PI2 update
     update_PI2(S, ro_par);

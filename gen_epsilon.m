@@ -9,7 +9,7 @@ for k=1:n_ro,
     
     for j=1:n_dmps,
         std_eps = ro_par.std * ro_par.noise_mult;
-        epsilon = std_eps*randn(ro_par.n_rfs,1)*ones(1,S.n_end);
+        epsilon = std_eps*randn(ro_par.n_dmp_bf,1)*ones(1,S.n_end);
         
         % store noise in D struct.
         S.rollouts(k).dmp(j).theta_eps = (dcps(j).w*ones(1,S.n_end)+epsilon)';

@@ -73,7 +73,7 @@ disp(' ')
 disp('exp(hyp2.lik)')
 exp(hyp2.lik)
 disp('nlml2 = gp(hyp2, @infExact, [], covfunc, likfunc, x, y)')
-nlml2 = gp(hyp2, @infExact, [], covfunc, likfunc, x, y)
+% nlml2 = gp(hyp2, @infExact, [], covfunc, likfunc, x, y)
 disp('[m s2] = gp(hyp2, @infExact, [], covfunc, likfunc, x, y, z);')
 [m, s2] = gp(hyp2, @infExact, [], covfunc, likfunc, x, y, z);
 

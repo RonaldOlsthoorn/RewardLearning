@@ -24,7 +24,8 @@ ref                 'ref_step'
 std                 600
 reps                10
 n_reuse             5
-n_rfs               40
+n_dmp_bf            40
+n_reward_bf         5
 loss_tol            0.1
 improve_tol         0.1
 af                  'acquisition_function'

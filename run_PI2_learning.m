@@ -39,13 +39,13 @@ function runProtocol(p)
 % runs a particular protocol item, i.e., one line from the protocol specs
 
 global n_dmps;
-global n_rfs;
+global n_dmp_bf;
 global dcps;
 global Ts;
 global wrapflag;
 global control_method;
 
-n_rfs = p.n_rfs;
+n_dmp_bf = p.n_dmp_bf;
 control_method = str2func(p.controller);
 wrapflag =0;
 
@@ -59,10 +59,10 @@ D.t             = 0:Ts:(p.duration-Ts);   % time vector
 D.n_end         = length(D.t);                % length of total simulation
 D.rollouts.dmp(1:n_dmps) = struct(...
     'xd',zeros(D.n_end,3),...             % DMP desired state
-    'bases',zeros(D.n_end,n_rfs),...      % DMP bases function vector
-    'eps',zeros(D.n_end,n_rfs),...        % DMP noisy parameters
-    'theta_eps',zeros(D.n_end,n_rfs),...  % DMP noisy parameters+kernel weights
-    'psi',zeros(D.n_end,n_rfs));          % DMP Gaussian kernels
+    'bases',zeros(D.n_end,n_dmp_bf),...      % DMP bases function vector
+    'eps',zeros(D.n_end,n_dmp_bf),...        % DMP noisy parameters
+    'theta_eps',zeros(D.n_end,n_dmp_bf),...  % DMP noisy parameters+kernel weights
+    'psi',zeros(D.n_end,n_dmp_bf));          % DMP Gaussian kernels
 
 D.rollouts.q        = zeros(D.n_end,2*n_dmps);          % point mass pos
 D.rollouts.u        = zeros(D.n_end,2*n_dmps);          % point mass command
@@ -88,7 +88,7 @@ D.rollouts(1:D.reps) = D.rollouts;  % one data structure for each repetition
 
 for i=1:n_dmps,                     % initialize DMPs
     dcp('clear',i);
-    dcp('init',i,n_rfs,sprintf('pi2_dmp_%d',i),0);
+    dcp('init',i,n_dmp_bf,sprintf('pi2_dmp_%d',i),0);
     
     % use the in-built function to initialize the dcp with reference tarjectory
     dcp('Batch_Fit',i,D.duration,Ts,D.ref_ss(i,:)',D.ref_ss_d(i,:)',D.ref_ss_dd(i,:)');  
@@ -102,7 +102,7 @@ dcp('reset_state',1,D.start(1));
 dcp('set_goal',1,D.goal(1),1);
 
 R_total = zeros(p.updates,2); % used to store the learning trace
-Weights = zeros(p.updates, n_rfs); % used to store weight trace
+Weights = zeros(p.updates, n_dmp_bf); % used to store weight trace
 
 for i=1:D.updates,
          
@@ -160,7 +160,7 @@ printResult(D, D_eval, R, R_eval, R_total);
 function updatePI2(D,R)
 % D is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
-global n_rfs;
+global n_dmp_bf;
 global dcps;
 
 n_reps = D.reps;        % number of roll-outs
@@ -182,7 +182,7 @@ P = expS./(sum(expS,2)*ones(1,n_reps));
 
 % compute the projected noise term. It is computationally more efficient to break this
 % operation into inner product terms.
-PMeps = zeros(n_dmps,n_reps,n_end,n_rfs);
+PMeps = zeros(n_dmps,n_reps,n_end,n_dmp_bf);
 
 for j=1:n_dmps,
     for k=1:n_reps,
@@ -195,12 +195,12 @@ for j=1:n_dmps,
         gTg  = sum(D.rollouts(k).dmp(j).bases.*D.rollouts(k).dmp(j).bases,2);
         
         % compute P*M*eps = P*g*g'*eps/(g'g) from previous results
-        PMeps(j,k,:,:) = D.rollouts(k).dmp(j).bases.*((P(:,k).*gTeps./(gTg + 1.e-10))*ones(1,n_rfs));
+        PMeps(j,k,:,:) = D.rollouts(k).dmp(j).bases.*((P(:,k).*gTeps./(gTg + 1.e-10))*ones(1,n_dmp_bf));
     end
 end
 
 % compute the parameter update per time step
-dtheta = reshape(sum(PMeps,2),n_dmps,n_end,n_rfs);
+dtheta = reshape(sum(PMeps,2),n_dmps,n_end,n_dmp_bf);
 
 % average updates over time
 % the time weighting matrix (note that this done based on the true duration of the
@@ -211,13 +211,13 @@ N = [(D.n_end:-1:1)'
     ];
 
 % the final weighting vector takes the kernel activation into account
-W = (N*ones(1,n_rfs)).*D.psi;
+W = (N*ones(1,n_dmp_bf)).*D.psi;
 
 % ... and normalize through time
 W = W./(ones(n_end,1)*sum(W,1));
 
 % compute the final parameter update for each DMP
-dtheta = reshape(sum(dtheta.*repmat(reshape(W,[1,n_end,n_rfs]),[n_dmps 1 1]),2),n_dmps,n_rfs);
+dtheta = reshape(sum(dtheta.*repmat(reshape(W,[1,n_end,n_dmp_bf]),[n_dmps 1 1]),2),n_dmps,n_dmp_bf);
 
 % and update the parameters by directly accessing the dcps data structure
 for i=1:n_dmps,
