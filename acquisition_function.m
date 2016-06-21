@@ -14,7 +14,7 @@ end
     x, y, roll_out.sum_out(1,:));
 
 sigmaPoints = m + [1 -1].*sqrt(s2);
-epd = zeros(2,1);
+epd = zeros(2,1); 
 
 for s = 1:length(sigmaPoints)
     
@@ -31,9 +31,21 @@ for s = 1:length(sigmaPoints)
         
     end
     
-    % Softmax
-    gamma_tilda = exp(max(gamma_tilda)-gamma_tilda)/sum(exp(gamma_tilda));
-    gamma_star  = exp(max(gamma_star)-gamma_star)/sum(exp(gamma_star));
+    minGamma = min(gamma_tilda);
+    maxGamma = max(gamma_tilda);
+    
+    gamma_tilda = exp(-(gamma_tilda - minGamma*ones(ro_par.reps, 1))./...
+    ((maxGamma-minGamma+1e-20)*ones(ro_par.reps, 1)));
+
+    gamma_tilda = gamma_tilda./sum(gamma_tilda);
+    
+    minGamma = min(gamma_star);
+    maxGamma = max(gamma_star);
+
+    gamma_star = exp(-(gamma_star - minGamma*ones(ro_par.reps, 1))./...
+    ((maxGamma-minGamma+1e-20)*ones(ro_par.reps, 1)));
+
+    gamma_star = gamma_tilda./sum(gamma_star);
     
     epd(s,1) = sum(gamma_star.*log(gamma_star./gamma_tilda));
     
