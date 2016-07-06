@@ -31,15 +31,13 @@ rm.loss_tol     = p.loss_tol;
 rm.improve_tol  = p.improve_tol;
 rm.af           = str2func(p.af);
 rm.rating_noise = p.rating_noise;
-rm.n_reward_bf  = p.n_reward_bf;
-rm.n_ff         = 2*rm.n_reward_bf+2;
+rm.n_segments   = p.n_segments;
+rm.n_ff         = 2;
 
-rm.meanfunc = {@meanSum, {@meanLinear, @meanConst}}; 
+% rm.meanfunc = {@meanSum, {@meanLinear, @meanConst}}; 
+rm.meanfunc = [];
 rm.covfunc = @covSEard; 
 rm.likfunc = @likGauss;
-rm.hyp.cov = [zeros(rm.n_ff,1); 0]; 
-rm.hyp.mean = [ones(rm.n_ff,1); 1];
-rm.hyp.lik = log(0.1);
 
 global n_dmps
 
@@ -58,8 +56,6 @@ S.rollouts.u        = zeros(S.n_end,2*n_dmps);   % point mass command
 S.rollouts.outcomes = zeros(S.n_end, rm.n_ff);
 S.rollouts.r        = zeros(S.n_end, 1);
 S.rollouts.R        = 0;
-
-
 
 % initialize the reference, if used.
 if strcmp('none', p.ref)
@@ -88,7 +84,7 @@ S_eval.psi  = S.psi;
 dcp('reset_state',1,ro_par.start(1));
 dcp('set_goal',1,ro_par.goal(1),1);
 
-rm.activation = init_activation(S, rm);
+rm = init_activation(S, rm);
 rm.outcome_handles = init_outcome_handles(rm);
 
 end

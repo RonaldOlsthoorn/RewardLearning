@@ -4,24 +4,35 @@ function rm = run_first_demo(S, rm, ro_par, sim_par)
 
 S = run_rollouts(S, ro_par, sim_par, ro_par.reps);
 
-outcomes =  compute_outcomes( S, rm, ro_par );
+outcomes =  compute_outcomes(S, ro_par, rm );
 sum_out  = rot90(rot90(cumsum(rot90(rot90(outcomes)))));
 
-x = zeros(ro_par.reps, rm.n_ff);
-y = zeros(ro_par.reps, 1);
+zero_sum_out = zeros(ro_par.reps,rm.n_ff);
+seg.sum_out = zero_sum_out;
+seg.R_expert = zeros(ro_par.reps,1);
+
+rm.seg(1:rm.n_segments) = seg;
 
 for k = 1:ro_par.reps
     
-    rm.D(k).outcomes = squeeze(outcomes(:,k,:));
-    rm.D(k).sum_out  = squeeze(sum_out(:,k,:));
-    
-    R_expert = query_expert( rm.D(k).sum_out(1,:) , rm.rating_noise );    
-    
-    rm.D(k).R_expert = R_expert;
-    
-    x(k,:)  = rm.D(k).sum_out(1,:);
-    y(k)    = rm.D(k).R_expert;
+    for s = 1:rm.n_segments
+        
+        rm.seg(s).sum_out(k,:)  = squeeze(sum_out(rm.seg_start(s),k,:));
+        rm.seg(s).R_expert(k) = query_expert( rm.seg(s).sum_out(k,:) , rm.rating_noise );
+    end
     
 end
 
-rm.hyp = minimize(rm.hyp, @gp, -100, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc, x, y);
+for s = 1:rm.n_segments
+    
+    rm.seg(s).hyp.cov = [10*ones(rm.n_ff,1); 10];
+    %rm.seg(s).hyp.mean = [ones(rm.n_ff,1); 1];
+    rm.seg(s).hyp.mean = [];
+    rm.seg(s).hyp.lik = log(0.1);
+    
+    rm.seg(s).hyp = minimize(rm.seg(s).hyp, @gp, -100, @infExact, ...
+        rm.meanfunc, rm.covfunc, rm.likfunc, ...
+        rm.seg(s).sum_out, rm.seg(s).R_expert);
+    
+end
+
