@@ -1,5 +1,5 @@
-function w = get_PI2_update(S, ro_par)
-% D is the data structure of all roll outs, and R the cost matrix for these roll outs
+function theta = get_PI2_update(S, ro_par)
+% S is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
 n_dmp_bf = ro_par.n_dmp_bf;
 global dcps;
@@ -7,14 +7,11 @@ global dcps;
 n_reps = ro_par.reps;       % number of roll-outs
 n_end = S.n_end;            % final time step
 
-R = zeros(n_end, n_reps);
+R_cum = zeros(n_end, n_reps);
 
 for k=1:n_reps
-    R(:,k) = S.rollouts(k).R;
+    R_cum(:,k) = -S.rollouts(k).r;
 end
-
-% compute the accumulate cost
-R_cum = rot90(rot90(cumsum(rot90(rot90(-1.*R)))));
 
 % compute the exponentiated cost with the special trick to automatically
 % adjust the lambda scaling parameter
@@ -47,9 +44,6 @@ for j=1:n_dmps,
     end
 end
 
-% compute the parameter update per time step
-dtheta = reshape(sum(PMeps,2),n_dmps,n_end,n_dmp_bf);
-
 % average updates over time
 % the time weighting matrix (note that this done based on the true duration of the
 % movement, while the movement "recording" is done beyond D.duration). Empirically, this
@@ -59,19 +53,22 @@ N = [(S.n_end:-1:1)'
     ];
 
 % the final weighting vector takes the kernel activation into account
-W = (N*ones(1,n_dmp_bf)).*S.psi;
+W = (N*ones(1, n_dmp_bf)).*S.psi;
 
 % ... and normalize through time
-W = W./(ones(n_end,1)*sum(W,1));
+W = W./(ones(n_end, 1)*sum(W, 1));
 
 % compute the final parameter update for each DMP
-dtheta = reshape(sum(dtheta.*repmat(reshape(W,[1,n_end,n_dmp_bf]),[n_dmps 1 1]),2),n_dmps,n_dmp_bf);
+dtheta = reshape(sum(PMeps.*repmat(reshape(W, [1, 1, n_end, n_dmp_bf]),[n_dmps n_reps 1 1]),3), [n_dmps n_reps n_dmp_bf]);
 
-% and update the parameters by directly accessing the dcps data structure
-w = zeros(ro_par.n_dmp_bf, n_dmps);
+% normalize over samples
+dtheta = dtheta./repmat(sum(dtheta,2), [1, n_reps, 1]);
+
+% add 
+theta = zeros(n_dmps*n_dmp_bf, n_reps);
 
 for i=1:n_dmps,
     
-    w(:,i) = dcps(i).w + dtheta(i,:)';
-    
+    theta((((i-1)*n_dmp_bf)+1):(i*n_dmp_bf),:) = dcps(i).w*ones(1,n_reps) + squeeze(dtheta(i,:,:))';
+
 end

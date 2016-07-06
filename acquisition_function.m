@@ -1,48 +1,54 @@
 function [ af ] = acquisition_function( S, ro_par, rm, roll_out)
 
-[m, s2] = gp(rm.seg(1).hyp, @infExact, ...
-            rm.meanfunc, rm.covfunc, rm.likfunc,...
-            rm.seg(1).sum_out, rm.seg(1).R_expert,...
-            roll_out.sum_out(1,:));
+epd = zeros(rm.n_segments, 2);
 
-sigmaPoints = m + [1 -1].*sqrt(s2);
-epd = zeros(2,1); 
+for segment = 1:rm.n_segments
+    
+    [m, s2] = gp(rm.seg(segment).hyp, @infExact, ...
+        rm.meanfunc, rm.covfunc, rm.likfunc,...
+        rm.seg(segment).sum_out, rm.seg(segment).R_expert,...
+        roll_out.sum_out(1,:));
+    
+    sigmaPoints = m + [1 -1].*sqrt(s2);
 
-for s = 1:length(sigmaPoints)
     
-    gamma_tilda = zeros(ro_par.reps,1);
-    gamma_star  = zeros(ro_par.reps,1);
-    
-    for k = 1:ro_par.reps
+    for sigma = 1:length(sigmaPoints)
         
-        [gamma_star(k), ~] = gp(rm.seg(1).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
-            [rm.seg(1).sum_out; roll_out.sum_out(1,:)], [rm.seg(1).R_expert; sigmaPoints(s)],...
-            S.rollouts(k).sum_out(1,:));
         
-        [gamma_tilda(k), ~] = gp(rm.seg(1).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
-            [rm.seg(1).sum_out], [rm.seg(1).R_expert],...
-            S.rollouts(k).sum_out(1,:));
+        
+        %             [gamma_star(k), ~] = gp(rm.seg(segment).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
+        %                 [rm.seg(segment).sum_out; roll_out.sum_out(1,:)], ...
+        %                 [rm.seg(segment).R_expert; sigmaPoints(sigma)],...
+        %                 S.rollouts(k).sum_out(1,:));
+        %
+        %             [gamma_tilda(k), ~] = gp(rm.seg(segment).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
+        %                 [rm.seg(segment).sum_out], [rm.seg(segment).R_expert],...
+        %                 S.rollouts(k).sum_out(1,:));
+        %
+        
+        theta_tilda = get_PI2_update(S, ro_par);
+        
+        rm_fake = rm;
+        rm_fake.seg(segment).sum_out = [rm_fake.seg(segment).sum_out; roll_out.sum_out(1,:)];
+        rm_fake.seg(segment).R_expert = [rm_fake.seg(segment).R_expert; sigmaPoints(sigma)];
+        
+        S_fake = compute_reward(S, ro_par, rm_fake);
+        
+        theta_star = get_PI2_update(S_fake, ro_par);
+             
+        theta_star_mean = mean(theta_star, 2);
+        theta_star_cov  = diag(var(theta_star'));
+        
+        theta_tilda_mean = mean(theta_tilda,2);
+        theta_tilda_cov = diag(var(theta_tilda'));
+        
+        theta_star_p = mvnpdf(theta_star', theta_star_mean', theta_star_cov);
+        theta_tilda_p = mvnpdf(theta_tilda', theta_tilda_mean', theta_tilda_cov);
+        
+        epd(segment, sigma) = sum(theta_star_p.*log(theta_star_p./theta_tilda_p));
         
     end
     
-    minGamma = min(gamma_tilda);
-    maxGamma = max(gamma_tilda);
-    
-    gamma_tilda = exp(-(gamma_tilda - minGamma*ones(ro_par.reps, 1))./...
-    ((maxGamma-minGamma)*ones(ro_par.reps, 1)));
-
-    gamma_tilda = gamma_tilda./sum(gamma_tilda);
-    
-    minGamma = min(gamma_star);
-    maxGamma = max(gamma_star);
-
-    gamma_star = exp(-(gamma_star - minGamma*ones(ro_par.reps, 1))./...
-    ((maxGamma-minGamma)*ones(ro_par.reps, 1)));
-
-    gamma_star = gamma_star./sum(gamma_star);
-    
-    epd(s,1) = sum(gamma_star.*log(gamma_star./gamma_tilda));
-    
 end
 
-af = mean(epd);
+af = mean(mean(epd));

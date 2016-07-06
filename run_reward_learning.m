@@ -14,6 +14,8 @@ function run_reward_learning(protocol_name)
 % changed to be a more complex nonlinear system.
 % Ronald Olsthoorn, May 2016
 
+clc
+
 % read the protocol file
 p = read_protocol(protocol_name);
 

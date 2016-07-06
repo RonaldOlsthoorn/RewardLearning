@@ -1,6 +1,5 @@
 function update_PI2(S, ro_par)
-
-% D is the data structure of all roll outs, and R the cost matrix for these roll outs
+% S is the data structure of all roll outs, and R the cost matrix for these roll outs
 global n_dmps;
 n_dmp_bf = ro_par.n_dmp_bf;
 global dcps;
