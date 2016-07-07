@@ -68,15 +68,14 @@ for i = 1:length(m_x(:,1))
     end
 end
 
-fig = figure(1);
-set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
-
-
+figure
 hold on
 xlabel('x');
 ylabel('y');
 zlabel('z');
 
 mesh(m_x, m_y, z);
+%mesh(m_x, m_y, z_true);
+
 
 scatter3(rm.seg(1).sum_out(:,1), rm.seg(1).sum_out(:,2), rm.seg(1).R_expert,'x', 'r');
