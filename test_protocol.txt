@@ -27,6 +27,6 @@ n_reuse             5
 n_dmp_bf            40
 n_segments          4
 loss_tol            0.1
-improve_tol         0.1
+improve_tol         1e-7
 af                  'acquisition_function'
 rating_noise        1

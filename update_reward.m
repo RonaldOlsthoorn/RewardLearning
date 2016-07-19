@@ -6,30 +6,27 @@ while find_nominee
     
     [max_outcome, set, epd] = find_max_outcome(S, rm, ro_par);
     
-    if strcmp(set, 'S') && rm.af(S, ro_par, rm, max_outcome)/rm.rating_noise > rm.improve_tol
+    if strcmp(set, 'S') && epd/rm.rating_noise > rm.improve_tol
         
-        D.R_expert = query_expert(max_outcome.sum_out(1,:), rm.rating_noise);
-        D.outcomes = max_outcome.outcomes;
-        D.sum_out = max_outcome.sum_out;
-        
-        rm.D = [rm.D D];
-        
+        for s=1:rm.n_segments
+            
+           rm.seg(s).sum_out =  [rm.seg(s).sum_out; max_outcome.seg(s).sum_out];
+           rm.seg(s).R_expert = [rm.seg(s).R_expert;...
+                                 query_expert(max_outcome.seg(s).sum_out, rm.rating_noise)];
+           
+        end
+                
     else
         find_nominee = false;
     end
     
 end
 
-x = zeros(length(rm.D), rm.n_ff);
-y = zeros(length(rm.D), 1);
-
-
-for i = 1:length(rm.D)
-    
-    x(i,:)  = rm.D(i).sum_out(1,:);
-    y(i)    = rm.D(i).R_expert;
+for s = 1:rm.n_segments
+      
+    rm.seg(s).hyp = minimize(rm.seg(s).hyp, @gp, -100, @infExact, ...
+        rm.meanfunc, rm.covfunc, rm.likfunc, ...
+        rm.seg(s).sum_out, rm.seg(s).R_expert);
     
 end
-
-rm.hyp = minimize(rm.hyp, @gp, -100, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc, x, y);
-
+clc

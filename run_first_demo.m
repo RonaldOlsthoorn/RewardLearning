@@ -7,7 +7,7 @@ S = run_rollouts(S, ro_par, sim_par, ro_par.reps);
 outcomes =  compute_outcomes(S, ro_par, rm );
 sum_out  = rot90(rot90(cumsum(rot90(rot90(outcomes)))));
 
-zero_sum_out = zeros(ro_par.reps,rm.n_ff);
+zero_sum_out = zeros(ro_par.reps, rm.n_ff);
 seg.sum_out = zero_sum_out;
 seg.R_expert = zeros(ro_par.reps,1);
 

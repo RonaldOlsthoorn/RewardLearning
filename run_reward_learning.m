@@ -16,6 +16,8 @@ function run_reward_learning(protocol_name)
 
 clc
 
+tic
+
 % read the protocol file
 p = read_protocol(protocol_name);
 
@@ -72,11 +74,13 @@ while converged(rm, i)~=1,
     i=i+1;
 end
 
+toc
+
 % perform the final noiseless evaluation to get the final cost
-S_eval=run_rollouts(S_eval,1);
+S_eval=run_rollouts(S_eval, ro_par, sim_par, 1);
 
-% compute all costs in batch from, as this is faster in matlab
-eval(sprintf('R_eval=%s(S_eval);',S_eval.cost));
-fprintf('%5d.Cost = %f \n',i,sum(R_eval));
-
-printResult(S, S_eval, R, R_eval, R_total, DMP_Weights);
+% % compute all costs in batch from, as this is faster in matlab
+% eval(sprintf('R_eval=%s(S_eval);',S_eval.rollouts(1).));
+% fprintf('%5d.Cost = %f \n',i,sum(R_eval));
+% 
+% printResult(S, S_eval, R, R_eval, R_total, DMP_Weights);

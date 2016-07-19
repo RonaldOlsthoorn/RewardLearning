@@ -7,29 +7,17 @@ for segment = 1:rm.n_segments
     [m, s2] = gp(rm.seg(segment).hyp, @infExact, ...
         rm.meanfunc, rm.covfunc, rm.likfunc,...
         rm.seg(segment).sum_out, rm.seg(segment).R_expert,...
-        roll_out.sum_out(1,:));
+        roll_out.seg(segment).sum_out);
     
     sigmaPoints = m + [1 -1].*sqrt(s2);
 
     
     for sigma = 1:length(sigmaPoints)
         
-        
-        
-        %             [gamma_star(k), ~] = gp(rm.seg(segment).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
-        %                 [rm.seg(segment).sum_out; roll_out.sum_out(1,:)], ...
-        %                 [rm.seg(segment).R_expert; sigmaPoints(sigma)],...
-        %                 S.rollouts(k).sum_out(1,:));
-        %
-        %             [gamma_tilda(k), ~] = gp(rm.seg(segment).hyp, @infExact, rm.meanfunc, rm.covfunc, rm.likfunc,...
-        %                 [rm.seg(segment).sum_out], [rm.seg(segment).R_expert],...
-        %                 S.rollouts(k).sum_out(1,:));
-        %
-        
         theta_tilda = get_PI2_update(S, ro_par);
         
         rm_fake = rm;
-        rm_fake.seg(segment).sum_out = [rm_fake.seg(segment).sum_out; roll_out.sum_out(1,:)];
+        rm_fake.seg(segment).sum_out = [rm_fake.seg(segment).sum_out; roll_out.seg(segment).sum_out];
         rm_fake.seg(segment).R_expert = [rm_fake.seg(segment).R_expert; sigmaPoints(sigma)];
         
         S_fake = compute_reward(S, ro_par, rm_fake);
