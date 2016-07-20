@@ -44,18 +44,18 @@ global n_dmps
 % S contains the roll out samples
 S.t             = 0:p.Ts:(p.duration-p.Ts); % time vector
 S.n_end         = length(S.t);              % length of total simulation
-S.rollouts.dmp(1:n_dmps) = struct(...
-    'xd',zeros(S.n_end,3),...                  % DMP desired state
-    'bases',zeros(S.n_end,p.n_dmp_bf),...      % DMP bases function vector
-    'eps',zeros(S.n_end,p.n_dmp_bf),...        % DMP noisy parameters
-    'theta_eps',zeros(S.n_end,p.n_dmp_bf),...  % DMP noisy parameters+kernel weights
-    'psi',zeros(S.n_end,p.n_dmp_bf));          % DMP Gaussian kernels
-
-S.rollouts.q        = zeros(S.n_end,3);          % point mass pos
-S.rollouts.u        = zeros(S.n_end,2*n_dmps);   % point mass command
-S.rollouts.outcomes = zeros(S.n_end, rm.n_ff);
-S.rollouts.r        = zeros(S.n_end, 1);
-S.rollouts.R        = 0;
+% S.rollouts.dmp(1:n_dmps) = struct(...
+%     'xd',zeros(S.n_end,3),...                  % DMP desired state
+%     'bases',zeros(S.n_end,p.n_dmp_bf),...      % DMP bases function vector
+%     'eps',zeros(S.n_end,p.n_dmp_bf),...        % DMP noisy parameters
+%     'theta_eps',zeros(S.n_end,p.n_dmp_bf),...  % DMP noisy parameters+kernel weights
+%     'psi',zeros(S.n_end,p.n_dmp_bf));          % DMP Gaussian kernels
+% 
+% S.rollouts.q        = zeros(S.n_end,3);          % point mass pos
+% S.rollouts.u        = zeros(S.n_end,2*n_dmps);   % point mass command
+% S.rollouts.outcomes = zeros(S.n_end, rm.n_ff);
+% S.rollouts.r        = zeros(S.n_end, 1);
+% S.rollouts.R        = 0;
 
 % initialize the reference, if used.
 if strcmp('none', p.ref)
@@ -67,7 +67,7 @@ end
 
 S_eval         = S;     % used for noiseless cost assessment
 
-S.rollouts(1:ro_par.reps) = S.rollouts;  % one data structure for each repetition
+% S.rollouts(1:ro_par.reps) = S.rollouts;  % one data structure for each repetition
 
 for i=1:n_dmps,                     % initialize DMPs
     dcp('clear',i);

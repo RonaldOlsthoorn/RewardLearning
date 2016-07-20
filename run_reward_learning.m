@@ -46,10 +46,10 @@ while converged(rm, i)~=1,
     
     % first batch, collect full nr of roll-outs
     if(i==1)
-        S = run_rollouts(S, ro_par, sim_par, ro_par.reps);
+        S = run_rollouts(S, ro_par, sim_par, i, ro_par.reps);
     else
         % after that mix new roll-outs with reused rollouts
-        S = run_rollouts(S, ro_par, sim_par, ro_par.reps - ro_par.n_reuse);
+        S = run_rollouts(S, ro_par, sim_par, i, ro_par.reps - ro_par.n_reuse);
     end
     
     S = compute_reward(S, ro_par, rm);        

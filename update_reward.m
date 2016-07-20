@@ -1,12 +1,13 @@
 function [ rm ] = update_reward(  S, rm, ro_par)
 
 find_nominee = true;
+S_original = S;
 
 while find_nominee
     
-    [max_outcome, set, epd] = find_max_outcome(S, rm, ro_par);
+    [max_outcome, set, epd] = find_max_outcome(S_original, S, rm, ro_par);
     
-    if strcmp(set, 'S') && epd/rm.rating_noise > rm.improve_tol
+    if (strcmp(set, 'S') && epd/rm.rating_noise > rm.improve_tol) 
         
         for s=1:rm.n_segments
             
@@ -15,11 +16,16 @@ while find_nominee
                                  query_expert(max_outcome.seg(s).sum_out, rm.rating_noise)];
            
         end
+        
+        S = remove_rollout(S, max_outcome.index);
+        
+        if isempty(S.rollouts)
+            find_nominee = false;
+        end
                 
     else
         find_nominee = false;
     end
-    
 end
 
 for s = 1:rm.n_segments

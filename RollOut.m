@@ -3,6 +3,14 @@ classdef RollOut
     properties
         iteration;
         index;
+        dmp;
+        q;
+        u;
+        outcomes;
+        sum_out;
+        r;
+        R;
+        R_expert;
     end
     
     methods

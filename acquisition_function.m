@@ -1,4 +1,4 @@
-function [ af ] = acquisition_function( S, ro_par, rm, roll_out)
+function [ af ] = acquisition_function( S_original, ro_par, rm, roll_out)
 
 epd = zeros(rm.n_segments, 2);
 
@@ -14,13 +14,13 @@ for segment = 1:rm.n_segments
     
     for sigma = 1:length(sigmaPoints)
         
-        theta_tilda = get_PI2_update(S, ro_par);
+        theta_tilda = get_PI2_update(S_original, ro_par);
         
         rm_fake = rm;
         rm_fake.seg(segment).sum_out = [rm_fake.seg(segment).sum_out; roll_out.seg(segment).sum_out];
         rm_fake.seg(segment).R_expert = [rm_fake.seg(segment).R_expert; sigmaPoints(sigma)];
         
-        S_fake = compute_reward(S, ro_par, rm_fake);
+        S_fake = compute_reward(S_original, ro_par, rm_fake);
         
         theta_star = get_PI2_update(S_fake, ro_par);
              

@@ -1,9 +1,16 @@
-function S = run_rollouts(S, ro_par, sim_par, n_ro)
+function S = run_rollouts(S, ro_par, sim_par, iteration, n_ro)
 % A dedicated function to run muultiple roll-outs using the specifictions in D. 
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
 
 global n_dmps;
+
+for k=1:n_ro,
+    
+    ro = RollOut(iteration, k);
+    S.rollouts(k) = ro;
+end
+
 
 S = gen_epsilon(S, ro_par, n_ro);
 
