@@ -55,8 +55,8 @@ while converged(rm, i)~=1,
     S = compute_reward(S, ro_par, rm);        
     rm = update_database(S, ro_par, rm, ro_par.reps);
     
-%    [ S_eval, W ] = evaluate_progress( S, S_eval, ro_par_eval, ...
-%                                            ro_par, sim_par, rm, i );
+   [ S_eval, W ] = evaluate_progress( S, S_eval, ro_par_eval, ...
+                                            ro_par, sim_par, rm, i );
                                 
 %     R_total = [R_total, sum(S_eval.rollouts(1).R)];
 %     DMP_Weights = [DMP_Weights, W'];

@@ -5,7 +5,11 @@ function rm = run_first_demo(S, rm, ro_par, sim_par)
 S = run_rollouts(S, ro_par, sim_par, 0, ro_par.reps);
 
 outcomes =  compute_outcomes(S, ro_par, rm );
-sum_out  = rot90(rot90(cumsum(rot90(rot90(outcomes)))));
+
+for s = 1:rm.n_segments
+    sum_out(rm.seg_start(s):rm.seg_end(s),:,:) = ...
+        rot90(rot90(cumsum(rot90(rot90(outcomes(rm.seg_start(s):rm.seg_end(s),:,:))))));
+end
 
 zero_sum_out = zeros(ro_par.reps, rm.n_ff);
 seg.sum_out = zero_sum_out;
@@ -37,34 +41,34 @@ for s = 1:rm.n_segments
 end
 clc
 
-% fig = figure(1);
-% set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
-% 
-% for s = 1:rm.n_segments
-%     
-%     [m_x, m_y] = meshgrid(-300:5:-50, -300:5:-50);
-%     z = zeros(length(m_x(:,1)),length(m_x(1,:)));
-%     z_true = z;
-%        
-%     for i = 1:length(m_x(:,1))
-%         for j = 1:length(m_y(:,1))
-%             
-%             [m, ~] = gp(rm.seg(s).hyp, @infExact, ...
-%                 [], rm.covfunc, rm.likfunc,...
-%                 rm.seg(s).sum_out, rm.seg(s).R_expert,...
-%                 [m_x(i,j) m_y(i,j)]);
-%             
-%             z(i,j) = m;
-%             z_true(i,j) = query_expert([m_x(i,j) m_y(i,j)] , 0);
-%         end
-%     end
-%     
-%     subplot(2,2,s);
-%     hold on
-%     xlabel('x');
-%     ylabel('y');
-%     zlabel('z');
-%     
-%     mesh(m_x, m_y, z);   
-%     scatter3(rm.seg(s).sum_out(:,1), rm.seg(s).sum_out(:,2), rm.seg(s).R_expert(:),'x', 'r');
-% end
+fig = figure(1);
+set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
+
+for s = 1:rm.n_segments
+    
+    [m_x, m_y] = meshgrid(-300:5:-50, -300:5:-50);
+    z = zeros(length(m_x(:,1)),length(m_x(1,:)));
+    z_true = z;
+       
+    for i = 1:length(m_x(:,1))
+        for j = 1:length(m_y(:,1))
+            
+            [m, ~] = gp(rm.seg(s).hyp, @infExact, ...
+                [], rm.covfunc, rm.likfunc,...
+                rm.seg(s).sum_out, rm.seg(s).R_expert,...
+                [m_x(i,j) m_y(i,j)]);
+            
+            z(i,j) = m;
+            z_true(i,j) = query_expert([m_x(i,j) m_y(i,j)] , 0);
+        end
+    end
+    
+    subplot(2,2,s);
+    hold on
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
+    
+    mesh(m_x, m_y, z);   
+    scatter3(rm.seg(s).sum_out(:,1), rm.seg(s).sum_out(:,2), rm.seg(s).R_expert(:),'x', 'r');
+end
