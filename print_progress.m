@@ -54,8 +54,8 @@ xlabel('t');
 ylabel('xd');
 
 subplot(2,3,3);
+hold on
 plot(t(1:S.n_end),S_eval.rollouts(1).r(1:S.n_end));
-plot(t(1:S.n_end),query_expert(S_eval.rollouts(1).sum_out), 0);
 xlabel('time [s]');
 ylabel('Cost');
 

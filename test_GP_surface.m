@@ -16,10 +16,14 @@ DMP_Weights = zeros(ro_par.n_dmp_bf,1); % used to store weight trace
 % before we run the main loop, we need 1 demo to initialize the reward
 % model
 
-S = run_rollouts(S, ro_par, sim_par, ro_par.reps);
+S = run_rollouts(S, ro_par, sim_par, 0, ro_par.reps);
 
 outcomes =  compute_outcomes(S, ro_par, rm );
-sum_out  = rot90(rot90(cumsum(rot90(rot90(outcomes)))));
+
+for s = 1:rm.n_segments
+    sum_out(rm.seg_start(s):rm.seg_end(s),:,:) = ...
+        rot90(rot90(cumsum(rot90(rot90(outcomes(rm.seg_start(s):rm.seg_end(s),:,:))))));
+end
 
 zero_sum_out = zeros(ro_par.reps,rm.n_ff);
 seg.sum_out = zero_sum_out;
@@ -39,7 +43,7 @@ end
 
 for s = 1:rm.n_segments
     
-    rm.seg(s).hyp.cov = [10; 10; 0];
+    rm.seg(s).hyp.cov = [5; 5; 0];
     rm.seg(s).hyp.mean = [];
     rm.seg(s).hyp.lik = log(0.1);
     
@@ -50,33 +54,56 @@ for s = 1:rm.n_segments
 end
 
 
-[m_x, m_y] = meshgrid(-300:5:-50, -300:5:-50);
-z = zeros(length(m_x(:,1)),length(m_x(1,:)));
+[m_x, m_y] = meshgrid(-150:5:50, -150:5:50);
+z = zeros(rm.n_segments, length(m_x(:,1)),length(m_x(1,:)));
 z_true = z;
 
-
-for i = 1:length(m_x(:,1))
-    for j = 1:length(m_y(:,1))
-        
-        [m, ~] = gp(rm.seg(1).hyp, @infExact, ...
-            [], rm.covfunc, rm.likfunc,...
-            rm.seg(1).sum_out, rm.seg(1).R_expert,...
-            [m_x(i,j) m_y(i,j)]);
-        
-        z(i,j) = m;
-        z_true(i,j) = query_expert([m_x(i,j) m_y(i,j)] , 0);
+for s = 1:rm.n_segments
+    for i = 1:length(m_x(:,1))
+        for j = 1:length(m_y(:,1))
+            
+            [m, ~] = gp(rm.seg(s).hyp, @infExact, ...
+                [], rm.covfunc, rm.likfunc,...
+                rm.seg(s).sum_out, rm.seg(s).R_expert,...
+                [m_x(i,j) m_y(i,j)]);
+            
+            z(s, i, j) = m;
+            z_true(s, i, j) = query_expert([m_x(i,j) m_y(i,j)] , 0);
+        end
     end
 end
 
 fig = figure(1);
 set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
 
-
+subplot(2,2,1);
+scatter3(rm.seg(1).sum_out(:,1), rm.seg(1).sum_out(:,2), rm.seg(1).R_expert,'x', 'r');
 hold on
 xlabel('x');
 ylabel('y');
 zlabel('z');
+mesh(m_x, m_y, squeeze(z(1,:,:)));
 
-mesh(m_x, m_y, z);
+subplot(2,2,2);
+scatter3(rm.seg(2).sum_out(:,1), rm.seg(2).sum_out(:,2), rm.seg(2).R_expert,'x', 'r');
+hold on
+xlabel('x');
+ylabel('y');
+zlabel('z');
+mesh(m_x, m_y, squeeze(z(2,:,:)));
 
-scatter3(rm.seg(1).sum_out(:,1), rm.seg(1).sum_out(:,2), rm.seg(1).R_expert,'x', 'r');
+subplot(2,2,3);
+scatter3(rm.seg(3).sum_out(:,1), rm.seg(3).sum_out(:,2), rm.seg(3).R_expert,'x', 'r');
+hold on
+xlabel('x');
+ylabel('y');
+zlabel('z');
+mesh(m_x, m_y, squeeze(z(3,:,:)));
+
+subplot(2,2,4);
+scatter3(rm.seg(4).sum_out(:,1), rm.seg(4).sum_out(:,2), rm.seg(4).R_expert,'x', 'r');
+hold on
+xlabel('x');
+ylabel('y');
+zlabel('z');
+mesh(m_x, m_y, squeeze(z(4,:,:)));

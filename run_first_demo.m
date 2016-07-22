@@ -29,7 +29,7 @@ end
 
 for s = 1:rm.n_segments
     
-    rm.seg(s).hyp.cov = [10; 10; 0];
+    rm.seg(s).hyp.cov = [5; 5; 0];
     %rm.seg(s).hyp.mean = [ones(rm.n_ff,1); 1];
     rm.seg(s).hyp.mean = [];
     rm.seg(s).hyp.lik = log(0.1);
@@ -46,7 +46,7 @@ set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
 
 for s = 1:rm.n_segments
     
-    [m_x, m_y] = meshgrid(-300:5:-50, -300:5:-50);
+    [m_x, m_y] = meshgrid(-150:5:50, -150:5:50);
     z = zeros(length(m_x(:,1)),length(m_x(1,:)));
     z_true = z;
        

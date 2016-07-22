@@ -71,16 +71,13 @@ while converged(rm, i)~=1,
         S = importance_sampling(S, ro_par, ro_par.n_reuse);
     end
     
-    i=i+1;
+    i=i+1
 end
 
 toc
 
 % perform the final noiseless evaluation to get the final cost
-S_eval=run_rollouts(S_eval, ro_par, sim_par, 1);
+S_eval=run_rollouts(S_eval, ro_par, sim_par, i, 1);
 
-% % compute all costs in batch from, as this is faster in matlab
-% eval(sprintf('R_eval=%s(S_eval);',S_eval.rollouts(1).));
-% fprintf('%5d.Cost = %f \n',i,sum(R_eval));
-% 
-% printResult(S, S_eval, R, R_eval, R_total, DMP_Weights);
+evaluate_progress( S, S_eval, ro_par_eval, ...
+                      ro_par, sim_par, rm, i );
