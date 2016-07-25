@@ -1,4 +1,11 @@
 function [ af ] = acquisition_function( S_original, ro_par, rm, roll_out)
+% implements an Expected Policy Divergence acquisition function.
+% S_original: struct containing all samples considered in the current
+% iteration.
+% ro_par: struct containing roll-out parameters
+% rm: struct containing the reward model
+% roll_out: struct containing the specific roll-out for which the acquistion
+% value needs to be computed
 
 epd = zeros(rm.n_segments, 2);
 

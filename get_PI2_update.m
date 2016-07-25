@@ -1,5 +1,7 @@
 function theta = get_PI2_update(S, ro_par)
-% S is the data structure of all roll outs, and R the cost matrix for these roll outs
+% returns the new policy, based on the new set of roll-outs.
+% S is the data structure of all roll outs.
+
 global n_dmps;
 n_dmp_bf = ro_par.n_dmp_bf;
 global dcps;

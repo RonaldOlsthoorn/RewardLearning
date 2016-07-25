@@ -1,6 +1,8 @@
 function [ u ] = perfect_controller( x, r )
 % Controller for trajectory tracking. Not really perfect PID controller,
-% but good enough
+% but good enough.
+% x: state vector (column)
+% r: reference vector (column)
 
 Kd = 10;
 Ki = 5;

@@ -1,4 +1,8 @@
 function [ rm ] = update_reward(  S, rm, ro_par)
+% update the reward model whith the new drawn samples.
+% S: struct containing the new drawn samples.
+% rm: struct containing the reward model.
+% ro_par: struct containing the roll_out parameters.
 
 find_nominee = true;
 S_original = S;

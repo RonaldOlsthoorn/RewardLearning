@@ -1,4 +1,6 @@
 function [ handles ] = init_outcome_handles( rm )
+% Initialize a set of handles to outcome functions. Outcome functions are
+% basically feature functions of the reward model. 
 
     handles = cell(rm.n_ff);
     handles{1} = @(S, ro_par)reward_err2(S, ro_par);

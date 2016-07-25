@@ -1,6 +1,6 @@
 function S = gen_epsilon(S, ro_par, n_ro)
 % Generates requested ammount of noise profiles and stores
-% the noise values in the structure D.
+% the noise values in the structure S.
 
 global n_dmps;
 global dcps;

@@ -1,6 +1,7 @@
 function R = reward_settling_time(S, ro_par)
-% Implements a simple squared error cost function. 
+% Implements a settling time penalty function. 
 % Struct S: Result of roll-outs.
+% Struct ro_par: rollout parameters.
                         
 n = S.n_end;            % The duration of the complete simulation 
                         % (core trajectory + terminal simulation).

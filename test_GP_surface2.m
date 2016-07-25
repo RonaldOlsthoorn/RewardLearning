@@ -1,5 +1,7 @@
 clear; close all; clc
 
+% test for gp hypers
+
 [m_x, m_y] = meshgrid(0:5:100, 0:5:100);
 z = zeros(length(m_x(:,1)),length(m_x(1,:)));
 z_true = z;

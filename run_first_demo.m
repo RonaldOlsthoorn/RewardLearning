@@ -2,6 +2,12 @@ function rm = run_first_demo(S, rm, ro_par, sim_par)
 % runs first roll-outs en queries the expert for its rating
 % this is necessary for the initialization of the reward model.
 
+% S: struct containing an empty set of roll-outs.
+% rm: struct containing the reward model.
+% ro_par: struct containing the rollout parameters.
+% sim_par: struct containing the simulation parameters.
+
+
 S = run_rollouts(S, ro_par, sim_par, 0, ro_par.reps);
 
 outcomes =  compute_outcomes(S, ro_par, rm );

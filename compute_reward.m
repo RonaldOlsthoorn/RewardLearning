@@ -1,5 +1,10 @@
 function [ S ] = compute_reward(S, ro_par, rm )
-%Computes the reward of the batch of roll-outs in S.
+% Computes the reward of a batch of roll-outs.
+% S: struct containing all the roll-outs of this iteration.
+% ro_par: struct containing all the roll-out parameters.
+% rm: struct containing the reward model.
+
+
 outcomes = compute_outcomes(S, ro_par, rm);
 
 for s = 1:rm.n_segments

@@ -1,5 +1,7 @@
 close all; clear; clc;
 
+% basis function unit-test
+
 t=0:0.01:10;
 alpha_s = 0.5;
 s = exp(-alpha_s*t);

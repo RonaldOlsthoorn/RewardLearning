@@ -1,5 +1,8 @@
 function rm = update_database(S, ro_par, rm, reps)
 
+% update the database containing all the samples ever drawn in the
+% algorithm.
+
 new_rollouts.eps_theta  = zeros(S.n_end, ro_par.n_dmp_bf);
 new_rollouts.eps        = zeros(S.n_end, ro_par.n_dmp_bf);
 new_rollouts.outcomes   = zeros(S.n_end, rm.n_ff);

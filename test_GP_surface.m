@@ -1,5 +1,7 @@
 clear; close all; clc
 
+% test for gp hypers
+
 protocol_name = 'test_protocol.txt';
 
 p = read_protocol(protocol_name);

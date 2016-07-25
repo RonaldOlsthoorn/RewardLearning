@@ -1,5 +1,15 @@
 function [ S, S_eval, ro_par, ro_par_eval, sim_par, rm ] = init( p )
-% create several structs and matrices used in the algorithm
+% returns several structs used in the algorithm.
+% S: reusable struct that contains new rollouts which are drawn every
+% iteration
+% S_eval: reusable struct containing an evaluation rollout, which is 
+% basically a roll-out without exploration noise.
+% ro_par: struct that contains parameters necessary for sampling batches 
+% of normal rollouts.
+% ro_par_eval: duplication of ro_par containing parameters for the
+% evaluation roll-outs.
+% sim_par: struct containing all the parameters needed for simulation.
+% rm: struct containing the reward model paramters.
 
 % use static random seed
 rng(10);

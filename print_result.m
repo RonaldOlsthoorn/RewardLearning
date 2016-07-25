@@ -1,12 +1,13 @@
-function  print_result(D, D_eval, R, R_eval, R_total)
+function  print_result(S, S_eval, R, R_eval, R_total)
 % Present the result of the complete PI2 algorithm.
 % D: struct containing the last set of roll-outs
 % D_eval: struct containing the noise-less evaluation of the 
-% final solution
-% R_eval: noise-less cost
-% R_total: noise-less cost per update
+% final solution.
+% R: reward of the last batch of roll-outs
+% R_eval: noise-less reward
+% R_total: total noise-less reward per update
 
-printProgress(D, D_eval,R, R_eval,D.updates+2); % print trajectory outputs
+printProgress(S, S_eval,R, R_eval,D.updates+2); % print trajectory outputs
 
 global par;
 
@@ -29,4 +30,4 @@ title('Learning curve');
 
 drawnow;
 
-body_animate(D_eval.t, D_eval.rollouts(1).q', par);
+body_animate(S_eval.t, S_eval.rollouts(1).q', par);

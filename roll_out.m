@@ -1,5 +1,5 @@
-classdef RollOut 
-    
+classdef roll_out 
+    % Container class used as a fancy struct.
     properties
         iteration;
         index;

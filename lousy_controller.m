@@ -1,6 +1,8 @@
 function [ u ] = lousy_controller( x, r )
 % Controller for trajectory tracking. Not at all a perfect PID controller,
-% used to show the power of PI2 learning
+% used to show the power of PI2 learning.
+% x: state vector (column)
+% r: reference vector (column)
 
 Kd = 0.5;
 Ki = 10;

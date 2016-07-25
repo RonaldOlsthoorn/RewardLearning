@@ -1,5 +1,9 @@
 function dx = eompend(x, r, control_method, arm)
-% Equations of motion for DCSC inverted pendulum setup
+% Equations of Motion for DCSC inverted pendulum setup.
+% x: column vector containing the state of the system.
+% r: column vector containing the reference.
+% control_method: handle to the controller of the system.
+% arm: struct containing all the robot arm parameters.
 
 u = control_method(x, r);
 

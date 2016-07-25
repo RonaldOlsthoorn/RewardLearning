@@ -1,7 +1,8 @@
 function print_progress(S, S_eval, ro_par, figID)
-% Plots the intermediate results of the running PI2 algorithm
-% D: struct containing the roll-outs (noise included)
-% D_eval: struct containing the noise-less roll-outs
+% Plots the intermediate results of the running reward learning algorithm
+% S: struct containing the roll-outs (noise included)
+% S_eval: struct containing the noise-less roll-outs
+% ro_par: struct containing the roll-out parameters
 % figID: ID (number) used as figure ID
 
 r = zeros(S.n_end, ro_par.reps);

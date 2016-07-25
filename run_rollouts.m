@@ -1,7 +1,12 @@
 function S = run_rollouts(S, ro_par, sim_par, iteration, n_ro)
-% A dedicated function to run muultiple roll-outs using the specifictions in D. 
+% A dedicated function to run muultiple roll-outs using the specifictions in ro_par. 
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
+
+% S: struct containing the result of sampling
+% ro_par: struct containing rollout parameters.
+% sim_par: struct containing simulation parameters.
+% n_ro: number of rollouts to perform.
 
 global n_dmps;
 

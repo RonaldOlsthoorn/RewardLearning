@@ -1,5 +1,6 @@
 function [ c ] = converged( rm_par, i )
-% checks whether the algorithm has converged or not. 1 for now
+% checks whether the algorithm has converged or not. 
+
 c= (i>100);
 
 i;

@@ -1,8 +1,10 @@
 function [xnext] = f_closed_loop(x, r, sim_par)
 % for a single state, x is a row vector, 
 %   otherwise it is a matrix with the individual state vectors in rows
-% for a single input u is a row vector (or scalar for SI systems), 
+% for a single input r is a row vector (or scalar for SI systems), 
 %   otherwise it is a matrix with individual input vectors in rows
+% sim_par is a struct containing parameters for simulation, such as
+%   sampling period
 
 t = 0:sim_par.Ts/2:sim_par.Ts;
 

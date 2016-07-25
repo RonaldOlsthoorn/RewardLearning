@@ -1,4 +1,14 @@
 function [max_outcome, set,  max_epd] = find_max_outcome(S_original, S, rm, ro_par)
+% Computes the rollout which results in the greatest acquisition value in
+% either S, the set of samples of the current iteration, or set D, the set
+% containing all expert-queried samples thusfar.
+% S_original: original set S containing all samples created in the current
+% iteration.
+% S: set containing all samples of S_original which are not queried by the
+% expert.
+% rm: struct containing all the reward model parameters as well as set D
+% ro_par: struct containing roll-out parameters
+
 
 for s = 1:rm.n_segments
     

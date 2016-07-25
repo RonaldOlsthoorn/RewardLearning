@@ -1,6 +1,7 @@
 function R = reward_err2(S, ro_par)
 % Implements a simple squared error cost function. 
-% Struct D: Result of roll-outs.
+% Struct S: Result of roll-outs.
+% Struct ro_par: rollout parameters.
                         
 n = S.n_end;            % The duration of the complete simulation 
                         % (core trajectory + terminal simulation).
