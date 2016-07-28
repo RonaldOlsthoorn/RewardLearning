@@ -94,7 +94,7 @@ S_eval.psi  = S.psi;
 dcp('reset_state',1,ro_par.start(1));
 dcp('set_goal',1,ro_par.goal(1),1);
 
-rm = init_activation(S, rm);
+rm = init_rm(S, rm);
 rm.outcome_handles = init_outcome_handles(rm);
 
 end

@@ -15,7 +15,7 @@ classdef roll_out
     
     methods
         
-        function obj = RollOut(iteration, index)
+        function obj = roll_out(iteration, index)
            obj.iteration = iteration;
            obj.index = index;
         end

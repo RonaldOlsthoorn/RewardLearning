@@ -17,7 +17,7 @@ while find_nominee
             
            rm.seg(s).sum_out =  [rm.seg(s).sum_out; max_outcome.seg(s).sum_out];
            rm.seg(s).R_expert = [rm.seg(s).R_expert;...
-                                 query_expert(max_outcome.seg(s).sum_out, rm.rating_noise)];
+                                 query_expert(max_outcome.seg(s).sum_out, s, rm.rating_noise)];
            
         end
         

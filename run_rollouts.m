@@ -12,7 +12,7 @@ global n_dmps;
 
 for k=1:n_ro,
     
-    ro = RollOut(iteration, k);
+    ro = roll_out(iteration, k);
     S.rollouts(k) = ro;
 end
 
