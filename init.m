@@ -84,7 +84,7 @@ for i=1:n_dmps,                     % initialize DMPs
     dcp('init',i,ro_par.n_dmp_bf,sprintf('pi2_dmp_%d',i),0);
     
     % use the in-built function to initialize the dcp with reference trajectory
-    dcp('Batch_Fit',i,ro_par.duration,ro_par.Ts,S.ref.r(i,:)',S.ref.r_d(i,:)',S.ref.r_dd(i,:)');
+    dcp('Batch_Fit',i,ro_par.duration, ro_par.Ts, S.ref.r(i,:)', S.ref.r_d(i,:)',S.ref.r_dd(i,:)');
     dcp('reset_state',i,ro_par.start(i));
     dcp('set_goal',i,ro_par.goal(i),1);
 end
