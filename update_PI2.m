@@ -67,7 +67,6 @@ W = W./(ones(n_end,1)*sum(W,1));
 dtheta = reshape(sum(dtheta.*repmat(reshape(W,[1,n_end,n_dmp_bf]),[n_dmps 1 1]),2),n_dmps,n_dmp_bf);
 
 % and update the parameters by directly accessing the dcps data structure
-
 for i=1:n_dmps,
     
     dcps(i).w = dcps(i).w + dtheta(i,:)';
