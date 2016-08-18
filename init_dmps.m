@@ -16,7 +16,10 @@ for i=1:n_dmps,                     % initialize DMPs
 end
 
 S.psi       = dcp('run_psi',1, dmp_par.duration, dmp_par.Ts); % Obtain basis functions
+S.time_weight = get_time_weight(S, dmp_par); 
+
 S_eval.psi  = S.psi;
+
 dcp('reset_state', 1, dmp_par.start(1));
 dcp('set_goal', 1, dmp_par.goal(1),1);
 
