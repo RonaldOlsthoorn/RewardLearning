@@ -22,6 +22,8 @@ Ts                  0.01
 controller          'lousy_controller'
 ref                 'ref_step'
 std                 600
+forward_method      'PI2'
+annealer            1/100
 reps                10
 n_reuse             5
 n_dmp_bf            40

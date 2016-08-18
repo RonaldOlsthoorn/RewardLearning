@@ -1,27 +1,27 @@
-function rm = run_first_demo(S, rm, ro_par, sim_par)
+function rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par)
 % runs first roll-outs en queries the expert for its rating
 % this is necessary for the initialization of the reward model.
-
+%
 % S: struct containing an empty set of roll-outs.
 % rm: struct containing the reward model.
-% ro_par: struct containing the rollout parameters.
+% forward_par: struct containing the rollout parameters.
 % sim_par: struct containing the simulation parameters.
 
-S = run_rollouts(S, ro_par, sim_par, 0, ro_par.reps);
-outcomes =  compute_outcomes(S, ro_par, rm );
+S = run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
+outcomes =  compute_outcomes(S, forward_par, rm );
 
 for s = 1:rm.n_segments
     sum_out(rm.seg_start(s):rm.seg_end(s),:,:) = ...
         rot90(rot90(cumsum(rot90(rot90(outcomes(rm.seg_start(s):rm.seg_end(s),:,:))))));
 end
 
-zero_sum_out = zeros(ro_par.reps, rm.n_ff);
+zero_sum_out = zeros(forward_par.reps, rm.n_ff);
 seg.sum_out = zero_sum_out;
-seg.R_expert = zeros(ro_par.reps,1);
+seg.R_expert = zeros(forward_par.reps,1);
 
 rm.seg(1:rm.n_segments) = seg;
 
-for k = 1:ro_par.reps
+for k = 1:forward_par.reps
     
     for s = 1:rm.n_segments
         
@@ -34,7 +34,6 @@ end
 for s = 1:rm.n_segments
     
     rm.seg(s).hyp.cov = [5; 5; 0];
-    %rm.seg(s).hyp.mean = [ones(rm.n_ff,1); 1];
     rm.seg(s).hyp.mean = [];
     rm.seg(s).hyp.lik = log(0.1);
     

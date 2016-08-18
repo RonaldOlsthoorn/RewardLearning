@@ -26,58 +26,48 @@ p = read_protocol(protocol_name);
 global n_dmps;
 n_dmps = 1;
 
-[ S, S_eval, ro_par, ro_par_eval, ...
+[ S, S_eval, dmp_par, forward_par, forward_par_eval, ...
     sim_par, rm ] = init(p);
-
-R_total = zeros(1,2); % used to store the learning trace
-DMP_Weights = zeros(ro_par.n_dmp_bf,1); % used to store weight trace
 
 % before we run the main loop, we need 1 demo to initialize the reward
 % model
-rm = run_first_demo(S, rm, ro_par, sim_par);
+rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par);
 
-i=1;
+i = 1;
 
 while converged(rm, i)~=1,
     
-    % run learning roll-outs with a noise annealing multiplier
-    ro_par.noise_mult =  double(100 - i+1)/double(100);
-    ro_par.noise_mult = max([0.1 ro_par.noise_mult]);
-    
     % first batch, collect full nr of roll-outs
     if(i==1)
-        S = run_rollouts(S, ro_par, sim_par, i, ro_par.reps);
+        S = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
     else
         % after that mix new roll-outs with reused rollouts
-        S = run_rollouts(S, ro_par, sim_par, i, ro_par.reps - ro_par.n_reuse);
+        S = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
     end
     
-    S = compute_reward(S, ro_par, rm);        
-    rm = update_database(S, ro_par, rm, ro_par.reps);
+    S = compute_reward(S, forward_par, rm);
+    rm = update_database(S, forward_par, rm, forward_par.reps);
     
-   [ S_eval, ~ ] = evaluate_progress( S, S_eval, ro_par_eval, ...
-                                            ro_par, sim_par, rm, i );
-                                
-%     R_total = [R_total, sum(S_eval.rollouts(1).R)];
-%     DMP_Weights = [DMP_Weights, W'];
-            
+    [ S_eval, ~ ] = evaluate_progress( S, S_eval, dmp_par, ...
+        forward_par_eval, sim_par, rm, i );
+    
     % update reward model
-    update_reward(S, rm, ro_par);
+    update_reward(S, rm, forward_par);
     
     % perform the PI2 update
-    update_PI2(S, ro_par);
+    forward_par = forward_par.forward_method(S, forward_par);
     
-    if (i > 1 && ro_par.n_reuse > 0)
-        S = importance_sampling(S, ro_par, ro_par.n_reuse);
+    if (i > 1 && forward_par.n_reuse > 0)
+        S = importance_sampling(S, forward_par, forward_par.n_reuse);
     end
     
-    i=i+1
+    i=i+1;
 end
 
 toc
 
 % perform the final noiseless evaluation to get the final cost
-S_eval=run_rollouts(S_eval, ro_par, sim_par, i, 1);
+S_eval = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
 
-evaluate_progress( S, S_eval, ro_par_eval, ...
-                      ro_par, sim_par, rm, i );
+[ ~, ~ ] = evaluate_progress( S, S_eval, dmp_par, ...
+    forward_par_eval, sim_par, rm, i );

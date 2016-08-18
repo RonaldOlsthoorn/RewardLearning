@@ -1,4 +1,4 @@
-function S = run_rollouts(S, ro_par, sim_par, iteration, n_ro)
+function S = run_rollouts(S, dmp_par, forward_par, sim_par, iteration, n_ro)
 % A dedicated function to run muultiple roll-outs using the specifictions in ro_par. 
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
@@ -17,20 +17,20 @@ for k=1:n_ro,
 end
 
 
-S = gen_epsilon(S, ro_par, n_ro);
+S = gen_epsilon(S, forward_par, n_ro);
 
-for k=1:n_ro, % Run DMPs
+for k = 1:n_ro, % Run DMPs
     
     % reset the DMP
     for j=1:n_dmps,
-        dcp('reset_state', j, ro_par.start(j));
-        dcp('set_goal', j, ro_par.goal(j),1);
+        dcp('reset_state', j, dmp_par.start(j));
+        dcp('set_goal', j, dmp_par.goal(j),1);
     end
     
     % run the DMPs to create the desired trajectory
     for n=1:S.n_end,                    
         for j=1:n_dmps,                           
-            [y, yd, ydd, b]=dcp('run', j, ro_par.duration, ro_par.Ts, ...
+            [y, yd, ydd, b]=dcp('run', j, dmp_par.duration, dmp_par.Ts, ...
                 0, 0, 1, 1, S.rollouts(k).dmp(j).eps(n,:)');  
             
             S.rollouts(k).dmp(j).xd(n,:) = [y, yd, ydd];    % desired state.
@@ -42,7 +42,7 @@ end
 
 for k=1:n_ro, % Run the robotic arm   
     
-    q = [ro_par.start(1);0;0];  
+    q = [dmp_par.start(1);0;0];  
     
     for n=1:S.n_end,
         
