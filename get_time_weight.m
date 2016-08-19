@@ -13,4 +13,3 @@ W = (N*ones(1, dmp_par.n_dmp_bf)).*S.psi;
 W = W./(ones(S.n_end, 1)*sum(W, 1));
 
 end
-
