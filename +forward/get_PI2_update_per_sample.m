@@ -10,7 +10,7 @@ global dcps;
 n_reps = forward_par.reps;       % number of roll-outs
 n_end = S.n_end;            % final time step
 
-P = get_probability_trajectories(S, forward_par);
+P = forward.get_probability_trajectories(S, forward_par);
 
 % compute the projected noise term. It is computationally more efficient to break this
 % operation into inner product terms.

@@ -6,11 +6,12 @@ function [xnext] = f_closed_loop(x, r, sim_par)
 % sim_par is a struct containing parameters for simulation, such as
 %   sampling period
 
+
 t = 0:sim_par.Ts/2:sim_par.Ts;
 
 %[~,y]= ode45(@(t,y)ode45_wrapper(t,y,r,control_method),t, x );
 
-y = ode4_ti('eompend',t, x, r, sim_par.controller, sim_par.arm);
+y = plant.ode4_ti('plant.eompend',t, x, r, sim_par.controller, sim_par.arm);
 
 y = y(end,:);           % we are only interested in the last value
 

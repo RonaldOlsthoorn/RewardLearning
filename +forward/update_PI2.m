@@ -3,7 +3,7 @@ function [forward_par] = update_PI2(S, forward_par)
 global n_dmps;
 global dcps;
 
-dtheta_per_sample = get_PI2_update_per_sample( S, forward_par );
+dtheta_per_sample = forward.get_PI2_update_per_sample( S, forward_par );
 dtheta = sum(dtheta_per_sample, 2);
 
 % and update the parameters by directly accessing the dcps data structure

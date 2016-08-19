@@ -23,7 +23,7 @@ Weights(i,:) = dcps(1).w';
 % visualization: plot at the start and end of the updating
 if mod(i,10)== 1,
     fprintf('%5d.Cost = %f \n',i,S_eval.rollouts(1).R(1));
-    print_progress(S, S_eval, forward_par_eval, i)
+    output.print_progress(S, S_eval, forward_par_eval, i)
 end
 
 end

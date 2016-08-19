@@ -8,6 +8,7 @@ function S = run_rollouts(S, dmp_par, forward_par, sim_par, iteration, n_ro)
 % sim_par: struct containing simulation parameters.
 % n_ro: number of rollouts to perform.
 
+import plant.*
 global n_dmps;
 
 for k=1:n_ro,

@@ -14,6 +14,8 @@ function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm ] = in
 % use static random seed
 rng(10);
 
+import init.*;
+
 % roll out parameters
 dmp_par.start        = p.start;
 dmp_par.goal         = p.goal;
@@ -21,7 +23,7 @@ dmp_par.duration     = p.duration;
 dmp_par.Ts           = p.Ts;
 dmp_par.n_dmp_bf     = p.n_dmp_bf;
 
-forward_par.forward_method = str2func(strcat('update_', p.forward_method));
+forward_par.forward_method = str2func(strcat('forward.update_', p.forward_method));
 forward_par.std      = p.std;
 forward_par.annealer = p.annealer;
 forward_par.n_reuse  = p.n_reuse;
@@ -37,13 +39,13 @@ forward_par_eval.n_reuse = 0;
 % simulation parameters
 sim_par.wrapflag     = 0;
 sim_par.arm         = read_par;
-sim_par.controller  = str2func(p.controller);
+sim_par.controller  = str2func(strcat('controllers.', p.controller));
 sim_par.Ts          = p.Ts;
 
 % reward model parameters
 rm.loss_tol     = p.loss_tol;
 rm.improve_tol  = p.improve_tol;
-rm.af           = str2func(p.af);
+rm.af           = str2func(strcat('acquisition.', p.af));
 rm.rating_noise = p.rating_noise;
 rm.n_segments   = p.n_segments;
 rm.n_ff         = 2;
@@ -57,7 +59,7 @@ S.ref = p.ref;
 
 % initialize the reference, if used.
 if ~strcmp('none', p.ref)
-    ref_function    = str2func(p.ref);
+    ref_function    = str2func(strcat('refs.', p.ref));
     S.ref           = ref_function(dmp_par);
 end
 

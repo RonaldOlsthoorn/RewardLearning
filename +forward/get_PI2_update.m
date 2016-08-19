@@ -4,7 +4,7 @@ function theta = get_PI2_update(S, forward_par)
 global n_dmps;
 global dcps;
 
-dtheta_per_sample = get_PI2_update_per_sample(S, forward_par);
+dtheta_per_sample = forward.get_PI2_update_per_sample(S, forward_par);
 
 % normalize over samples
 dtheta = dtheta_per_sample./ ...
