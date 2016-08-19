@@ -4,8 +4,7 @@ function [ S ] = compute_reward(S, ro_par, rm )
 % ro_par: struct containing all the roll-out parameters.
 % rm: struct containing the reward model.
 
-
-outcomes = compute_outcomes(S, ro_par, rm);
+outcomes = reward.compute_outcomes(S, ro_par, rm);
 
 for s = 1:rm.n_segments
     sum_out(rm.seg_start(s):rm.seg_end(s),:,:) = ...

@@ -29,7 +29,7 @@ for segment = 1:rm.n_segments
         rm_fake.seg(segment).sum_out = [rm_fake.seg(segment).sum_out; roll_out.seg(segment).sum_out];
         rm_fake.seg(segment).R_expert = [rm_fake.seg(segment).R_expert; sigmaPoints(sigma)];
         
-        S_fake = compute_reward(S_original, ro_par, rm_fake);
+        S_fake = reward.compute_reward(S_original, ro_par, rm_fake);
         
         theta_star = get_PI2_update(S_fake, ro_par);
              

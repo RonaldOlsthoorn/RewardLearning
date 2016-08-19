@@ -4,12 +4,15 @@ function [ rm ] = update_reward(  S, rm, ro_par)
 % rm: struct containing the reward model.
 % ro_par: struct containing the roll_out parameters.
 
+import expert.query_expert
+import rollout.remove_rollout
+
 find_nominee = true;
 S_original = S;
 
 while find_nominee
     
-    [max_outcome, set, epd] = find_max_outcome(S_original, S, rm, ro_par);
+    [max_outcome, set, epd] = acquisition.find_max_outcome(S_original, S, rm, ro_par);
     
     if (strcmp(set, 'S') && epd/rm.rating_noise > rm.improve_tol) 
         

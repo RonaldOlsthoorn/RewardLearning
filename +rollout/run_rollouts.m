@@ -9,6 +9,9 @@ function S = run_rollouts(S, dmp_par, forward_par, sim_par, iteration, n_ro)
 % n_ro: number of rollouts to perform.
 
 import plant.*
+import rollout.*
+import dmp.dcp
+
 global n_dmps;
 
 for k=1:n_ro,

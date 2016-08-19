@@ -1,5 +1,8 @@
 function [ S, S_eval ] = init_dmps( S, S_eval, dmp_par )
 
+import dmp.dcp;
+import init.get_time_weight;
+
 global n_dmps;
 
 for i=1:n_dmps,                     % initialize DMPs

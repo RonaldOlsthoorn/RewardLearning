@@ -12,18 +12,20 @@ end
 global dcps
 
 % perform one noiseless evaluation to get the cost
-S_eval=run_rollouts(S_eval, dmp_par, forward_par_eval, sim_par, i, 1);
+S_eval = rollout.run_rollouts(S_eval, dmp_par, forward_par_eval, sim_par, i, 1);
 
 % compute all costs in batch from, as this is faster in matlab
-S_eval = compute_reward( S_eval, forward_par_eval, rm );
+S_eval = reward.compute_reward( S_eval, forward_par_eval, rm );
 
 % store the noise-less reward and the weights
 Weights(i,:) = dcps(1).w';
 
+fprintf('%5d.Cost = %f \n',i,S_eval.rollouts(1).R(1));
+
 % visualization: plot at the start and end of the updating
 if mod(i,10)== 1,
-    fprintf('%5d.Cost = %f \n',i,S_eval.rollouts(1).R(1));
-    output.print_progress(S, S_eval, forward_par_eval, i)
+    output.print_progress(S, S_eval, forward_par_eval, i);
+    
 end
 
 end

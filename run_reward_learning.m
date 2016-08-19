@@ -14,6 +14,10 @@ function run_reward_learning(protocol_name)
 % changed to be a more complex nonlinear system.
 % Ronald Olsthoorn, May 2016
 
+import frame.*
+import rollout.*
+
+
 clc
 
 tic
@@ -31,7 +35,7 @@ n_dmps = 1;
 
 % before we run the main loop, we need 1 demo to initialize the reward
 % model
-rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par);
+rm = init.run_first_demo(S, rm, forward_par, dmp_par, sim_par);
 
 i = 1;
 
@@ -45,14 +49,14 @@ while converged(rm, i)~=1,
         S = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
     end
     
-    S = compute_reward(S, forward_par, rm);
+    S = reward.compute_reward(S, forward_par, rm);
     rm = update_database(S, forward_par, rm, forward_par.reps);
     
     [ S_eval, ~ ] = output.evaluate_progress( S, S_eval, dmp_par, ...
         forward_par_eval, sim_par, rm, i );
     
     % update reward model
-    update_reward(S, rm, forward_par);
+    reward.update_reward(S, rm, forward_par);
     
     % perform the PI2 update
     forward_par = forward_par.forward_method(S, forward_par);

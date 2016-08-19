@@ -7,7 +7,9 @@ function rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par)
 % forward_par: struct containing the rollout parameters.
 % sim_par: struct containing the simulation parameters.
 
-S = run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
+import reward.compute_outcomes
+
+S = rollout.run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
 outcomes =  compute_outcomes(S, forward_par, rm );
 
 for s = 1:rm.n_segments
@@ -26,7 +28,7 @@ for k = 1:forward_par.reps
     for s = 1:rm.n_segments
         
         rm.seg(s).sum_out(k,:)  = squeeze(sum_out(rm.seg_start(s),k,:));
-        rm.seg(s).R_expert(k) = query_expert( rm.seg(s).sum_out(k,:) , s, rm.rating_noise );
+        rm.seg(s).R_expert(k) = expert.query_expert( rm.seg(s).sum_out(k,:) , s, rm.rating_noise );
         
     end
 end
@@ -62,7 +64,7 @@ for s = 1:rm.n_segments
                 [m_x(i,j) m_y(i,j)]);
             
             z(i,j) = m;
-            z_true(i,j) = query_expert([m_x(i,j) m_y(i,j)] , s, 0);
+            z_true(i,j) = expert.query_expert([m_x(i,j) m_y(i,j)] , s, 0);
         end
     end
     
