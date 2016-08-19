@@ -3,3 +3,6 @@
 cd('gpml');
 run('startup.m');
 cd('..')
+
+currentFolder = pwd;
+addpath(currentFolder);
