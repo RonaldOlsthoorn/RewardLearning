@@ -5,8 +5,10 @@ function [ R_expert ] = query_expert( sum_out, segment, noise )
 
 w_true = [0.1 1 2 4
           0.1 1 2 4];
-% w_true = [1; 1; 1; 1];
-
+      
+%w_true = [1 1 1 1
+%          1 1 1 1];
+      
 R_expert = w_true(:,segment)'*sum_out' + noise*randn(1,1);
 
 end

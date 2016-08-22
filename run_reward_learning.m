@@ -17,7 +17,6 @@ function run_reward_learning(protocol_name)
 import frame.*
 import rollout.*
 
-
 clc
 
 tic
