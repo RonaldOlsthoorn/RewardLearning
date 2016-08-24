@@ -321,13 +321,13 @@ switch lower(action),
     
     % the weighted sum of the locally weighted regression models
     dcps(ID).psi = exp(-0.5*((dcps(ID).x-dcps(ID).c).^2).*dcps(ID).D);
-    amp          = dcps(ID).s;
+    amp = dcps(ID).s;
     if (dcps(ID).c_order == 1)
       in = dcps(ID).v;
     else
       in = dcps(ID).x;
     end
-    f            = sum(in*(dcps(ID).w+cw).*dcps(ID).psi)/sum(dcps(ID).psi+1.e-10) * amp;
+    f = sum(in*(dcps(ID).w+cw).*dcps(ID).psi)/sum(dcps(ID).psi+1.e-10) * amp;
     
     if (dcps(ID).c_order == 1),
       dcps(ID).vd = (dcps(ID).alpha_v*(dcps(ID).beta_v*(0-dcps(ID).x)-dcps(ID).v)+cc)*tau*cc_tau;
