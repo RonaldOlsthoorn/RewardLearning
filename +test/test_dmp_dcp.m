@@ -38,8 +38,6 @@ S_eval.psi  = S.psi;
 dcp('reset_state', 1, dmp_par.start(1));
 dcp('set_goal', 1, dmp_par.goal(1),1);
 
-global dcps;
-
 dmp = DMP(1, dmp_par);
 dmp.batch_fit(S.ref.r(i,:)', S.ref.r_d(i,:)', S.ref.r_dd(i,:)');
 
@@ -54,9 +52,9 @@ end
 
 rollout1 = Rollout();
 
-%eps = randn(dmp_par.n_dmp_bf,1);
+eps = 1000*randn(dmp_par.n_dmp_bf,1);
 
-eps = zeros(dmp_par.n_dmp_bf, 1);
+%eps = zeros(dmp_par.n_dmp_bf, 1);
 
 % run the DMPs to create the desired trajectory
 for n=1:S.n_end,

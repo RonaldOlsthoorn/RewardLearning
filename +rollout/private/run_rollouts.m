@@ -15,34 +15,22 @@ import rollout.*
 global n_dmps;
 
 for k=1:n_ro,
-    
+   
     ro = Rollout();
     ro.iteration = iteration;
     ro.index = k;
-    S.rollouts(k) = ro;
+    S.rollouts(k) = ro;    
 end
 
 S = gen_epsilon(S, forward_par, n_ro);
 
 for k = 1:n_ro, % Run DMPs
     
-    % reset the DMP
     for j=1:n_dmps,
-        dcp('reset_state', j, dmp_par.start(j));
-        dcp('set_goal', j, dmp_par.goal(j),1);
+        
+        [y, yd, ydd] = S.dmps(j).run(S.rollouts(k).dmp(j).eps);
+        S.rollouts(k).dmp(j).xd = [y, yd, ydd];    % desired state.
     end
-    
-    % run the DMPs to create the desired trajectory
-    for n=1:S.n_end,                    
-        for j=1:n_dmps,                           
-            [y, yd, ydd, b]=dcp('run', j, dmp_par.duration, dmp_par.Ts, ...
-                0, 0, 1, 1, S.rollouts(k).dmp(j).eps(n,:)');  
-            
-            S.rollouts(k).dmp(j).xd(n,:) = [y, yd, ydd];    % desired state.
-            S.rollouts(k).dmp(j).bases(n,:) = b';           % bases. used for updates.
-        end      
-    end
-    
 end
 
 for k=1:n_ro, % Run the robotic arm   

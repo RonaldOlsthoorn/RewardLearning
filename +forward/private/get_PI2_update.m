@@ -1,8 +1,8 @@
 function theta = get_PI2_update(S, forward_par)
 % returns the new policy, based on the new set of roll-outs.
 % S is the data structure of all roll outs.
-global n_dmps;
-global dcps;
+
+n_dmps = length(S.dmps);
 
 dtheta_per_sample = forward.get_PI2_update_per_sample(S, forward_par);
 
@@ -16,6 +16,6 @@ theta = zeros(n_dmps*forward_par.n_dmp_bf, forward_par.reps);
 
 for i=1:n_dmps,    
     theta((((i-1)*forward_par.n_dmp_bf)+1):(i*forward_par.n_dmp_bf),:) = ...
-        dcps(i).w*ones(1,forward_par.reps) + squeeze(dtheta(i,:,:))';
+        S.dmps(i).w*ones(1,forward_par.reps) + squeeze(dtheta(i,:,:))';
 
 end

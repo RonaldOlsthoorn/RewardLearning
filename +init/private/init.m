@@ -20,6 +20,7 @@ dmp_par.goal         = p.goal;
 dmp_par.duration     = p.duration;
 dmp_par.Ts           = p.Ts;
 dmp_par.n_dmp_bf     = p.n_dmp_bf;
+dmp_par.n_dmps       = 1;
 
 forward_par.forward_method = str2func(strcat('forward.update_', p.forward_method));
 forward_par.std      = p.std;
@@ -61,9 +62,8 @@ if ~strcmp('none', p.ref)
     S.ref           = ref_function(dmp_par);
 end
 
-S_eval         = S;     % used for noiseless cost assessment
-
-[ S, S_eval ] = init_dmps( S, S_eval, dmp_par );
+S = init_dmps( S, dmp_par );
+S_eval = S;     % used for noiseless cost assessment
 
 rm = init_rm(S, rm);
 rm.outcome_handles = init_outcome_handles(rm);

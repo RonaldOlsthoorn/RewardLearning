@@ -29,8 +29,6 @@ for k=1:10
     
 end
 
-global dcps;
-
 figure(double(figID));
 set(double(figID), 'units','normalized','outerposition',[0 0 1 1]);
 clf;
@@ -69,7 +67,7 @@ ylabel('sum outcomes');
 
 % the paramter vector
 subplot(2,3,6);
-bar(dcps(1).w);
+bar(S.dmps(1).w);
 ylabel('theta');
 axis('tight');
 

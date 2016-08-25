@@ -144,7 +144,9 @@ classdef DMP < handle
 
         end
         
-        function [rollout] = run(obj, eps)
+        function [y, yd, ydd] = run(obj, eps)
+            
+            eps = eps(1,:)';
             
             import dmp.DMP;
             import rollout.Rollout;
@@ -163,16 +165,9 @@ classdef DMP < handle
                 yd(i) = zd*obj.Ts+yd(i-1);
                 y(i) = yd(i-1)*obj.Ts*obj.tau+y(i-1);
             end
-            
-            rollout = Rollout();
-            rollout.dmp(obj.index).xd(:,1) = y;
-            rollout.dmp(obj.index).xd(:,2) = yd*obj.tau;
-            rollout.dmp(obj.index).xd(:,3) = ydd;
         end
         
-%         function run_fit()
-%                     
-%         end
+
         
         function batch_fit(obj, T, Td, Tdd)
             
