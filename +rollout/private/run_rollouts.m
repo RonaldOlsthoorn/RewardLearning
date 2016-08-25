@@ -16,10 +16,11 @@ global n_dmps;
 
 for k=1:n_ro,
     
-    ro = roll_out(iteration, k);
+    ro = Rollout();
+    ro.iteration = iteration;
+    ro.index = k;
     S.rollouts(k) = ro;
 end
-
 
 S = gen_epsilon(S, forward_par, n_ro);
 
