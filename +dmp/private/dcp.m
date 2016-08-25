@@ -351,7 +351,6 @@ switch lower(action),
     dcps(ID).y  = dcps(ID).yd*dt+dcps(ID).y;
     
     dcps(ID).g  = dcps(ID).gd*dt+dcps(ID).g;
-
        
     varargout(1) = {dcps(ID).y};
     varargout(2) = {dcps(ID).yd};
@@ -523,9 +522,9 @@ switch lower(action),
       dcps(ID).sxtd = sum(((V.*Ft)*ones(1,length(dcps(ID).c))).*PSI,1)';
       dcps(ID).w    = dcps(ID).sxtd./(dcps(ID).sx2+1.e-10);
     else
-      dcps(ID).sx2  = sum(((X.^2)*ones(1,length(dcps(ID).c))).*PSI,1)';
+      dcps(ID).sx2 = sum(((X.^2)*ones(1,length(dcps(ID).c))).*PSI,1)';
       dcps(ID).sxtd = sum(((X.*Ft)*ones(1,length(dcps(ID).c))).*PSI,1)';
-      dcps(ID).w    = dcps(ID).sxtd./(dcps(ID).sx2+1.e-10);
+      dcps(ID).w = dcps(ID).sxtd./(dcps(ID).sx2+1.e-10);
     end
     
     % compute the prediction
