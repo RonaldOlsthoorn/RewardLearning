@@ -1,6 +1,6 @@
-function [forward_par] = update_PI2(S, forward_par)
+function [S, forward_par] = update_PI2(S, forward_par)
 
 %Calls wrapper function. Convenient for imports.
-[forward_par] = update_PI2(S, forward_par);
+[S, forward_par] = update_PI2(S, forward_par);
 
 end

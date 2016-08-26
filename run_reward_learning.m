@@ -58,7 +58,7 @@ while converged(rm, i)~=1,
     reward.update_reward(S, rm, forward_par);
     
     % perform the PI2 update
-    forward_par = forward_par.forward_method(S, forward_par);
+    [S, forward_par] = forward_par.forward_method(S, forward_par);
     
     if (i > 1 && forward_par.n_reuse > 0)
         S = importance_sampling(S, forward_par, forward_par.n_reuse);
