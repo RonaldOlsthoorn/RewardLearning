@@ -1,7 +1,6 @@
 classdef DMP < handle
     
-    %
-    
+    %  
     properties(Constant)
         
         alpha_z = 25;
@@ -145,9 +144,7 @@ classdef DMP < handle
         end
         
         function [y, yd, ydd] = run(obj, eps)
-            
-            eps = eps(1,:)';
-            
+                        
             import dmp.DMP;
             import rollout.Rollout;
             
@@ -155,9 +152,15 @@ classdef DMP < handle
             yd = zeros(length(obj.t), 1);
             ydd = zeros(length(obj.t), 1);
             
+            f = sum(obj.x(1)*(obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
+            f = f*obj.scale;
+                
+            zd = (DMP.alpha_z*(DMP.beta_z*(obj.goal-y(1))-yd(1))+f)*obj.tau;
+            ydd(1) = zd*obj.tau;
+            
             for i = 2:length(obj.t)
                 
-                f = sum(obj.x(i)*(obj.w+eps).*obj.psi(i,:)')/sum(obj.psi(i,:)+1.e-10);
+                f = sum(obj.x(i).*(obj.w+eps).*obj.psi(i,:)')/sum(obj.psi(i,:)+1.e-10);
                 f = f*obj.scale;
                 
                 zd = (DMP.alpha_z*(DMP.beta_z*(obj.goal-y(i-1))-yd(i-1))+f)*obj.tau;
@@ -165,9 +168,10 @@ classdef DMP < handle
                 yd(i) = zd*obj.Ts+yd(i-1);
                 y(i) = yd(i-1)*obj.Ts*obj.tau+y(i-1);
             end
+            
+            yd = yd.*obj.tau;
         end
         
-
         
         function batch_fit(obj, T, Td, Tdd)
             

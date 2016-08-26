@@ -28,7 +28,7 @@ for k = 1:n_ro, % Run DMPs
     
     for j=1:n_dmps,
         
-        [y, yd, ydd] = S.dmps(j).run(S.rollouts(k).dmp(j).eps);
+        [y, yd, ydd] = S.dmps(j).run(S.rollouts(k).dmp(j).eps(1,:)');
         S.rollouts(k).dmp(j).xd = [y, yd, ydd];    % desired state.
     end
 end

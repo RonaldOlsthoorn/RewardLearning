@@ -67,22 +67,22 @@ for n=1:S.n_end,
     end
 end
 
-rollout2 = dmp.run(eps);
+[y, yd, ydd] = dmp.run(eps);
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,1));
-plot(rollout2.dmp(1).xd(:,1));
+plot(y);
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,2));
-plot(rollout2.dmp(1).xd(:,2));
+plot(yd);
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,3));
-plot(rollout2.dmp(1).xd(:,3));
+plot(ydd);
 
 
 % figure
