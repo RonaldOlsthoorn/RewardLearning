@@ -1,5 +1,4 @@
-import dmp.dcp;
-import dmp.DMP;
+import dmp.*;
 import refs.ref_trajectory;
 import init.*;
 import rollout.Rollout;
@@ -38,8 +37,11 @@ S_eval.psi  = S.psi;
 dcp('reset_state', 1, dmp_par.start(1));
 dcp('set_goal', 1, dmp_par.goal(1),1);
 
-dmp = DMP(1, dmp_par);
-dmp.batch_fit(S.ref.r(i,:)', S.ref.r_d(i,:)', S.ref.r_dd(i,:)');
+dmp_exact = Exact_Timed_DMP(1, dmp_par);
+dmp_exact.batch_fit(S.ref.r(i,:)', S.ref.r_d(i,:)', S.ref.r_dd(i,:)');
+
+dmp_inexact = Inexact_Timed_DMP(1, dmp_par);
+dmp_inexact.w = dmp_exact.w;
 
 
 %%
@@ -52,11 +54,11 @@ end
 
 rollout1 = Rollout();
 
-eps = 1000*randn(dmp_par.n_dmp_bf,1);
-
+eps = 1000*randn(dmp_par.n_dmp_bf, 1);
 %eps = zeros(dmp_par.n_dmp_bf, 1);
 
 % run the DMPs to create the desired trajectory
+
 for n=1:S.n_end,
     for j=1:n_dmps,
         [y, yd, ydd, b]=dcp('run', j, dmp_par.duration, dmp_par.Ts, ...
@@ -67,31 +69,36 @@ for n=1:S.n_end,
     end
 end
 
-[y, yd, ydd] = dmp.run(eps);
+[y_exact, yd_exact, ydd_exact] = dmp_exact.run(eps);
+
+% run the DMPs to create the desired trajectory
+dmp_inexact.init_run(eps);
+t_block = 0; 
+
+for n=1:S.n_end,
+    
+    [y, yd, ydd]=dmp_inexact.run_increment(t_block);
+    t_block = t_block+dmp_par.Ts;
+    
+    y_inexact(n) = y;
+    yd_inexact(n) = yd;
+    ydd_inexact(n) = ydd;
+end
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,1));
-plot(y);
+plot(y_exact);
+plot(y_inexact);
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,2));
-plot(yd);
+plot(yd_exact);
+plot(yd_inexact);
 
 figure
 hold on
 plot(rollout1.dmp(1).xd(:,3));
-plot(ydd);
-
-
-% figure
-% subplot(1,2,1)
-% bar(dcps(1).w);
-% ylabel('theta');
-% axis('tight');
-% subplot(1,2,2)
-% bar(dmp.w);
-% ylabel('theta');
-% axis('tight');
-% 
+plot(ydd_exact);
+plot(ydd_inexact);

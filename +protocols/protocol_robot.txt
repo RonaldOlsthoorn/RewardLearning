@@ -17,10 +17,10 @@
 
 start               [0]
 goal                [1]
-duration            4
+duration            8
 Ts                  0.01
 controller          'lousy_controller'
-ref                 'ref_step'
+ref                 'ref_trajectory'
 std                 600
 forward_method      'PI2'
 annealer            1/100
@@ -32,4 +32,4 @@ loss_tol            0.1
 improve_tol         1e-7
 af                  'acquisition_epd'
 rating_noise        1
-system              '1-dof'
+system              'robot'

@@ -1,6 +1,6 @@
 classdef Exact_Timed_DMP < handle
     
-    %
+    %  
     properties(Constant)
         
         alpha_z = 25;
@@ -8,7 +8,7 @@ classdef Exact_Timed_DMP < handle
         alpha_g = 25/2;
         alpha_x = 25/3;
         alpha_v = 25;
-        beta_v = 25/4;
+        beta_v = 25/4;     
     end
     
     
@@ -21,9 +21,9 @@ classdef Exact_Timed_DMP < handle
         
         x;
         
-        goal = 0;
+        goal = 0;        
         y0;
-        
+
         scale = 1;
         
         c; % to be renamed
@@ -46,7 +46,7 @@ classdef Exact_Timed_DMP < handle
     
     methods
         
-        function obj = DMP(index, dmp_par)
+        function obj = Exact_Timed_DMP(index, dmp_par)
             
             obj.index = index;
             obj.initialize(dmp_par);
@@ -71,10 +71,8 @@ classdef Exact_Timed_DMP < handle
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
             obj.goal = dmp_par.goal;
-            obj.y0 = dmp_par.y0;
-            
-            obj.n_rfs = dmp_par.n_dmp_bf;
-            
+            obj.y0 = dmp_par.start;
+            obj.n_rfs = dmp_par.n_dmp_bf;           
         end
         
         function initialize_centers(obj, n_dmp_bf)
@@ -91,7 +89,7 @@ classdef Exact_Timed_DMP < handle
             obj.D = (diff(obj.c)*0.55).^2;
             obj.D = 1./[obj.D; obj.D(end)];
         end
-        
+                    
         function initialize_x(obj)
             
             obj.x = zeros(length(obj.t), 1);
@@ -99,9 +97,7 @@ classdef Exact_Timed_DMP < handle
             
             for i = 2:length(obj.t)
                 obj.x(i) = obj.x(i-1)-obj.alpha_x.*obj.tau*obj.Ts*obj.x(i-1);
-            end
-            
-            % obj.x = exp(-obj.alpha_x.*obj.tau.*obj.t);
+            end  
         end
         
         function initialize_psi(obj)
@@ -109,7 +105,7 @@ classdef Exact_Timed_DMP < handle
             for i = 1:obj.n_rfs
                 
                 obj.psi(:, i) = exp(-0.5*((obj.x - obj.c(i)).^2).*obj.D(i));
-            end
+            end      
         end
         
         function initialize_weighted_psi(obj)
@@ -133,11 +129,10 @@ classdef Exact_Timed_DMP < handle
                 
                 obj.bases(i,:) = obj.psi(i,:)*obj.x(i, 1)/sum(obj.psi(i,:));
             end
-            
         end
         
         function [y, yd, ydd] = run(obj, eps)
-            
+                        
             import rollout.Rollout;
             
             y = zeros(length(obj.t), 1);
@@ -146,7 +141,7 @@ classdef Exact_Timed_DMP < handle
             
             f = sum(obj.x(1)*(obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
             f = f*obj.scale;
-            
+                
             zd = (obj.alpha_z*(obj.beta_z*(obj.goal-y(1))-yd(1))+f)*obj.tau;
             ydd(1) = zd*obj.tau;
             
@@ -177,7 +172,7 @@ classdef Exact_Timed_DMP < handle
             % the start state is the first state in the trajectory
             obj.y0 = T(1);
             
-            s  = 1;  % for fitting a new primitive, the scale factor is always equal to one
+            s  = 1;  % for fitting a new primitive, the scale factor is always equal to one  
             amp = s;
             Ft  = (Tdd/obj.tau^2-obj.alpha_z*(obj.beta_z*(obj.goal-T)-Td/obj.tau)) / amp;
             
@@ -188,14 +183,8 @@ classdef Exact_Timed_DMP < handle
             sx2  = sum(((obj.x.^2)*ones(1,length(obj.c))).*obj.psi, 1)';
             sxtd = sum(((obj.x.*Ft)*ones(1,length(obj.c))).*obj.psi, 1)';
             obj.w    = sxtd./(sx2+1.e-10);
-            
+                      
         end
-        
-        %         function run_increment()
-        %
-        %         end
-        
-    end
-    
+    end    
 end
 
