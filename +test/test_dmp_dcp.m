@@ -87,18 +87,29 @@ end
 
 figure
 hold on
-plot(rollout1.dmp(1).xd(:,1));
+%plot(rollout1.dmp(1).xd(:,1));
 plot(y_exact);
 plot(y_inexact);
 
 figure
 hold on
-plot(rollout1.dmp(1).xd(:,2));
+%plot(rollout1.dmp(1).xd(:,2));
 plot(yd_exact);
 plot(yd_inexact);
 
 figure
 hold on
-plot(rollout1.dmp(1).xd(:,3));
+%plot(rollout1.dmp(1).xd(:,3));
 plot(ydd_exact);
 plot(ydd_inexact);
+
+figure
+subplot(1,2,1);
+hold on
+plot(dmp_inexact.x);
+plot(dmp_exact.x);
+subplot(1,2,2);
+hold on
+plot(dmp_inexact.psi(:,10));
+plot(dmp_exact.psi(:,10));
+

@@ -127,7 +127,7 @@ classdef Inexact_Timed_DMP < handle
         
         function [y, yd, ydd] = run_increment(obj, t_block)
             
-            if(t_block ==0)
+            if(t_block == 0)
                 
                 y = obj.previous_state.y;
                 yd = obj.previous_state.yd;
@@ -148,27 +148,26 @@ classdef Inexact_Timed_DMP < handle
                 /sum(obj.psi(obj.k, :) + 1.e-10);
             f = f * obj.scale;
             
-            zd = (obj.alpha_z * (obj.beta_z * (obj.goal - p_state.y) - p_state.yd) + f) * obj.tau;
-            ydd = p_state.zd * obj.tau;
-            yd = p_state.zd * dt + p_state.yd;
+            zd = (obj.alpha_z * (obj.beta_z * (obj.goal - p_state.y) - p_state.yd) + f) * obj.tau;  
+            ydd = zd * obj.tau;
+            yd = zd * dt + p_state.yd;
             y = p_state.yd * dt * obj.tau + p_state.y;
-            
-            yd = yd * obj.tau;
             
             obj.previous_state.y = y;
             obj.previous_state.yd = yd;    
             obj.previous_state.zd = zd;
+            
+            yd = yd * obj.tau;
             
             obj.k = obj.k + 1;
         end
         
         function init_run(obj, eps)
             
+            obj.clear_run();
+            
             obj.eps = eps;
-            
-            obj.k = 1; 
-            clear obj.t obj.x obj.psi obj.time_normalized_psi obj.bases;
-            
+
             obj.t = 0;
             
             obj.compute_x();
@@ -183,7 +182,13 @@ classdef Inexact_Timed_DMP < handle
             
             obj.previous_state.zd = ...
                 (obj.alpha_z * (obj.beta_z * (obj.goal - obj.previous_state.y) - obj.previous_state.yd) + f) * obj.tau;                    
-        end               
+        end 
+        
+        function clear_run(obj)
+            
+            obj.k = 1; 
+            clear obj.t obj.x obj.psi obj.time_normalized_psi obj.bases;
+        end
     end
 end
 

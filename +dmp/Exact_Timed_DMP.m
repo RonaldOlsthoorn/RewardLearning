@@ -141,9 +141,10 @@ classdef Exact_Timed_DMP < handle
             
             f = sum(obj.x(1)*(obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
             f = f*obj.scale;
-                
+             
+            y(1) = obj.y0;
             zd = (obj.alpha_z*(obj.beta_z*(obj.goal-y(1))-yd(1))+f)*obj.tau;
-            ydd(1) = zd*obj.tau;
+            ydd(1) = zd*obj.tau;           
             
             for i = 2:length(obj.t)
                 
