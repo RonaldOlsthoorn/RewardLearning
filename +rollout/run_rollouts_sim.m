@@ -1,5 +1,5 @@
-function S = run_rollouts(S, dmp_par, forward_par, sim_par, iteration, n_ro)
-% A dedicated function to run muultiple roll-outs using the specifictions in ro_par. 
+function S = run_rollouts_sim(S, dmp_par, forward_par, sim_par, iteration, n_ro)
+% A dedicated function to run multiple roll-outs using the specifictions in ro_par. 
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
 
