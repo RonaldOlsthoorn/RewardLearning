@@ -1,7 +1,9 @@
 function [ c ] = converged( rm_par, i )
+% checks whether the algorithm has converged or not. 
 
-%Calls wrapper function. Convenient for imports.
-[ c ] = converged( rm_par, i );
+c= (i>100);
+
+i;
 
 end
 

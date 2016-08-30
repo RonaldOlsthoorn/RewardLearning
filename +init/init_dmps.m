@@ -1,7 +1,12 @@
-function [ S, S_eval ] = init_dmps( S, S_eval, dmp_par )
+function [ S ] = init_dmps( S, dmp_par )
 
-%Calls wrapper function. Convenient for imports.
-[ S, S_eval ] = init_dmps( S, S_eval, dmp_par );
+import dmp.DMP;
+
+for i=1:dmp_par.n_dmps,                     % initialize DMPs
+    
+    S.dmps(i) = DMP(i, dmp_par);
+    S.dmps(i).batch_fit(S.ref.r(i,:)', S.ref.r_d(i,:)', S.ref.r_dd(i,:)');
+end
 
 end
 
