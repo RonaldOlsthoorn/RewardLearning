@@ -3,58 +3,34 @@ ip = '192.168.1.50';
 arm.fopen(ip);
 
 UR5.reset_arm(arm);
+pause(1);
+
 tolerance = 0.001;
+
+pos0 = arm.getToolPosition();
+posPath(:, 1) = pos0;
+posPath(1, 1) = posPath(1, 1)+0.03;
+posPath(:, 2) = posPath(:, 1);
+posPath(1, 2) = posPath(1, 2)+0.03;
+posPath(:, 3) = posPath(:, 2);
+posPath(1, 3) = posPath(1, 3)+0.03;
+
+t = tic;
+y = pos0(1,1);
 
 for i = 1:3
     
-    pause(1);
-    arm.update();
-    posFrom = arm.getToolPositions();
-    posTo = posFrom;
-    posTo(i) = posTo(i) + 0.2;
-    arm.moveTool(posTo);
+    arm.moveTool(posPath(:,i));
     
-    y = posFrom(i);
-    t = 0;
-    pos = posFrom;
-    
-    t0 = tic;
-    
-    while abs(pos(i)-posTo(i)) > tolerance
-        
+    while toc(t) < Ts
         arm.update();
-        pos = arm.getToolPositions();
-        y(end+1) = pos(i);
-        t(end+1) = toc(t0);
+        pos = arm.getToolPosition();
+        y(end+1) = pos(1,1);
     end
     
-    yBuf{i}.y_there = y;
-    yBuf{i}.t = t;
-    
-    pause(1);
-    arm.update();
-    posFrom = arm.getToolPositions();
-    posTo = posFrom;
-    posTo(i) = posTo(i) - 0.2;
-    arm.moveTool(posTo);
-    
-    y = posFrom(i);
-    t = 0;
-    pos = posFrom;
-    
-    t0 = tic;
-    
-    while abs(pos(i)-posTo(i)) > tolerance
-        
-        arm.update();
-        pos = arm.getToolPositions();
-        y(end+1) = pos(i);
-        t(end+1) = toc(t0);
-    end
-    
-    yBuf{i}.y_and_back_again = y;
-    yBuf{i}.t = t;
-    
+    t = tic;
 end
+
 pause(1);
 UR5.reset_arm(arm);
+arm.fclose();
