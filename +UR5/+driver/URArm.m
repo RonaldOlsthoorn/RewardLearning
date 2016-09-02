@@ -1,5 +1,5 @@
 function obj = URArm()
-% URArm provides methods to read data from and write data to 
+% URArm provides methods to read data from and write data to
 % the UR robotic arm via tcp/ip.
 %
 %
@@ -20,7 +20,7 @@ function obj = URArm()
 %   speed = arm.getJointsSpeeds();
 %   toolpos = arm.getToolPositions(); % [x,y,z,rx,ry,rz] last 3 is
 %   axis-angle representation NOT euler angles!
-%   toolpos = arm.getToolPositions2(): [x,y,z,roll,yaw,pitch], derive tool 
+%   toolpos = arm.getToolPositions2(): [x,y,z,roll,yaw,pitch], derive tool
 %   position from the joints angles
 %   toolspeed = arm.getToolSpeeds();
 %   temp = arm.getMotorTemperatures();
@@ -57,17 +57,19 @@ function obj = URArm()
 %   arm.sendCustomCommand(custom_cmd_string)
 %
 % Close:
-% arm.fclose();
+%   arm.fclose();
 %
 % Example:
 %	ipaddress = '192.168.0.50';
-%	arm = URArm();	
+%	arm = URArm();
 %   arm.fopen(ipaddress);
 %	joints = arm.getJoints();
 %   arm.moveJoints(pos,speed,acceleration);
 %
 % Fankai Zhang TU Delft DCSC Robotics lab (c)
 % June 27, 2013
+
+import UR5.driver.*;
 
 try
     cmd_ = URArmMex;
@@ -77,7 +79,7 @@ end
 obj.fopen = @open;
 obj.fclose = @close;
 obj.fread = @getData;
-obj.update = @update;
+obj.update = @updateUR;
 obj.getJointsPositions = @getJointsPositions;
 obj.getJointsSpeeds = @getJointsSpeeds;
 obj.getToolPositions = @getToolPositions;
@@ -132,6 +134,9 @@ waypoints_ = [];
 waypoint_itr_ = 0;
 
     function open(ip)
+        
+        import UR5.driver.*;
+        
         fprintf(1,'Establishing connection to URArm @ %s, please wait ...\n',...
             ip);
         URArmMex(cmd_.OPEN,ip);
@@ -145,11 +150,17 @@ waypoint_itr_ = 0;
     end
 
     function close
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.CLOSE);
         fprintf(1,'URArm connection closed!\n');
     end
 
     function varargout = getData
+        
+        import UR5.driver.*;
+        
         [joints_positions_,joints_speeds_,joints_currents_,...
             joints_temperatures_,tool_positions_,tool_speeds_,...
             tool_forces_,tool_accelerometer_,digital_input_]...
@@ -192,53 +203,83 @@ waypoint_itr_ = 0;
         end
     end
 
-    function update
+    function updateUR
+        
+        import UR5.driver.*;
+        
         getData;
     end
+
     function out = getJointsPositions
         % returns joints angles in radians for each joint
         out = joints_positions_;
     end
 
     function out = getJointsSpeeds
+        
+        import UR5.driver.*;
+        
         % returns speed in rad/s for each joint
         out = joints_speeds_;
     end
 
-    function out = getToolPositions        
-        % Cartesian coordinates of the tool: (x,y,z,rx,ry,rz), 
-        % where rx, ry and rz is a rotation vector representation 
+    function out = getToolPositions
+        
+        import UR5.driver.*;
+        % Cartesian coordinates of the tool: (x,y,z,rx,ry,rz),
+        % where rx, ry and rz is a rotation vector representation
         % of the tool orientation
         out = tool_positions_;
     end
 
     function out = getToolPositions2
+        
+        import UR5.driver.*;
+        
         out = URArmMex(cmd_.GET_TOOL_POSITIONS2);
     end
 
     function out = getToolSpeeds
+        
+        import UR5.driver.*;
         out = tool_speeds_;
     end
+
     function out = getToolForces
+        
+        import UR5.driver.*;
         out = tool_forces_;
     end
+
     function out = getToolAccelerometer
+        
+        import UR5.driver.*;
         % Tool x,y and z accelerometer values
         out = tool_accelerometer_;
     end
+
     function out = getDigitalInput
+        
+        import UR5.driver.*;
         out = digital_input_;
     end
 
     function out = getJointsCurrents
+        
+        import UR5.driver.*;
         out = joints_currents_;
     end
 
     function out = getMotorTemperatures
+        
+        import UR5.driver.*;
         out = joints_temperatures_;
     end
 
     function moveJoints(pos,speed,accel,time,blend_radius)
+        
+        import UR5.driver.*;
+        
         if isempty(pos)
             return;
         end
@@ -253,15 +294,16 @@ waypoint_itr_ = 0;
         end
         if nargin < 2 || isempty(speed)
             speed = 0.3;
-        end        
+        end
         if accel == 0 || speed == 0
             return;
         end
-        disp('pos')
         URArmMex(cmd_.MOVE_JOINTS,pos,accel,speed,time,blend_radius);
     end
 
     function moveJointsSelective(pos,selection,speed,accel)
+        
+        import UR5.driver.*;
         if nargin < 4 || isempty(accel)
             accel = 1.2;
         end
@@ -274,6 +316,8 @@ waypoint_itr_ = 0;
     end
 
     function moveJointsIncremental(val,selection,speed,accel)
+        
+        import UR5.driver.*;
         if nargin < 4 || isempty(accel)
             accel = 1.2;
         end
@@ -289,6 +333,9 @@ waypoint_itr_ = 0;
     end
 
     function moveTool(pos,speed,accel,time,blend_radius)
+        
+        import UR5.driver.*;
+        
         if isempty(pos)
             return;
         end
@@ -311,26 +358,44 @@ waypoint_itr_ = 0;
     end
 
     function setJointsSpeed(speed, accel, time)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SET_JOINTS_SPEED,speed,accel,time);
     end
 
     function setToolSpeed(speed,accel,time)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SET_TOOL_SPEED,speed,accel,time);
     end
 
     function setToolTaskFrameVelocity(linpos,angpos,accel,time)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SET_TOOLTASKFRAME,linpos,angpos,accel,time);
     end
 
     function out = isConnected()
+        
+        import UR5.driver.*;
+        
         out = URArmMex(cmd_.IS_CONNECTED);
     end
 
     function powerdown()
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.POWERDOWN);
     end
 
     function stopJoints(accel)
+        
+        import UR5.driver.*;
+        
         if nargin < 1 || isempty(accel)
             accel = 1.2;
         end
@@ -338,6 +403,9 @@ waypoint_itr_ = 0;
     end
 
     function stopTool(accel)
+        
+        import UR5.driver.*;
+        
         if nargin < 1 || isempty(accel)
             accel = 1.2;
         end
@@ -345,14 +413,23 @@ waypoint_itr_ = 0;
     end
 
     function log(text)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.LOG,text);
     end
 
     function sendCustomCommand(cmd)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SEND_CUSTOM_COMMAND,cmd);
     end
 
     function home(pos,speed,accel)
+        
+        import UR5.driver.*;
+        
         if nargin < 1 || isempty(pos)
             pos = [0,-pi/2,0,-pi/2,0,0];
         end
@@ -366,31 +443,55 @@ waypoint_itr_ = 0;
     end
 
     function setDigitalOut(id,v)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SET_DIGITAL_OUT,id,v);
     end
+
     function setAnalogOut(id,v)
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.SET_ANALOG_OUT,id,v);
     end
+
     function end_effector_pos = solveForwardKinematics(angles)
+        
+        import UR5.driver.*;
+        
         end_effector_pos = URArmMex(cmd_.SOLVE_FORWARD_KINEMATICS,angles);
     end
+
     function out = solveInverseKinematics(end_effector_pos)
+        
+        import UR5.driver.*;
+        
         out = URArmMex(cmd_.SOLVE_INVERSE_KINEMATICS,end_effector_pos);
     end
+
     function closeGripper
+        
+        import UR5.driver.*;
         setDigitalOut(0,0);
     end
+
     function openGripper
+        
+        import UR5.driver.*;
         setDigitalOut(0,1);
     end
+
     function showInfo
+        
+        import UR5.driver.*;
         update();
         disp('joints positions:');
         disp(mat2str(getJointsPositions()'));
         disp('joints speeds:');
         disp(mat2str(getJointsSpeeds()'));
         disp('joints currents:');
-        disp(mat2str(getJointsCurrents()'));        
+        disp(mat2str(getJointsCurrents()'));
         disp('joints temperatures:');
         disp(mat2str(getMotorTemperatures()'));
         disp(' ');
@@ -411,23 +512,37 @@ waypoint_itr_ = 0;
     end
 
     function appendWaypoint(angles)
+        
+        import UR5.driver.*;
         if nargin < 1
             update();
             angles = getJointsPositions();
         end
         waypoints_ = [waypoints_;angles(:)'];
     end
+
     function clearWaypoints()
+        
+        import UR5.driver.*;
         waypoints_ = [];
         waypoint_itr_ = 0;
     end
+
     function wp = getWaypoints()
+        
+        import UR5.driver.*;
         wp = waypoints_;
     end
+
     function setWaypoints(wp)
+        
+        import UR5.driver.*;
         waypoints_ = wp;
     end
+
     function wp = getNextWaypoint()
+        
+        import UR5.driver.*;
         if ~isempty(waypoints_)
             wp = waypoints_(mod(waypoint_itr_,size(waypoints_,1))+1,:);
             waypoint_itr_ = waypoint_itr_ + 1;
@@ -435,10 +550,16 @@ waypoint_itr_ = 0;
             wp = [];
         end
     end
+
     function out = checkGoalReached(pos,dest)
+        
+        import UR5.driver.*;
         out = all(abs(pos(:)-dest(:)) <= 0.001);
     end
+
     function playWaypoints(speed,accel)
+        
+        import UR5.driver.*;
         if nargin < 2 || isempty(accel)
             accel = 1.2;
         end
@@ -471,10 +592,15 @@ waypoint_itr_ = 0;
     end
 
     function cleanupFun
+        
+        import UR5.driver.*;
         stopJoints();
     end
 
     function enableLog
+        
+        import UR5.driver.*;
+        
         URArmMex(cmd_.ENABLE_LOG,end_effector_pos);
     end
 end

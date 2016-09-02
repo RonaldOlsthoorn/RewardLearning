@@ -11,7 +11,7 @@ startup
 arm = UR5.driver.URArm();
 %% open
 ip = '192.168.1.50';
-arm.fopen(ip)
+arm.fopen(ip);
 %%
 Tf = 10;
 Ts = 1/125;

@@ -9,7 +9,7 @@ function rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par)
 
 import reward.compute_outcomes
 
-S = rollout.run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
+S = S.run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
 outcomes =  compute_outcomes(S, forward_par, rm );
 
 for s = 1:rm.n_segments

@@ -12,7 +12,7 @@ end
 S_eval.dmps = S.dmps;
 
 % perform one noiseless evaluation to get the cost
-S_eval = rollout.run_rollouts(S_eval, dmp_par, forward_par_eval, sim_par, i, 1);
+S_eval = S_eval.run_rollouts(S_eval, dmp_par, forward_par_eval, sim_par, i, 1);
 
 % compute all costs in batch from, as this is faster in matlab
 S_eval = reward.compute_reward( S_eval, forward_par_eval, rm );

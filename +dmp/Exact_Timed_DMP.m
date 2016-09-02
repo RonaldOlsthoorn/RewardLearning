@@ -171,7 +171,7 @@ classdef Exact_Timed_DMP < handle
             end
             
             % the start state is the first state in the trajectory
-            obj.y0 = T(1);
+            % obj.y0 = T(1);
             
             s  = 1;  % for fitting a new primitive, the scale factor is always equal to one  
             amp = s;

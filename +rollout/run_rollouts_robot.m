@@ -1,4 +1,4 @@
-function S = run_rollouts_robot(S, dmp_par, forward_par, sim_par, iteration, n_ro)
+function S = run_rollouts_robot(S, dmp_par, forward_par, ~, iteration, n_ro)
 % A dedicated function to run multiple roll-outs using the specifictions in ro_par.
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
@@ -12,7 +12,11 @@ import plant.*
 import dmp.dcp
 import rollout.*
 
-global n_dmps;
+n_dmps = dmp_par.n_dmps;
+
+arm = UR5.driver.URArm();
+ip = '192.168.1.50';
+arm.fopen(ip);
 
 for i=1:n_ro,
     
@@ -43,6 +47,8 @@ for i = 1:n_ro, % Run DMPs
         
         r = S.rollouts(i).dmp(1).xd(j, :)';
         
+        arm.
+        
         % send r to robot
         
         % update
@@ -53,3 +59,6 @@ for i = 1:n_ro, % Run DMPs
         
     end
 end
+
+%% close
+arm.fclose();

@@ -33,3 +33,4 @@ improve_tol         1e-7
 af                  'acquisition_epd'
 rating_noise        1
 system              'robot'
+n_dmps              6

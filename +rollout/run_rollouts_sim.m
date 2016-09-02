@@ -9,10 +9,7 @@ function S = run_rollouts_sim(S, dmp_par, forward_par, sim_par, iteration, n_ro)
 % n_ro: number of rollouts to perform.
 
 import plant.*
-import dmp.dcp
 import rollout.*
-
-global n_dmps;
 
 for k=1:n_ro,
    
@@ -26,7 +23,7 @@ S = gen_epsilon(S, forward_par, n_ro);
 
 for k = 1:n_ro, % Run DMPs
     
-    for j=1:n_dmps,
+    for j=1:dmp_par.n_dmps,
         
         [y, yd, ydd] = S.dmps(j).run(S.rollouts(k).dmp(j).eps(1,:)');
         S.rollouts(k).dmp(j).xd = [y, yd, ydd];    % desired state.

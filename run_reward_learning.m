@@ -21,18 +21,16 @@ clc
 
 tic
 
-% read the protocol file
+% Read the protocol file
 p = init.read_protocol(protocol_name);
 
-% initializes a 1 DOF DMP -- this is dones as two independent DMPs as the
+% Initializes a 1 DOF DMP -- this is dones as two independent DMPs as the
 % Matlab DMPs currently do not support multi-DOF DMPs.
-global n_dmps;
-n_dmps = 1;
 
-[ S, S_eval, dmp_par, forward_par, forward_par_eval, ...
-    sim_par, rm ] = init.init(p);
+[S, S_eval, dmp_par, forward_par, forward_par_eval, ...
+    sim_par, rm, arm] = init.init(p);
 
-% before we run the main loop, we need 1 demo to initialize the reward
+% Before we run the main loop, we need 1 demo to initialize the reward
 % model
 rm = init.run_first_demo(S, rm, forward_par, dmp_par, sim_par);
 
@@ -42,10 +40,10 @@ while converged(rm, i)~=1,
     
     % first batch, collect full nr of roll-outs
     if(i==1)
-        S = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
+        S = S.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
     else
         % after that mix new roll-outs with reused rollouts
-        S = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
+        S = S.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
     end
     
     S = reward.compute_reward(S, forward_par, rm);
@@ -70,7 +68,7 @@ end
 toc
 
 % perform the final noiseless evaluation to get the final cost
-S_eval = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
+S_eval = S_eval.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
 
 [ ~, ~ ] = output.evaluate_progress( S, S_eval, dmp_par, ...
     forward_par_eval, sim_par, rm, i );

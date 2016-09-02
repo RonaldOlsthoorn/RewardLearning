@@ -1,4 +1,4 @@
-function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm ] = init( p )
+function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm, arm ] = init( p )
 % returns several structs used in the algorithm.
 % S: reusable struct that contains new rollouts which are drawn every
 % iteration
@@ -14,13 +14,16 @@ function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm ] = in
 % use static random seed
 rng(10);
 
+global n_dmps;
+n_dmps = p.n_dmps;
+
 % roll out parameters
 dmp_par.start        = p.start;
 dmp_par.goal         = p.goal;
 dmp_par.duration     = p.duration;
 dmp_par.Ts           = p.Ts;
 dmp_par.n_dmp_bf     = p.n_dmp_bf;
-dmp_par.n_dmps       = 1;
+dmp_par.n_dmps       = n_dmps;
 
 forward_par.forward_method = str2func(strcat('forward.update_', p.forward_method));
 forward_par.std      = p.std;
@@ -63,9 +66,12 @@ if ~strcmp('none', p.ref)
 end
 
 S = init.init_dmps( S, dmp_par );
+S.run_rollouts = str2func(strcat('rollout.', 'run_rollouts_', p.system));
 S_eval = S;     % used for noiseless cost assessment
 
 rm = init.init_rm(S, rm);
 rm.outcome_handles = init.init_outcome_handles(rm);
+
+arm = init.init_UR5();
 
 end
