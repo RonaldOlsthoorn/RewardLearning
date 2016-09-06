@@ -20,7 +20,10 @@ y = pos0(1,1);
 
 for i = 1:3
     
-    arm.moveTool(posPath(:,i));
+    arm.moveTool(posPath(:,i), ... 
+                [0.3; 0; 0; 0; 0; 0], ...
+                [1.2; 0; 0; 0; 0; 0], ...
+                [0.15; 0; 0; 0; 0; 0]);
     
     while toc(t) < Ts
         arm.update();
