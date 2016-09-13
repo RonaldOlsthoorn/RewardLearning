@@ -72,7 +72,8 @@ classdef Exact_Timed_DMP < handle
             
             obj.goal = dmp_par.goal;
             obj.y0 = dmp_par.start;
-            obj.n_rfs = dmp_par.n_dmp_bf;           
+            obj.n_rfs = dmp_par.n_dmp_bf;      
+            obj.w = zeros(dmp_par.n_dmp_bf, 1);
         end
         
         function initialize_centers(obj, n_dmp_bf)

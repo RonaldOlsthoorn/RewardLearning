@@ -4,7 +4,7 @@ function [ pos ] = reset_arm(arm)
 
 tolerance = 0.001;
 
-pos0 = [0; -pi/2; pi/2; 0; pi/2; 0];  
+pos0 = [-pi/2; -pi/2; pi/2; 0; pi/2; 0];  
 
 arm.update();
 pos = arm.getJointsPositions();

@@ -55,5 +55,6 @@ for i = 1:3
     yBuf{i}.y_and_back_again = y;
     yBuf{i}.t = t;   
 end
+
 pause(1);
 UR5.reset_arm(arm);
