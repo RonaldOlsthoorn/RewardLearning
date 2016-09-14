@@ -8,7 +8,7 @@ function S = run_rollouts_robot(S, dmp_par, forward_par, ~, iteration, n_ro)
 % sim_par: struct containing simulation parameters.
 % n_ro: number of rollouts to perform.
 
-import plant.*
+import UR5.*
 import dmp.dcp
 import rollout.*
 
@@ -30,9 +30,8 @@ S = gen_epsilon(S, forward_par, n_ro);
 
 for i = 1:n_ro, % Run DMPs
     
-    ur5.reset_arm();
-    
-    q; % = update and read;
+    ur5.reset_arm();  
+    q = arm.getJointPositions; % = update and read;
     
     for j=1:S.n_end,
         
@@ -41,19 +40,18 @@ for i = 1:n_ro, % Run DMPs
         for k=1:n_dmps,
             
             [y, yd, ydd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
-            S.rollouts(i).dmp(k).xd(j, :) = [y, yd, ydd];    % desired state.
+            S.rollouts(i).dmp(k).xd(j, :) = [y, yd, ydd]; % desired state.
             r(k, :) = [r; [y, yd, ydd]];
         end    
         
         r = S.rollouts(i).dmp(1).xd(j, :)';
         
-        arm.
         
-        % send r to robot
         
-        % update
+        v_feed = Kp*(r - q) + Kd*(rd - qd);
+
         
-        % read next state
+        q = arm.getJointsPositions();
         
         S.rollouts(i).q(j,:) = q;    % store the state
         
