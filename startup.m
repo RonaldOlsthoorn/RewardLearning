@@ -3,5 +3,9 @@ cd('gpml');
 startup_gpml;
 cd('..');
 
+cd('rvctools');
+startup_rvc;
+cd('..');
+
 currentFolder = pwd;
 addpath(currentFolder);
