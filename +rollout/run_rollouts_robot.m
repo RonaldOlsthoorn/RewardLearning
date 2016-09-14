@@ -30,31 +30,31 @@ S = gen_epsilon(S, forward_par, n_ro);
 
 for i = 1:n_ro, % Run DMPs
     
-    ur5.reset_arm();  
-    q = arm.getJointPositions; % = update and read;
+    ur5.reset_arm();
     
-    for j=1:S.n_end,
+    for k=1:n_dmps,
         
-        r = zeros(n_dmps, 3);
+        [y, yd, ydd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
+        S.rollouts(i).dmp(k).xd = [y, yd, ydd]; % desired state.
+        r = [r; y];
+        rd = [rd; yd];
+    end
+    
+    UR5.reset_arm(arm);
+    pause(1);
+    
+    for j=1:S.n_end,     
         
-        for k=1:n_dmps,
-            
-            [y, yd, ydd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
-            S.rollouts(i).dmp(k).xd(j, :) = [y, yd, ydd]; % desired state.
-            r(k, :) = [r; [y, yd, ydd]];
-        end    
+        v_feed = UR5.externalPD(r, rd);
+        v_feed = UR5.saturation(v_feed);
+        arm.setJointsSpeeds(v_feed, a, dmp_par.Ts);
         
-        r = S.rollouts(i).dmp(1).xd(j, :)';
-        
-        
-        
-        v_feed = Kp*(r - q) + Kd*(rd - qd);
+        while toc(t) < Ts
+        end
+                        
+        S.rollouts(i).joint_positions(j,:) = arm.getJointsPositions();    % store the state
+        S.rollouts(i).joint_speeds(j,:) = arm.getJointsSpeeds();    % store the state
 
-        
-        q = arm.getJointsPositions();
-        
-        S.rollouts(i).q(j,:) = q;    % store the state
-        
     end
 end
 
