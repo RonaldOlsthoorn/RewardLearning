@@ -2,9 +2,9 @@ function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm, arm ]
 % returns several structs used in the algorithm.
 % S: reusable struct that contains new rollouts which are drawn every
 % iteration
-% S_eval: reusable struct containing an evaluation rollout, which is 
+% S_eval: reusable struct containing an evaluation rollout, which is
 % basically a roll-out without exploration noise.
-% ro_par: struct that contains parameters necessary for sampling batches 
+% ro_par: struct that contains parameters necessary for sampling batches
 % of normal rollouts.
 % ro_par_eval: duplication of ro_par containing parameters for the
 % evaluation roll-outs.
@@ -35,7 +35,7 @@ forward_par.noise_mult   = 1;
 
 forward_par_eval         = forward_par;
 forward_par_eval.reps    = 1;     % only one repetition for evaluation
-forward_par_eval.std     = 0;     
+forward_par_eval.std     = 0;
 forward_par_eval.n_reuse = 0;
 
 % simulation parameters
@@ -52,7 +52,7 @@ rm.rating_noise = p.rating_noise;
 rm.n_segments   = p.n_segments;
 rm.n_ff         = 2;
 rm.meanfunc     = [];
-rm.covfunc      = @covSEard; 
+rm.covfunc      = @covSEard;
 rm.likfunc      = @likGauss;
 
 S.t             = 0:p.Ts:(p.duration-p.Ts); % time vector
@@ -72,6 +72,10 @@ S_eval = S;     % used for noiseless cost assessment
 rm = init.init_rm(S, rm);
 rm.outcome_handles = init.init_outcome_handles(rm);
 
-arm = init.init_UR5();
+if strcmp('robot', p.system)
+    arm = init.init_UR5();
+else
+    arm = [];
+end
 
 end

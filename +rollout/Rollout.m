@@ -5,7 +5,10 @@ classdef Rollout
         index;
         
         dmp;
-        q;
+        joint_positions;
+        joint_speeds;
+        ef_positions;
+        ef_speeds
 
         outcomes;
         sum_out;

@@ -23,7 +23,7 @@ ee = zeros(S.n_end , forward_par_eval.n_dmp_bf*forward_par_eval.reps);
 
 for k=1:10
     
-    yy(:,k) = S.rollouts(k).q(:,1);
+    yy(:,k) = S.rollouts(k).joint_positions(:,1);
     xd(:,k) = S.rollouts(k).dmp.xd(:,1);
     ee(:,(k-1)*forward_par_eval.n_dmp_bf+1:k*forward_par_eval.n_dmp_bf) = S.rollouts(k).dmp.eps;
     
@@ -45,7 +45,7 @@ legend(legendInfo);
 
 subplot(2,3,2);
 hold on;
-plot(t(1:S.n_end), S_eval.rollouts(1).q(:,1));
+plot(t(1:S.n_end), S_eval.rollouts(1).joint_positions(:,1));
 plot(t(1:S.n_end), S_eval.rollouts(1).dmp.xd(:,1));
 plot(t(1:S.n_end), S.ref.r(1,:));
 hold off;

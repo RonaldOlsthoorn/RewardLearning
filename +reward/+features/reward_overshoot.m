@@ -13,9 +13,9 @@ R = zeros(n,ro_par.reps);   % Reward container (not to be confused with control 
 for k=1:ro_par.reps,
     
     if delta_step>0
-        [opt_output, ~] = max(S.rollouts(k).q(1:n,1));
+        [opt_output, ~] = max(S.rollouts(k).joint_positions(1:n,1));
     else
-        [opt_output, ~] = min(S.rollouts(k).q(1:n,1));
+        [opt_output, ~] = min(S.rollouts(k).joint_positions(1:n,1));
     end
         
     overshoot = opt_output/delta_step;

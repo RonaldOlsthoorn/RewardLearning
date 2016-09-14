@@ -44,7 +44,8 @@ for k=1:n_ro, % Run the robotic arm
         [q_next] = f_closed_loop(q, r, sim_par);        
         q = q_next';
         
-        S.rollouts(k).q(n,:) = q';    % store the state
+        S.rollouts(k).joint_positions(n,:) = q(1,1);    % store the state
+        S.rollouts(k).joint_speeds(n,:) = q(2,1);    % store the state
 
     end
 end

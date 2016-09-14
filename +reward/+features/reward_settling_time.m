@@ -14,8 +14,8 @@ R = zeros(n,ro_par.reps);   % Reward container (not to be confused with control 
  
 for k=1:ro_par.reps,
     
-    margin = abs(S.rollouts(k).q(:,1)- ro_par.goal);
-    settling_index = length(S.rollouts(k).q(:,1))- ...
+    margin = abs(S.rollouts(k).joint_positions(:,1)- ro_par.goal);
+    settling_index = length(S.rollouts(k).joint_positions(:,1))- ...
         find(flipud(margin)>=abs_tol,1)+1;
     
     % Cost during trajectory
