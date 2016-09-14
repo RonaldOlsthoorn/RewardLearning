@@ -13,15 +13,14 @@ pause(1);
 
 for i = 1:6;
 
-a_tol = 2*ones(6, 1);
-v_tol = 1*ones(6, 1);
+v_tol = 0.3*ones(6, 1);
 Ts = 0.1;
 
 arm.update();
 posFrom = arm.getJointsPositions();
 posTo = posFrom;
 posTo(i) = posTo(i) - pi/8;
-duration = 8;
+duration = 4;
 
 dmp_par.n_dmp_bf = 10;
 dmp_par.Ts = Ts;
@@ -45,7 +44,9 @@ t_command = 0;
 y_buf = posFrom;
 t_buf = 0;
 v_buf = zeros(6, 1);
-a_buf = zeros(1, 1);
+
+Kp = 3;
+Kd = 0.0375;
 
 pos = posFrom;
 vel = zeros(6, 1);
@@ -54,55 +55,41 @@ disp('into the movement loop');
 
 for j = 2:length(y(:,1))
     
-    a_d = abs((vel_d(:, j)-vel)/(Ts));
+    a_d = 10;
 
-    if a_d(i) > a_tol(i) 
-        a_d(i) = a_tol;
-        disp('Warning: acceleration limit reached!!');
-    elseif a_d(i) < -a_tol(i) 
-        a_d(i) = -a_tol;
-        disp('Warning: acceleration limit reached!!');
-    end
+    v_feed = Kp*(pos_d(:, j) - pos) + Kd*(vel_d(:, j) - vel);
     
-    v_d = (pos_d(:, j) - pos) / Ts;
-    
-    if v_d(i) > v_tol(i)
-        v_d(i) = v_tol(i);
+    if v_feed(i) > v_tol(i)
+        v_feed(i) = v_tol(i);
         disp('Warning: velocity limit reached!!');
-    elseif v_d(i) < -v_tol(i) 
-        v_d(i) = -v_tol(i);
+    elseif v_feed(i) < -v_tol(i) 
+        v_feed(i) = -v_tol(i);
         disp('Warning: velocity limit reached!!');
     end
         
-    arm.setJointsSpeed(v_d, a_d(i, 1), Ts);
+    arm.setJointsSpeed(v_feed, a_d, Ts);
     
     t = tic;
-    t_command(end + 1) = toc(t0);
+    t_command(end + 1) = toc(t0);   
+    v_buf(:, end + 1) = v_feed;
     
-    v_buf(:, end + 1) = v_d;
-    a_buf(1, end + 1) = a_d(i, 1);
-    
-    while toc(t) < Ts
-       
+    while toc(t) < Ts    
     end
     
     arm.update();
     
-    pos = arm.getJointsPositions()
+    pos = arm.getJointsPositions();
     vel = arm.getJointsSpeeds();
     
     y_buf(:, end + 1) = pos;
     t_buf(end + 1) = toc(t0);
 end
 
-
-
 disp('out of the movement loop');
 
 bufPos{i} = y_buf;
 bufT{i} = t_buf;
 bufV{i} = v_buf;
-bufA{i} = a_buf;
 
 pause(1);
 
