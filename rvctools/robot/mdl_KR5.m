@@ -24,7 +24,7 @@
 %mdl_KR5 
 %Define simplest line model for KUKA KR5 robot
 %Contain DH parameters for KUKA KR5 robot
-%All link lenghts and offsets are measured in cm
+%All link lenghts and offsets are measured in m
 clear L
 %            theta    d           a       alpha
 L(1) = Link([0        0.4         0.18    pi/2]);
