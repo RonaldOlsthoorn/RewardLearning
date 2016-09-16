@@ -1,10 +1,8 @@
 function [ pos ] = reset_arm(arm)
-% UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
 tolerance = 0.001;
 
-pos0 = [0; -pi/2; pi/2; 0; pi/2; 0];  
+pos0 = [0; -2*pi/3; 2*pi/3; 0; pi/2; 0];  
 
 arm.update();
 pos = arm.getJointsPositions();

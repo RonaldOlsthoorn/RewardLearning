@@ -15,8 +15,10 @@
 % n_reuse           : number of re-used trials per update
 % n_rfs             : number of basis functions used
 
-start               [0]
-goal                [1]
+pos_from            [-0.4619; -0.1091; 0.3623; 1.2088; -1.2107; -1.2104]
+pos_to              [-0.2619; -0.1091; 0.3623; 1.2088; -1.2107; -1.2104]
+start               [0; -2*pi/3; 2*pi/3; 0; pi/2; 0]
+goal                [0; -1.5935; 1.7393; -0.1464; 1.5727; 0]
 duration            8
 Ts                  0.01
 controller          'lousy_controller'

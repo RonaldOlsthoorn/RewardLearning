@@ -11,11 +11,11 @@ arm.update();
 
 posTool1 = arm.getToolPositions()
 
-qz = [0; -pi/2; pi/2; 0; pi/2; 0];  
+qz = [0; (-pi/2); 0; 0; 0; 0];  
 fkinematics = model_UR5.fkine(qz)
 
 pos = arm.getJointsPositions();
-pos0 = [0; -pi/2; 0; 0; 0; 0];
+pos0 = qz
 tolerance = 0.001;
 
 for i = 6:-1:1

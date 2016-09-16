@@ -11,7 +11,7 @@ for i = 1:3
     arm.update();
     posFrom = arm.getToolPositions();
     posTo = posFrom;
-    posTo(i) = posTo(i) + 0.2;
+    posTo(i) = posTo(i) - 0.2;
     arm.moveTool(posTo);
     
     y = posFrom(i);
@@ -35,7 +35,7 @@ for i = 1:3
     arm.update();
     posFrom = arm.getToolPositions();
     posTo = posFrom;
-    posTo(i) = posTo(i) - 0.2;
+    posTo(i) = posTo(i) + 0.2;
     arm.moveTool(posTo);
     
     y = posFrom(i);
