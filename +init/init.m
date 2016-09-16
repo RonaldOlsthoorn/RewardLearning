@@ -18,8 +18,13 @@ global n_dmps;
 n_dmps = p.n_dmps;
 
 % roll out parameters
-dmp_par.start        = p.start;
-dmp_par.goal         = p.goal;
+dmp_par.start        = p.start_joint;
+dmp_par.goal         = p.goal_joint;
+dmp_par.start_joint  = p.start_joint;
+dmp_par.goal_joint   = p.goal_joint;
+dmp_par.start_tool   = p.start_tool;
+dmp_par.goal_tool    = p.goal_tool;
+
 dmp_par.duration     = p.duration;
 dmp_par.Ts           = p.Ts;
 dmp_par.n_dmp_bf     = p.n_dmp_bf;
@@ -65,7 +70,12 @@ if ~strcmp('none', p.ref)
     S.ref           = ref_function(dmp_par);
 end
 
-S = init.init_dmps( S, dmp_par );
+if p.use_ik
+    S = init.init_dmps_ik( S, dmp_par );
+else
+    S = init.init_dmps( S, dmp_par );
+end
+
 S.run_rollouts = str2func(strcat('rollout.', 'run_rollouts_', p.system));
 S_eval = S;     % used for noiseless cost assessment
 

@@ -1,12 +1,16 @@
+clear; close all; clc;
+
 p = init.read_protocol('+protocols/protocol_robot.txt');
 
 % roll out parameters
-dmp_par.start        = p.start;
-dmp_par.goal         = p.goal;
-dmp_par.duration     = p.duration;
+dmp_par.start        = p.start_tool;
+dmp_par.goal         = p.goal_tool;
+dmp_par.start_joint  = p.start_joint;
+dmp_par.goal_joint   = p.goal_joint;
+dmp_par.start_tool   = p.start_tool;
+dmp_par.goal_tool    = p.goal_tool;
 dmp_par.Ts           = p.Ts;
-dmp_par.n_dmp_bf     = p.n_dmp_bf;
-dmp_par.n_dmps       = p.n_dmps;
+dmp_par.duration     = p.duration;
 
 S.t             = 0:p.Ts:(p.duration-p.Ts); % time vector
 S.n_end         = length(S.t);              % length of total simulation
@@ -18,4 +22,8 @@ if ~strcmp('none', p.ref)
     S.ref           = ref_function(dmp_par);
 end
 
-S = init.init_dmps( S, dmp_par );
+if p.use_ik
+    S = init.init_dmps_ik(S, dmp_par );
+else
+    S = init.init_dmps(S, dmp_par );
+end

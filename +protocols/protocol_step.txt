@@ -17,6 +17,7 @@
 
 start               [0]
 goal                [1]
+use_ik              false
 duration            4
 Ts                  0.01
 controller          'lousy_controller'

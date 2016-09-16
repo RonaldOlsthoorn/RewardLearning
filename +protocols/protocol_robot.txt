@@ -14,15 +14,18 @@
 % reference         : name of the reference trajectory to use in reward. 'none' if no such function is used.
 % n_reuse           : number of re-used trials per update
 % n_rfs             : number of basis functions used
+%
+% DO NOT USE WHITESPACE IN THE VALUE FIELDS
 
-pos_from            [-0.4619; -0.1091; 0.3623; 1.2088; -1.2107; -1.2104]
-pos_to              [-0.2619; -0.1091; 0.3623; 1.2088; -1.2107; -1.2104]
-start               [0; -2*pi/3; 2*pi/3; 0; pi/2; 0]
-goal                [0; -1.5935; 1.7393; -0.1464; 1.5727; 0]
+start_tool          [-0.4619;-0.1091;0.3623;1.2088;-1.2107;-1.2104]
+goal_tool           [-0.2619;-0.0091;0.3623;1.2088;-1.2107;-1.2104]
+start_joint         [0;-2*pi/3;2*pi/3;0;pi/2;0]
+goal_joint          [0;-1.5935;1.7393;-0.1464;1.5727;0]
+use_ik              true
 duration            8
 Ts                  0.01
 controller          'lousy_controller'
-ref                 'ref_trajectory'
+ref                 'ref_robot'
 std                 600
 forward_method      'PI2'
 annealer            1/100
