@@ -1,4 +1,4 @@
-%SerialLink.ikine Numerical inverse kinematics
+% SerialLink.ikine Numerical inverse kinematics
 %
 % Q = R.ikine(T) are the joint coordinates (1xN) corresponding to the robot 
 % end-effector pose T (4x4) which is a homogenenous transform.
@@ -187,10 +187,13 @@ function [qt,histout] = ikine(robot, tr, varargin)
             Tq = robot.fkine(q');
             
             e(1:3) = transl(T - Tq);
-            Rq = t2r(Tq);
-            [th,n] = tr2angvec(Rq'*t2r(T));
-            e(4:6) = th*n;
             
+%             Rq = t2r(Tq);
+%             [th,n] = tr2angvec(Rq'*t2r(T));
+%             e(4:6) = th*n;
+            
+            e(4:6) = 0;
+
             % optionally adjust the step size
             if opt.varstep
                 % test against last best error, only consider the DOF of

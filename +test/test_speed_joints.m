@@ -1,6 +1,5 @@
-import dmp.*
-
 clear; close all; clc;
+import dmp.*
 
 arm = UR5.driver.URArm();
 ip = '192.168.1.50';

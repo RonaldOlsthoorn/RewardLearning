@@ -1,4 +1,4 @@
-function [model_UR5, T, u] = test_dh(input)
+function [model_UR5, T, u] = test_denavit_hartenberg(input)
 
 mdl_UR5;
 
