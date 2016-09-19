@@ -18,7 +18,6 @@ import frame.*
 import rollout.*
 
 clc
-
 tic
 
 % Read the protocol file

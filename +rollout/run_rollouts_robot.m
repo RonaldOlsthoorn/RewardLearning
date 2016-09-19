@@ -18,6 +18,8 @@ arm = UR5.driver.URArm();
 ip = '192.168.1.50';
 arm.fopen(ip);
 
+a = 10;
+
 for i=1:n_ro,
     
     ro = Rollout();
@@ -30,30 +32,42 @@ S = gen_epsilon(S, forward_par, n_ro);
 
 for i = 1:n_ro, % Run DMPs
     
-    ur5.reset_arm();
+    r = zeros(n_dmps, S.n_end);
+    rd = zeros(n_dmps, S.n_end);
+    
     
     for k=1:n_dmps,
         
         [y, yd, ydd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
         S.rollouts(i).dmp(k).xd = [y, yd, ydd]; % desired state.
-        r = [r; y];
-        rd = [rd; yd];
+        r(k,:) = y';
+        rd(k,:) = yd';
     end
     
     UR5.reset_arm(arm);
     pause(1);
+    arm.update();
+    
+    p = arm.getJointsPositions();
+    v = arm.getJointsSpeeds();
+    
     
     for j=1:S.n_end,     
         
-        v_feed = UR5.externalPD(r, rd);
+        t = tic;
+        v_feed = UR5.externalPD(r(:,j), rd(:,j), p, v);
         v_feed = UR5.saturation(v_feed);
-        arm.setJointsSpeeds(v_feed, a, dmp_par.Ts);
+        arm.setJointsSpeed(v_feed, a, dmp_par.Ts);
         
-        while toc(t) < Ts
+        while toc(t) < dmp_par.Ts
         end
-                        
-        S.rollouts(i).joint_positions(j,:) = arm.getJointsPositions();    % store the state
-        S.rollouts(i).joint_speeds(j,:) = arm.getJointsSpeeds();    % store the state
+        
+        arm.update();  
+        p = arm.getJointsPositions();
+        v = arm.getJointsSpeeds();
+        
+        S.rollouts(i).joint_positions(j,:) = p;    % store the state
+        S.rollouts(i).joint_speeds(j,:) = v;   % store the state
 
     end
 end
