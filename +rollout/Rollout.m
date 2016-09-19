@@ -8,7 +8,8 @@ classdef Rollout
         joint_positions;
         joint_speeds;
         ef_positions;
-        ef_speeds
+        ef_speeds;
+        time
 
         outcomes;
         sum_out;

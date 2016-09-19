@@ -25,6 +25,11 @@ for i=1:n_ro,
     ro = Rollout();
     ro.iteration = iteration;
     ro.index = i;
+    ro.joint_positions = zeros(n_dmps, S.n_end);
+    ro.joint_speeds = zeros(n_dmps, S.n_end);
+    ro.ef_positions = zeros(n_dmps, S.n_end);
+    ro.ef_speeds = zeros(n_dmps, S.n_end);
+    
     S.rollouts(i) = ro;
 end
 
@@ -45,14 +50,23 @@ for i = 1:n_ro, % Run DMPs
     end
     
     UR5.reset_arm(arm);
-    pause(1);
+    
     arm.update();
     
     p = arm.getJointsPositions();
     v = arm.getJointsSpeeds();
     
+    S.rollouts(i).joint_positions(:,1) = p;
+    S.rollouts(i).joint_speeds(:,1) = v;
+    S.rollouts(i).ef_positions(:,1) = arm.getToolPositions();
+    S.rollouts(i).ef_speeds(:,1) = arm.getToolSpeeds();
+    S.rollouts(i).time = zeros(1,S.n_end);
+        
+    pause(1);
     
-    for j=1:S.n_end,     
+    t0 = tic;
+    
+    for j=1:S.n_end,
         
         t = tic;
         v_feed = UR5.externalPD(r(:,j), rd(:,j), p, v);
@@ -62,16 +76,21 @@ for i = 1:n_ro, % Run DMPs
         while toc(t) < dmp_par.Ts
         end
         
-        arm.update();  
+        arm.update();
         p = arm.getJointsPositions();
         v = arm.getJointsSpeeds();
         
-        S.rollouts(i).joint_positions(j,:) = p;    % store the state
-        S.rollouts(i).joint_speeds(j,:) = v;   % store the state
-%         S.rollouts(i).ef_positions(j,:) = arm.getToolPositions();    % store the state
-%         S.rollouts(i).ef_speeds(j,:) = arm.getToolSpeeds();   % store the state    
+        S.rollouts(i).joint_positions(:,j) = p;    % store the state
+        S.rollouts(i).joint_speeds(:,j) = v;   % store the state
+        S.rollouts(i).ef_positions(:,j) = arm.getToolPositions();    % store the state
+        S.rollouts(i).ef_speeds(:,j) = arm.getToolSpeeds();   % store the state 
+        S.rollouts(i).time(j) = toc(t0);
     end
 end
+
+pause(1);
+UR5.reset_arm(arm);
+pause(1);
 
 %% close
 arm.fclose();
