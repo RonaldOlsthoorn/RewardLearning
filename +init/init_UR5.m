@@ -3,8 +3,8 @@ function [ arm ] = init_UR5( )
 % Detailed explanation goes here
 
 arm = UR5.driver.URArm();
-ip = '192.168.1.50';
-arm.fopen(ip);
+% ip = '192.168.1.50';
+% arm.fopen(ip);
 
 end
 

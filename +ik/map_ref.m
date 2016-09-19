@@ -8,7 +8,6 @@ for i = 2:length(S.ref.r_tool(1,:))
     T = transl(S.ref.r_tool(:,i));
     qi = model_UR5.ikine(T, q(:,i-1));   
     q(:, i)= qi';
-    i
 end
 
 % figID = 1;

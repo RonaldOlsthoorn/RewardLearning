@@ -68,7 +68,8 @@ for i = 1:n_ro, % Run DMPs
         
         S.rollouts(i).joint_positions(j,:) = p;    % store the state
         S.rollouts(i).joint_speeds(j,:) = v;   % store the state
-
+%         S.rollouts(i).ef_positions(j,:) = arm.getToolPositions();    % store the state
+%         S.rollouts(i).ef_speeds(j,:) = arm.getToolSpeeds();   % store the state    
     end
 end
 

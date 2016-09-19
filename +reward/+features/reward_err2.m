@@ -9,12 +9,13 @@ n = S.n_end;            % The duration of the complete simulation
 R = zeros(n,ro_par.reps);   % Reward container (not to be confused with control effort).
 
 % Create trajectory to track.
-ref = S.ref.r';
+ref = S.ref.r_tool';
+
  
 for k=1:ro_par.reps,
         
     % Cost during trajectory
-    r  = -(S.rollouts(k).joint_positions(1:n,1)-ref(1:n,1)).^2;   
+    r  = -(S.rollouts(k).tool_positions(1:n,1)-ref(1:n,1)).^2;   
     R(:,k) = r;
 end
 
