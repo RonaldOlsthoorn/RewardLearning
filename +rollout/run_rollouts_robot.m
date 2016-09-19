@@ -2,7 +2,7 @@ function S = run_rollouts_robot(S, dmp_par, forward_par, ~, iteration, n_ro)
 % A dedicated function to run multiple roll-outs using the specifictions in ro_par.
 % noise_mult allows decreasing the noise with the number of roll-outs, which gives
 % smoother converged performance (but it is not needed for convergence).
-
+%
 % S: struct containing the result of sampling
 % ro_par: struct containing rollout parameters.
 % sim_par: struct containing simulation parameters.
