@@ -30,6 +30,7 @@ dmp_par.Ts           = p.Ts;
 dmp_par.n_dmp_bf     = p.n_dmp_bf;
 dmp_par.n_dmps       = n_dmps;
 
+% all parameters concerned with the forward learning algorithm
 forward_par.forward_method = str2func(strcat('forward.update_', p.forward_method));
 forward_par.std      = p.std;
 forward_par.annealer = p.annealer;
@@ -39,7 +40,7 @@ forward_par.n_dmp_bf = p.n_dmp_bf;
 forward_par.noise_mult   = 1;
 
 forward_par_eval         = forward_par;
-forward_par_eval.reps    = 1;     % only one repetition for evaluation
+forward_par_eval.reps    = 1;
 forward_par_eval.std     = 0;
 forward_par_eval.n_reuse = 0;
 
@@ -62,7 +63,7 @@ rm.likfunc      = @likGauss;
 
 S.t             = 0:p.Ts:(p.duration-p.Ts); % time vector
 S.n_end         = length(S.t);              % length of total simulation
-S.ref = p.ref;
+S.ref           = p.ref;
 
 % initialize the reference, if used.
 if ~strcmp('none', p.ref)
@@ -71,9 +72,9 @@ if ~strcmp('none', p.ref)
 end
 
 if p.use_ik
-    S = init.init_dmps_ik( S, dmp_par );
+    S = init.init_dmps_ik(S, dmp_par);
 else
-    S = init.init_dmps( S, dmp_par );
+    S = init.init_dmps(S, dmp_par);
 end
 
 S.run_rollouts = str2func(strcat('rollout.', 'run_rollouts_', p.system));

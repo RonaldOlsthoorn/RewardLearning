@@ -1,77 +1,22 @@
-function [ ref ] = map_ref(ref, model_UR5)
+function [S] = map_ref(S, dmp_par, model_UR5)
 
-T1 = transl(ref.r_tool(:,1));
-T2 = transl(ref.r_tool(:,end));
-T = ctraj(T1, T2, length(ref.r_tool(1,:))); 	% compute a Cartesian path
-q = model_UR5.ikine(T, 'pinv'); 
+q = zeros(6, length(S.ref.r_tool(1,:)));
+q(:, 1) = model_UR5.ikine(transl(S.ref.r_tool(:,1)), dmp_par.start_joint);  
 
-figID = 1;
-figure(double(figID));
-set(double(figID), 'units','normalized','outerposition',[0 0 1 1]);
-clf;
-model_UR5.plot(q);
-
-T_back_again = model_UR5.fkine(q);
-
-ref.r_joint = q;
-ref.r_joint_d = [];
-ref.r_joint_dd = [];
-
-
-% Inverse kinematics function, based on the Jacobian method.
-% theta0: initial state in state-space
-% xgoal: desired end state of the end-effector in cartesian space
-% par: struct containing the parameters of the robotic arm
-
-% theta_end: end state in state-space
-% x_res: trajectory of the end-effector
-
-% Calculate the initial end-effector coordinates (Cartesian)
-
-
-
-
-alpha = 0.001;                      % state increment
-epsilon=0.001;                      % error threshold
-
-max_iterations = 100000;
-
-x_res = zeros(2,max_iterations);    % pre-allocate
-
-x = [x0(1);x0(3)];                        % initial end-effector
-theta = theta0;                     % initial state
-
-i=0;
-
-while(norm(xgoal-x,2)>epsilon && i< max_iterations)
+for i = 2:length(S.ref.r_tool(1,:))
     
-    i=i+1;
-    x_res(:,i)=x;
-    
-    delta_x = alpha*(xgoal-x)/norm(xgoal-x);
-    
-    J = [-par.l1*sin(theta(1))-par.l2*sin(theta(1)+theta(2)),...
-        -par.l2*sin(theta(1)+theta(2));
-        par.l1*cos(theta(1))+par.l2*cos(theta(1)+theta(2)),...
-        par.l2*cos(theta(1)+theta(2))];
-    
-    delta_theta = pinv(J)*delta_x;
-    theta = delta_theta+theta;
-    
-    [x_end] = forward_kinematics([theta(1);0;theta(2);0], par);
-    x = [x_end(1);x_end(3)];
-    
+    T = transl(S.ref.r_tool(:,i));
+    qi = model_UR5.ikine(T, q(:,i-1));   
+    q(:, i)= qi';
+    i
 end
 
-if(i==max_iterations)
-    disp('no solution found');
-end
+% figID = 1;
+% figure(double(figID));
+% set(double(figID), 'units','normalized','outerposition',[0 0 1 1]);
+% clf;
+% model_UR5.plot(q');
 
-theta_end = theta;
-
-end
-
-
-
-end
-
+S.ref.r_joint = q;
+S.ref.r_joint_d = [zeros(6, 1) diff(S.ref.r_joint, 1, 2)/dmp_par.Ts];
+S.ref.r_joint_dd = [zeros(6, 1) diff(S.ref.r_joint_d, 1, 2)/dmp_par.Ts];

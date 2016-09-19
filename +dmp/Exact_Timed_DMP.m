@@ -70,8 +70,8 @@ classdef Exact_Timed_DMP < handle
             obj.tau = 0.5/obj.duration;
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
-            obj.goal = dmp_par.goal;
-            obj.y0 = dmp_par.start;
+            obj.goal = dmp_par.goal_joint(obj.index);
+            obj.y0 = dmp_par.start_joint(obj.index);
             obj.n_rfs = dmp_par.n_dmp_bf;      
             obj.w = zeros(dmp_par.n_dmp_bf, 1);
         end
