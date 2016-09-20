@@ -71,7 +71,7 @@ for i = 1:n_ro, % Run DMPs
         t = tic;
         v_feed = UR5.externalPD(r(:,j), rd(:,j), p, v);
         v_feed = UR5.saturation(v_feed);
-        arm.setJointsSpeed(v_feed, a, dmp_par.Ts);
+        arm.setJointsSpeed(v_feed, a, 2*dmp_par.Ts);
         
         while toc(t) < dmp_par.Ts
         end
