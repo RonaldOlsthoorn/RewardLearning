@@ -64,6 +64,8 @@ for i = 1:n_ro, % Run DMPs
         
     pause(1);
     
+    display(strcat('Rollout number:', ' ', num2str(i)));
+    
     t0 = tic;
     
     for j=1:S.n_end,

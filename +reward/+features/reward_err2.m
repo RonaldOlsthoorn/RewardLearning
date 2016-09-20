@@ -10,12 +10,11 @@ R = zeros(n,ro_par.reps);   % Reward container (not to be confused with control 
 
 % Create trajectory to track.
 ref = S.ref.r_tool';
-
  
 for k=1:ro_par.reps,
         
     % Cost during trajectory
-    r  = -(S.rollouts(k).tool_positions(1:n,1)-ref(1:n,1)).^2;   
+    r  = -sum((S.rollouts(k).ef_positions(1:3,:)'-ref(:,1:3)).^2, 2);   
     R(:,k) = r;
 end
 

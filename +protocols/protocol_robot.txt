@@ -17,16 +17,16 @@
 %
 % DO NOT USE WHITESPACE IN THE VALUE FIELDS   [100;50;50;10;100;0]
 
-start_tool          [-0.2619;-0.0091;0.3623;1.2088;-1.2107;-1.2104]
-goal_tool           [-0.4619;-0.1091;0.3623;1.2088;-1.2107;-1.2104]
+start_tool          [-0.2619;-0.1091;0.3623;1.2088;-1.2107;-1.2104]
+goal_tool           [-0.4619;-0.0091;0.3623;1.2088;-1.2109;-1.2103]
 start_joint         [0;-2*pi/3;2*pi/3;0;pi/2;0]
-goal_joint          [0;-1.5935;1.7393;-0.1464;1.5727;0]
+goal_joint          [-0.2672;-1.6281;1.7727;-0.1439;1.3053;0]
 use_ik              true
 duration            8
 Ts                  0.01
 controller          'lousy_controller'
 ref                 'ref_robot'
-std                 [0;0;0;0;0;0]
+std                 [200;100;100;20;200;0]
 forward_method      'PI2'
 annealer            1/100
 reps                10

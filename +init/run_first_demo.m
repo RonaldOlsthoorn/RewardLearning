@@ -28,8 +28,7 @@ for k = 1:forward_par.reps
     for s = 1:rm.n_segments
         
         rm.seg(s).sum_out(k,:)  = squeeze(sum_out(rm.seg_start(s),k,:));
-        rm.seg(s).R_expert(k) = expert.query_expert( rm.seg(s).sum_out(k,:) , s, rm.rating_noise );
-        
+        rm.seg(s).R_expert(k) = expert.query_expert(rm.seg(s).sum_out(k,:), s, rm.rating_noise );       
     end
 end
 
@@ -52,7 +51,7 @@ set (fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
 for s = 1:rm.n_segments
     
     [m_x, m_y] = meshgrid(-150:5:50, -150:5:50);
-    z = zeros(length(m_x(:,1)),length(m_x(1,:)));
+    z = zeros(length(m_x(:,1)), length(m_x(1,:)));
     z_true = z;
        
     for i = 1:length(m_x(:,1))
