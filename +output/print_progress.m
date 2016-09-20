@@ -17,16 +17,27 @@ end
 
 t = S_eval.t;
 
+xx = zeros(S.n_end , forward_par_eval.reps);
 yy = zeros(S.n_end , forward_par_eval.reps);
+zz = zeros(S.n_end , forward_par_eval.reps);
+
 xd = zeros(S.n_end , forward_par_eval.reps);
+yd = zeros(S.n_end , forward_par_eval.reps);
+zd = zeros(S.n_end , forward_par_eval.reps);
+
 ee = zeros(S.n_end , forward_par_eval.n_dmp_bf*forward_par_eval.reps);
 
 for k=1:10
     
-    yy(:,k) = S.rollouts(k).joint_positions(:,1);
-    xd(:,k) = S.rollouts(k).dmp.xd(:,1);
-    ee(:,(k-1)*forward_par_eval.n_dmp_bf+1:k*forward_par_eval.n_dmp_bf) = S.rollouts(k).dmp.eps;
+    xx(:,k) = S.rollouts(k).ef_positions(1,:);
+    yy(:,k) = S.rollouts(k).ef_positions(2,:);
+    zz(:,k) = S.rollouts(k).ef_positions(3,:);
     
+%     xd(:,k) = S.rollouts(k).dmp.xd(:,1);
+%     yd(:,k) = S.rollouts(k).dmp.yd(:,2);
+%     zd(:,k) = S.rollouts(k).dmp.zd(:,3);
+     
+    ee(:,(k-1)*forward_par_eval.n_dmp_bf+1:k*forward_par_eval.n_dmp_bf) = S.rollouts(k).dmp.eps; 
 end
 
 figure(double(figID));
@@ -36,37 +47,56 @@ clf;
 % plot the samples
 subplot(2,3,1);
 hold on;
-plot(t(1:S.n_end), yy);
-plot(t(1:S.n_end), S.ref.r(1,:));
+plot(t(1:S.n_end), xx);
 hold off;
 xlabel('t');
 ylabel('x');
 legend(legendInfo);
 
+% plot the samples
 subplot(2,3,2);
 hold on;
-plot(t(1:S.n_end), S_eval.rollouts(1).joint_positions(:,1));
-plot(t(1:S.n_end), S_eval.rollouts(1).dmp.xd(:,1));
-plot(t(1:S.n_end), S.ref.r(1,:));
+plot(t(1:S.n_end), yy);
 hold off;
 xlabel('t');
-ylabel('xd');
+ylabel('y');
+legend(legendInfo);
 
+% plot the samples
 subplot(2,3,3);
-hold on
-plot(t(1:S.n_end),S_eval.rollouts(1).r(1:S.n_end));
-xlabel('time [s]');
-ylabel('Cost');
+hold on;
+plot(t(1:S.n_end), zz);
+hold off;
+xlabel('t');
+ylabel('z');
+legend(legendInfo);
 
 subplot(2,3,4);
 hold on;
-plot(t(1:S.n_end), S_eval.rollouts(1).sum_out(:,1));
+plot(t(1:S.n_end), S_eval.rollouts(1).ef_positions(1,:));
+plot(t(1:S.n_end), S.ref.r_tool(1,:));
 hold off;
 xlabel('t');
-ylabel('sum outcomes');
+ylabel('x');
 
-% the paramter vector
+subplot(2,3,5);
+hold on;
+plot(t(1:S.n_end), S_eval.rollouts(1).ef_positions(2,:));
+plot(t(1:S.n_end), S.ref.r_tool(2,:));
+hold off;
+xlabel('t');
+ylabel('y');
+
 subplot(2,3,6);
+hold on;
+plot(t(1:S.n_end), S_eval.rollouts(1).ef_positions(3,:));
+plot(t(1:S.n_end), S.ref.r_tool(3,:));
+hold off;
+xlabel('t');
+ylabel('z');
+
+figure;
+% the paramter vector
 bar(S.dmps(1).w);
 ylabel('theta');
 axis('tight');

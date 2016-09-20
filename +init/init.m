@@ -1,4 +1,4 @@
-function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm, arm ] = init( p )
+function [ S, S_eval, dmp_par, forward_par, forward_par_eval, sim_par, rm] = init( p )
 % returns several structs used in the algorithm.
 % S: reusable struct that contains new rollouts which are drawn every
 % iteration
@@ -41,7 +41,7 @@ forward_par.noise_mult   = 1;
 
 forward_par_eval         = forward_par;
 forward_par_eval.reps    = 1;
-forward_par_eval.std     = 0;
+forward_par_eval.std     = zeros(6, 1);
 forward_par_eval.n_reuse = 0;
 
 % simulation parameters
@@ -82,11 +82,5 @@ S_eval = S;     % used for noiseless cost assessment
 
 rm = init.init_rm(S, rm);
 rm.outcome_handles = init.init_outcome_handles(rm);
-
-if strcmp('robot', p.system)
-    arm = init.init_UR5();
-else
-    arm = [];
-end
 
 end

@@ -19,8 +19,7 @@ for segment = 1:rm.n_segments
         roll_out.seg(segment).sum_out);
     
     sigmaPoints = m + [1 -1].*sqrt(s2);
-
-    
+ 
     for sigma = 1:length(sigmaPoints)
         
         theta_tilda = get_PI2_update(S_original, ro_par);
@@ -42,10 +41,8 @@ for segment = 1:rm.n_segments
         theta_star_p = mvnpdf(theta_star', theta_star_mean', theta_star_cov);
         theta_tilda_p = mvnpdf(theta_tilda', theta_tilda_mean', theta_tilda_cov);
         
-        epd(segment, sigma) = sum(theta_star_p.*log(theta_star_p./theta_tilda_p));
-        
+        epd(segment, sigma) = sum(theta_star_p.*log(theta_star_p./theta_tilda_p)); 
     end
-    
 end
 
 af = mean(mean(epd));

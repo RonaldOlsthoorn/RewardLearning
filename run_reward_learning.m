@@ -27,11 +27,21 @@ p = init.read_protocol(protocol_name);
 % Matlab DMPs currently do not support multi-DOF DMPs.
 
 [S, S_eval, dmp_par, forward_par, forward_par_eval, ...
-    sim_par, rm, arm] = init.init(p);
+    sim_par, rm] = init.init(p);
+
+if strcmp('robot', p.system)
+    arm = UR5.driver.URArm();
+    ip = '192.168.1.50';
+    arm.fopen(ip);
+    
+else
+    arm = [];
+end
+
 
 % Before we run the main loop, we need 1 demo to initialize the reward
 % model
-rm = init.run_first_demo(S, rm, forward_par, dmp_par, sim_par);
+rm = init.run_first_demo(S, arm, rm, forward_par, dmp_par, sim_par);
 
 i = 1;
 
@@ -39,20 +49,20 @@ while converged(rm, i)~=1,
     
     % first batch, collect full nr of roll-outs
     if(i==1)
-        S = S.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
+        S = S.run_rollouts(S, arm, dmp_par, forward_par, sim_par, i, forward_par.reps);
     else
         % after that mix new roll-outs with reused rollouts
-        S = S.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
+        S = S.run_rollouts(S, arm, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
     end
     
     S = reward.compute_reward(S, forward_par, rm);
     rm = update_database(S, forward_par, rm, forward_par.reps);
     
-    [ S_eval, ~ ] = output.evaluate_progress( S, S_eval, dmp_par, ...
-        forward_par_eval, sim_par, rm, i );
+    [ S_eval, ~ ] = output.evaluate_progress(S, S_eval, arm, dmp_par, ...
+        forward_par_eval, sim_par, rm, i);
     
     % update reward model
-    reward.update_reward(S, rm, forward_par);
+    % reward.update_reward(S, rm, forward_par);
     
     % perform the PI2 update
     [S, forward_par] = forward_par.forward_method(S, forward_par);
@@ -64,10 +74,12 @@ while converged(rm, i)~=1,
     i=i+1;
 end
 
+arm.fclose();
+
 toc
 
 % perform the final noiseless evaluation to get the final cost
 S_eval = S_eval.run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
 
-[ ~, ~ ] = output.evaluate_progress( S, S_eval, dmp_par, ...
+[~, ~] = output.evaluate_progress( S, S_eval, dmp_par, ...
     forward_par_eval, sim_par, rm, i );

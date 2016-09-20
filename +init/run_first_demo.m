@@ -1,4 +1,4 @@
-function rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par)
+function rm = run_first_demo(S, arm, rm, forward_par, dmp_par, sim_par)
 % runs first roll-outs en queries the expert for its rating
 % this is necessary for the initialization of the reward model.
 %
@@ -9,7 +9,7 @@ function rm = run_first_demo(S, rm, forward_par, dmp_par, sim_par)
 
 import reward.compute_outcomes
 
-S = S.run_rollouts(S, dmp_par, forward_par, sim_par, 0, forward_par.reps);
+S = S.run_rollouts(S, arm, dmp_par, forward_par, sim_par, 0, forward_par.reps);
 outcomes =  compute_outcomes(S, forward_par, rm );
 
 for s = 1:rm.n_segments
