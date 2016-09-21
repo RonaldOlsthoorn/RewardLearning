@@ -32,11 +32,11 @@ dmp_par.n_dmps       = n_dmps;
 
 % all parameters concerned with the forward learning algorithm
 forward_par.forward_method = str2func(strcat('forward.update_', p.forward_method));
-forward_par.std      = p.std;
-forward_par.annealer = p.annealer;
-forward_par.n_reuse  = p.n_reuse;
-forward_par.reps     = p.reps;
-forward_par.n_dmp_bf = p.n_dmp_bf;
+forward_par.std          = p.std;
+forward_par.annealer     = p.annealer;
+forward_par.n_reuse      = p.n_reuse;
+forward_par.reps         = p.reps;
+forward_par.n_dmp_bf     = p.n_dmp_bf;
 forward_par.noise_mult   = 1;
 
 forward_par_eval         = forward_par;
