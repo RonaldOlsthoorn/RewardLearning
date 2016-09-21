@@ -72,5 +72,5 @@ toc
 % perform the final noiseless evaluation to get the final cost
 S_eval = run_rollouts(S, dmp_par, forward_par, sim_par, i, forward_par.reps);
 
-[ ~, ~ ] = output.evaluate_progress( S, S_eval, dmp_par, ...
+[~, ~] = output.evaluate_progress( S, S_eval, dmp_par, ...
     forward_par_eval, sim_par, rm, i );
