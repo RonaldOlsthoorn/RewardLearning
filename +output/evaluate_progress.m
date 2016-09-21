@@ -1,8 +1,7 @@
-function [ S_eval, Weights ] = evaluate_progress(S, S_eval, arm, dmp_par, ...
+function [S_eval, Weights] = evaluate_progress(S, S_eval, arm, dmp_par, ...
                                         forward_par_eval, sim_par, rm, i )
                                     
 % Evaluate and print the progress of the algorithm so far.                                    
-
 r = zeros(S.n_end, forward_par_eval.reps);
 
 for k=1:forward_par_eval.reps
