@@ -32,10 +32,6 @@ for k=1:10
     xx(:,k) = S.rollouts(k).ef_positions(1,:);
     yy(:,k) = S.rollouts(k).ef_positions(2,:);
     zz(:,k) = S.rollouts(k).ef_positions(3,:);
-    
-%     xd(:,k) = S.rollouts(k).dmp.xd(:,1);
-%     yd(:,k) = S.rollouts(k).dmp.yd(:,2);
-%     zd(:,k) = S.rollouts(k).dmp.zd(:,3);
      
     ee(:,(k-1)*forward_par_eval.n_dmp_bf+1:k*forward_par_eval.n_dmp_bf) = S.rollouts(k).dmp.eps; 
 end
