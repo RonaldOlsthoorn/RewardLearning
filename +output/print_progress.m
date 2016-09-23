@@ -21,10 +21,6 @@ xx = zeros(S.n_end , forward_par_eval.reps);
 yy = zeros(S.n_end , forward_par_eval.reps);
 zz = zeros(S.n_end , forward_par_eval.reps);
 
-xd = zeros(S.n_end , forward_par_eval.reps);
-yd = zeros(S.n_end , forward_par_eval.reps);
-zd = zeros(S.n_end , forward_par_eval.reps);
-
 ee = zeros(S.n_end , forward_par_eval.n_dmp_bf*forward_par_eval.reps);
 
 for k=1:10

@@ -1,0 +1,9 @@
+% The protocol file has the following columns:
+%
+%
+% DO NOT USE WHITESPACE IN THE VALUE FIELDS   [100;50;50;10;100;0]
+
+trajectory          trajectory_robot
+plant               plant_real_robot
+forward             forward_PI2
+reward_model        reward_model_epd
