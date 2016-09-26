@@ -59,20 +59,20 @@ classdef RBF_policy < handle
             
             obj.n_rfs = n_dmp_bf;
             
-            centers_time = (0:1/(obj.n_rfs-1):1)';
+            centers_time = (0:(obj.duration/(obj.n_rfs-1)):obj.duration)';
             obj.c = centers_time;
         end
         
         function initialize_amplitudes(obj)
             
-            obj.D = 0.55;
+            obj.D = 3;
         end
                     
         function initialize_psi(obj)
             
             for i = 1:obj.n_rfs
                 
-                obj.psi(:, i) = exp(-0.5*((obj.t - obj.c(i)).^2).*obj.D(i));
+                obj.psi(:, i) = exp(-0.5*((obj.t - obj.c(i)).^2)*obj.D);
             end      
         end
         
@@ -95,7 +95,7 @@ classdef RBF_policy < handle
             
             for i = 1:length(obj.t)
                 
-                obj.bases(i,:) = obj.psi(i,:)*obj.x(i, 1)/sum(obj.psi(i,:));
+                obj.bases(i,:) = obj.psi(i,:)/sum(obj.psi(i,:));
             end
         end
         
@@ -104,22 +104,13 @@ classdef RBF_policy < handle
             y = sum((obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
             yd = [0 diff(y)/obj.Ts];
         end
-        
-        
+              
         function batch_fit(obj, T)
             
-            if (nargin < 3)
-                Td = diffnc(T, dt);
-            end
-            if (nargin < 4)
-                Tdd = diffnc(Td, dt);
-            end
+            y = T;
+            X = obj.bases;
             
-            % compute the regression
-            sx2  = sum(((obj.x.^2)*ones(1,length(obj.c))).*obj.psi, 1)';
-            sxtd = sum(((obj.x.*Ft)*ones(1,length(obj.c))).*obj.psi, 1)';
-            obj.w    = sxtd./(sx2+1.e-10);
-                      
+            obj.w = (X' * X) \ X' * y;
         end
     end    
 end
