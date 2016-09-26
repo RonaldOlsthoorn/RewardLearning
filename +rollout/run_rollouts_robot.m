@@ -42,8 +42,8 @@ for i = 1:n_ro, % Run DMPs
         
     for k=1:n_dmps,
         
-        [y, yd, ydd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
-        S.rollouts(i).dmp(k).xd = [y, yd, ydd]; % desired state.
+        [y, yd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');
+        S.rollouts(i).dmp(k).xd = [y, yd]; % desired state.
         r(k,:) = y';
         rd(k,:) = yd';
     end
@@ -87,6 +87,8 @@ for i = 1:n_ro, % Run DMPs
         S.rollouts(i).ef_speeds(:,j) = arm.getToolSpeeds();   % store the state 
         S.rollouts(i).time(j) = toc(t0);
     end
+    
+    UR5.gently_break(arm);
 end
 
 pause(1);

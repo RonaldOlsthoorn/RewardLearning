@@ -15,7 +15,7 @@
 % n_reuse           : number of re-used trials per update
 % n_rfs             : number of basis functions used
 %
-% DO NOT USE WHITESPACE IN THE VALUE FIELDS   [1000;5000;5000;500;500;0]
+% DO NOT USE WHITESPACE IN THE VALUE FIELDS
 
 start_tool          [-0.2619;-0.1091;0.3623;1.2088;-1.2107;-1.2104]
 goal_tool           [-0.4619;-0.0091;0.3623;1.2088;-1.2109;-1.2103]
@@ -26,7 +26,7 @@ duration            8
 Ts                  0.01
 controller          'lousy_controller'
 ref                 'ref_robot'
-std                 [0.1;0.1;0.1;0.1;0.1;0.1]
+std                 [0.05;0.05;0.05;0.05;0.05;0.05]
 forward_method      'PI2'
 annealer            1/100
 reps                10
