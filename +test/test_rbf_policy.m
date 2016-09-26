@@ -13,3 +13,15 @@ r = refs.ref_trajectory(policy_par);
 T = r.r(1:100)';
 
 p1.batch_fit(T);
+
+eps_std = 1;
+
+[y, yd] = p1.run(zeros(policy_par.n_dmp_bf,1));
+
+figure
+hold on
+plot(p1.t, y);
+plot(p1.t, T);
+
+figure
+plot(p1.t, yd);
