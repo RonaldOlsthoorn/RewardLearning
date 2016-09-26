@@ -88,6 +88,8 @@ for i = 1:n_ro, % Run DMPs
         S.rollouts(i).ef_speeds(:,j) = arm.getToolSpeeds();   % store the state 
         S.rollouts(i).time(j) = toc(t0);
     end
+    
+    UR5.gently_break(arm);
 end
 
 pause(1);

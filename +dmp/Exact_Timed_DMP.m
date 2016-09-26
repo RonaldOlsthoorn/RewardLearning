@@ -160,8 +160,7 @@ classdef Exact_Timed_DMP < handle
             
             yd = yd.*obj.tau;
         end
-        
-        
+          
         function batch_fit(obj, T, Td, Tdd)
             
             if (nargin < 3)
