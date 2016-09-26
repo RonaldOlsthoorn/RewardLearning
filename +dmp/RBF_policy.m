@@ -1,9 +1,9 @@
 classdef RBF_policy < handle
     
-    %  
+    %
     properties(Constant)
         
-             
+        
     end
     
     
@@ -12,7 +12,7 @@ classdef RBF_policy < handle
         index;
         
         n_rfs;
-
+        
         duration;
         Ts;
         t;
@@ -24,6 +24,8 @@ classdef RBF_policy < handle
         time_normalized_psi;
         bases;
         w;
+        
+        ref;
         
     end
     
@@ -51,8 +53,9 @@ classdef RBF_policy < handle
             obj.duration = dmp_par.duration;
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
-            obj.n_rfs = dmp_par.n_dmp_bf;      
+            obj.n_rfs = dmp_par.n_dmp_bf;
             obj.w = zeros(dmp_par.n_dmp_bf, 1);
+            
         end
         
         function initialize_centers(obj, n_dmp_bf)
@@ -67,13 +70,13 @@ classdef RBF_policy < handle
             
             obj.D = 3;
         end
-                    
+        
         function initialize_psi(obj)
             
             for i = 1:obj.n_rfs
                 
                 obj.psi(:, i) = exp(-0.5*((obj.t - obj.c(i)).^2)*obj.D);
-            end      
+            end
         end
         
         function initialize_weighted_psi(obj)
@@ -100,18 +103,26 @@ classdef RBF_policy < handle
         end
         
         function [y, yd] = run(obj, eps)
-                        
+            
             y = (obj.bases*(obj.w+eps))';
+            
+            if isprop(obj, 'ref')
+                y = y+obj.ref';
+            end
+            
             yd = [0 diff(y)/obj.Ts];
         end
-              
+        
         function batch_fit(obj, T)
             
-            y = T;
-            X = obj.bases;
+            %                y = T;
+            %                X = obj.bases;
+            %
+            %                obj.w = (X' * X) \ X' * y;
             
-            obj.w = (X' * X) \ X' * y;
+            obj.ref = T;
+            
         end
-    end    
+    end
 end
 
