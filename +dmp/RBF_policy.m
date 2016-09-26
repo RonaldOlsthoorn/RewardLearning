@@ -101,7 +101,7 @@ classdef RBF_policy < handle
         
         function [y, yd] = run(obj, eps)
                         
-            y = sum((obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
+            y = (obj.bases*(obj.w+eps))';
             yd = [0 diff(y)/obj.Ts];
         end
               
