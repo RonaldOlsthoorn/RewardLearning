@@ -78,7 +78,7 @@ else
 end
 
 S.run_rollouts = str2func(strcat('rollout.', 'run_rollouts_', p.system));
-S_eval = S;     % used for noiseless cost assessment
+S_eval = S; % used for noiseless cost assessment
 
 rm = init.init_rm(S, rm);
 rm.outcome_handles = init.init_outcome_handles(rm);

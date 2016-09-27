@@ -3,6 +3,7 @@ classdef PI2Agent < handle
     properties
         
         policy;
+        previous_batch;
     end
     
     methods
@@ -12,6 +13,7 @@ classdef PI2Agent < handle
         end
         
         function update_policy(batch_rollouts)
+
             
         end
     end

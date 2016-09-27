@@ -8,6 +8,7 @@ classdef Reference < handle
         
         duration
         Ts
+        t;
         
     end
     
@@ -16,7 +17,8 @@ classdef Reference < handle
         function obj = Reference(ref_par)
             
             obj.duration = ref_par.duration;
-            obj.Ts = ref_par.Ts;           
+            obj.Ts = ref_par.Ts;      
+            obj.t = 0:obj.Ts:(obj.duration-obj.Ts);
         end
     end   
 end

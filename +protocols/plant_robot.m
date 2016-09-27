@@ -1,4 +1,4 @@
-function [plant_par] = plant_real_robot( input_args )
+function [plant_par] = system_real_robot( input_args )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 

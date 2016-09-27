@@ -1,4 +1,4 @@
-classdef StaticLinearRewardModel < RewardModel
+classdef StaticLinearRewardModel < reward.RewardModel
     
     properties(Constant)
         
@@ -7,7 +7,7 @@ classdef StaticLinearRewardModel < RewardModel
     
     methods
         
-        function reward = get_reward(outcome)
+        function reward = compute_reward(outcome)
             
             reward = obj.weights*outcome;
             

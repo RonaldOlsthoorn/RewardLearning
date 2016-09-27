@@ -1,4 +1,4 @@
-classdef RewardModel < Handle
+classdef RewardModel < handle
     
     properties
     end
