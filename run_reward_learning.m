@@ -54,7 +54,7 @@ while converged(rm, i)~=1,
         S = S.run_rollouts(S, arm, dmp_par, forward_par, sim_par, i, forward_par.reps - forward_par.n_reuse);
     end
     
-    S = reward.compute_reward(S, forward_par, rm);
+    S = reward.compute_reward_static(S, forward_par, rm);
     rm = update_database(S, forward_par, rm, forward_par.reps);
     
     [ S_eval, ~ ] = output.evaluate_progress(S, S_eval, arm, dmp_par, ...
