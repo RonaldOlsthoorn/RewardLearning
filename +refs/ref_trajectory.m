@@ -12,5 +12,4 @@ r = [ -0.5*goal+0.5*goal*cos(pi*t(1:n_seg)/(segment)),...
 ref.r = [r goal*ones(1,length(t)-length(r))];
 ref.r_d = [0 diff(ref.r)./dmp_par.Ts];
 ref.r_dd = [0 diff(ref.r_d)./dmp_par.Ts];
-
 end

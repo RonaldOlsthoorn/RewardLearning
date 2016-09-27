@@ -1,11 +1,4 @@
-classdef RBF_policy < handle
-    
-    %  
-    properties(Constant)
-        
-             
-    end
-    
+classdef RBF_policy < Policy
     
     properties
         
@@ -31,30 +24,30 @@ classdef RBF_policy < handle
     
     methods
         
-        function obj = RBF_policy(index, dmp_par)
+        function obj = RBF_policy(index, policy_par)
             
             obj.index = index;
-            obj.initialize(dmp_par);
+            obj.initialize(policy_par);
         end
         
-        function initialize(obj, dmp_par)
+        function initialize(obj, policy_par)
             
-            obj.initialize_parameters(dmp_par)
-            obj.initialize_centers(dmp_par.n_dmp_bf);
+            obj.initialize_parameters(policy_par)
+            obj.initialize_centers(policy_par.n_dmp_bf);
             obj.initialize_amplitudes();
             obj.initialize_psi();
             obj.initialize_weighted_psi();
             obj.initialize_bases();
         end
         
-        function initialize_parameters(obj, dmp_par)
+        function initialize_parameters(obj, policy_par)
             
-            obj.Ts = dmp_par.Ts;
-            obj.duration = dmp_par.duration;
+            obj.Ts = policy_par.Ts;
+            obj.duration = policy_par.duration;
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
-            obj.n_rfs = dmp_par.n_dmp_bf;
-            obj.w = zeros(dmp_par.n_dmp_bf, 1);
+            obj.n_rfs = policy_par.n_dmp_bf;
+            obj.w = zeros(policy_par.n_dmp_bf, 1);
             
         end
         
@@ -102,7 +95,7 @@ classdef RBF_policy < handle
             end
         end
         
-        function [y, yd] = run(obj, eps)
+        function [y, yd] = create_trajectory(obj, eps)
             
             y = (obj.bases*(obj.w+eps))';
             
@@ -120,8 +113,7 @@ classdef RBF_policy < handle
             %
             %                obj.w = (X' * X) \ X' * y;
             
-            obj.ref = T;
-            
+            obj.ref = T;          
         end
     end
 end
