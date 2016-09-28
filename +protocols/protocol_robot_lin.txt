@@ -26,7 +26,7 @@ duration            8
 Ts                  0.01
 controller          'lousy_controller'
 ref                 'ref_robot'
-std                 [0.05;0.05;0.05;0.05;0.05;0.05]
+std                 [0.1;0.1;0.1;0.1;0.1;0]
 forward_method      'PI2'
 annealer            1/100
 reps                10

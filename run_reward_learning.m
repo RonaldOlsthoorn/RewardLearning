@@ -40,7 +40,7 @@ end
 
 % Before we run the main loop, we need 1 demo to initialize the reward
 % model
-rm = init.run_first_demo(S, arm, rm, forward_par, dmp_par, sim_par);
+% rm = init.run_first_demo(S, arm, rm, forward_par, dmp_par, sim_par);
 
 i = 1;
 
