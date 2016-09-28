@@ -14,10 +14,6 @@ import rollout.*
 
 n_dmps = dmp_par.n_dmps;
 
-% arm = UR5.driver.URArm();
-% ip = '192.168.1.50';
-% arm.fopen(ip);
-
 a = 10;
 
 for i=1:n_ro,
@@ -29,6 +25,8 @@ for i=1:n_ro,
     ro.joint_speeds = zeros(n_dmps, S.n_end);
     ro.ef_positions = zeros(n_dmps, S.n_end);
     ro.ef_speeds = zeros(n_dmps, S.n_end);
+    ro.v_feed = zeros(n_dmps, S.n_end);
+    
     
     S.rollouts(i) = ro;
 end
@@ -61,6 +59,7 @@ for i = 1:n_ro, % Run DMPs
     S.rollouts(i).ef_positions(:,1) = arm.getToolPositions();
     S.rollouts(i).ef_speeds(:,1) = arm.getToolSpeeds();
     S.rollouts(i).time = zeros(1,S.n_end);
+    
         
     pause(1);
     
@@ -87,6 +86,7 @@ for i = 1:n_ro, % Run DMPs
         S.rollouts(i).ef_positions(:,j) = arm.getToolPositions();    % store the state
         S.rollouts(i).ef_speeds(:,j) = arm.getToolSpeeds();   % store the state 
         S.rollouts(i).time(j) = toc(t0);
+        S.rollouts(i).v_feed(:,j) = v_feed; 
     end
     
     UR5.gently_break(arm);

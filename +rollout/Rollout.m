@@ -17,6 +17,8 @@ classdef Rollout
         r;
         R;
         R_expert;
+        
+        v_feed;
     end
     
     methods
