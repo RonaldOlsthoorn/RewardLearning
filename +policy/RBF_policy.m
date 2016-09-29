@@ -18,12 +18,18 @@ classdef RBF_policy < policy.Policy
             end           
         end
         
-        function [trajectory] = get_trajectory(obj, eps)
+        function [trajectory] = create_trajectory(obj, eps)
+            
+            trajectory = Rollout();
             
             for i = 1:policy_par.dof
-                trajectory(i) = obj.DoFs(i).create_trajectory(eps);
+                
+                trajectory.policy.dof(i).xd = obj.DoFs(i).create_trajectory(eps);
+                trajectory.policy.dof(i).eps = eps;
+                trajectory.policy.dof(i).theta_eps = obj.DoFs(i).w+eps;       
             end
         end
+        
     end
 end
     

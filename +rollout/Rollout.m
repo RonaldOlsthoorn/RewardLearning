@@ -4,7 +4,7 @@ classdef Rollout
         iteration;
         index;
         
-        dmp;
+        policy;
         joint_positions;
         joint_speeds;
         tool_positions;

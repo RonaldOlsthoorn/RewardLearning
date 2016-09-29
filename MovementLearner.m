@@ -22,8 +22,8 @@ classdef MovementLearner < handle
         
         function obj = MovementLearner(protocol)
             
-            W = [];
-            R = [];
+            obj.W = [];
+            obj.R = [];
             
             p = init.read_protocol(protocol);
             obj.init_learner(p);
@@ -64,7 +64,7 @@ classdef MovementLearner < handle
             obj.agent = init.init_agent(agent_par, obj.policy);
         end
         
-        function [W, R] = run_movement_learning(obj)
+        function [Weights, Returns] = run_movement_learning(obj)
             
             iteration = 1;
             
@@ -80,10 +80,13 @@ classdef MovementLearner < handle
                 noiseless_rollout = obj.agent.create_noiseless_rollout();
                 noiseless_rollout.print();                
                 
-                iteration = iteration +1;
+                iteration = iteration + 1;
             end
             
             obj.print_result();
+            
+            Weights = obj.W;
+            Returns = obj.R;
         end
         
         function print_result(obj)
