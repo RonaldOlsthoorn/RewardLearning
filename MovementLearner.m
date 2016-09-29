@@ -32,6 +32,9 @@ classdef MovementLearner < handle
         
         function init_learner(obj, p)    
             
+            import plant.Plant;
+            import environment.Environment;
+            
             system_protocol = str2func(strcat('protocols.', p.system)); 
             system_par = system_protocol();
             obj.system = init.init_system(system_par);
@@ -40,29 +43,25 @@ classdef MovementLearner < handle
             controller_par = controller_protocol();
             obj.controller = init.init_controller(controller_par);
             
-            obj.plant = plant.Plant(obj.system, obj.controller);
+            obj.plant = Plant(obj.system, obj.controller);
             
             reference_protocol = str2func(strcat('protocols.', p.reference)); 
             reference_par = reference_protocol();
             obj.reference = init.init_reference(reference_par);
 
-            featrure_block_protocol = str2func(strcat('protocols.', p.featrure_block)); 
-            featrure_block_par = featrure_block_protocol();
-            obj.featrure_block = init.init_featrure_block(featrure_block_par);
-
             reward_model_protocol = str2func(strcat('protocols.', p.reward_model)); 
             reward_model_par = reward_model_protocol();
             obj.reward_model = init.init_reward_model(reward_model_par);
             
-            obj.environment = environment.Environment(obj.plant, obj.feature_block, obj.reward_model);
+            obj.environment = Environment(obj.plant, obj.reward_model);
           
             policy_protocol = str2func(strcat('protocols.', p.policy)); 
             policy_par = policy_protocol();
-            obj.policy = init.init_policy(policy_par);
+            obj.policy = init.init_policy(policy_par, obj.reference);
             
             agent_protocol = str2func(strcat('protocols.', p.agent)); 
             agent_par = agent_protocol();
-            obj.agent = init.init_agent(agent_par);
+            obj.agent = init.init_agent(agent_par, obj.policy);
         end
         
         function [W, R] = run_movement_learning(obj)

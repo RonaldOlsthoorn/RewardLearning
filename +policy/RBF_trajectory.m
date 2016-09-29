@@ -1,4 +1,4 @@
-classdef RBF_trajectory < Policy
+classdef RBF_trajectory < handle
     
     properties
         
@@ -32,7 +32,7 @@ classdef RBF_trajectory < Policy
         function initialize(obj, policy_par)
             
             obj.initialize_parameters(policy_par)
-            obj.initialize_centers(policy_par.n_dmp_bf);
+            obj.initialize_centers(policy_par.n_rbfs);
             obj.initialize_amplitudes();
             obj.initialize_psi();
             obj.initialize_weighted_psi();
@@ -45,14 +45,14 @@ classdef RBF_trajectory < Policy
             obj.duration = policy_par.duration;
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
-            obj.n_rfs = policy_par.n_dmp_bf;
-            obj.w = zeros(policy_par.n_dmp_bf, 1);
+            obj.n_rfs = policy_par.n_rbfs;
+            obj.w = zeros(policy_par.n_rbfs, 1);
             
         end
         
-        function initialize_centers(obj, n_dmp_bf)
+        function initialize_centers(obj, n_rbfs)
             
-            obj.n_rfs = n_dmp_bf;
+            obj.n_rfs = n_rbfs;
             
             centers_time = (0:(obj.duration/(obj.n_rfs-1)):obj.duration)';
             obj.c = centers_time;

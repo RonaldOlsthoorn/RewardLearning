@@ -6,6 +6,6 @@
 reference           'reference_robot'
 system              'system_real_robot'
 controller          'lousy_PID'
-forward             'forward_PI2'
+agent               'agent_PI2'
 reward_model        'reward_model_static_lin'
 policy              'policy_rbf'

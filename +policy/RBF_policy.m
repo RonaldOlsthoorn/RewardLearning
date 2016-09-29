@@ -1,4 +1,4 @@
-classdef RBF_policy < Policy
+classdef RBF_policy < policy.Policy
     
     properties
         
@@ -13,9 +13,9 @@ classdef RBF_policy < Policy
             obj.reference = ref;
             
             for i = 1:policy_par.dof
-                DoFs(i) = RBF_trajectory(policy_par, reference.r_joints(i,:));
-            end
-            
+                DoFs(i) = policy.RBF_trajectory(i, policy_par);
+                DoFs(i).batch_fit(obj.reference.r_joints(i,:));
+            end           
         end
         
         function [trajectory] = get_trajectory(obj, eps)
