@@ -29,14 +29,16 @@ p = init.read_protocol(protocol_name);
 [S, S_eval, dmp_par, forward_par, forward_par_eval, ...
     sim_par, rm] = init.init(p);
 
-if strcmp('robot', p.system)
-    arm = UR5.driver.URArm();
-    ip = '192.168.1.50';
-    arm.fopen(ip);
-    
-else
-    arm = [];
-end
+% if strcmp('robot', p.system)
+%     arm = UR5.driver.URArm();
+%     ip = '192.168.1.50';
+%     arm.fopen(ip);
+%     
+% else
+%     arm = [];
+% end
+
+arm = [];
 
 % Before we run the main loop, we need 1 demo to initialize the reward
 % model
