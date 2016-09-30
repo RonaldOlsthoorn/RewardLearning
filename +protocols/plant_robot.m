@@ -1,4 +1,4 @@
-function [plant_par] = system_real_robot( input_args )
+function [plant_par] = plant_robot()
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,4 +7,3 @@ function [plant_par] = system_real_robot( input_args )
     plant_par.sim = false;
     plant_par.dof = 6;
 end
-

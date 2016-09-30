@@ -16,25 +16,25 @@ classdef Plant < handle
         
         function rollout = run(obj, trajectory)
             
-            trajectory.control_input = zeros(obj.system.dof, length(trajectory.xd(1,:)));
-            trajectory.joint_positions = zeros(obj.system.dof, length(trajectory.xd(1,:)));
-            trajectory.joint_speeds = zeros(obj.system.dof, length(trajectory.xd(1,:)));
-            trajectory.tool_positions = zeros(obj.system.dof, length(trajectory.xd(1,:)));
-            trajectory.tool_speeds = zeros(obj.system.dof, length(trajectory.xd(1,:))); 
+            trajectory.control_input = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            trajectory.joint_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            trajectory.joint_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            trajectory.tool_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            trajectory.tool_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
             
-            r = zeros(obj.system.dof, length(trajectory.dof(1).xd(1,:)));
-            rd = zeros(obj.system.dof, length(trajectory.dof(1).xd(1,:)));
+            r = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            rd = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
             
             for i=1:obj.system.dof
                 
-                r(i,:) = trajectory.dof(i).xd(1,:);
-                rd(i,:) = trajectory.dof(i).xd(2,:);
+                r(i,:) = trajectory.policy.dof(i).xd(1,:);
+                rd(i,:) = trajectory.policy.dof(i).xd(2,:);
                 
             end
             
             output = obj.system.reset();
             
-            for i = 1:length(trajectory.xd(1,:))
+            for i = 1:length(trajectory.policy.dof(1).xd(1,:))
                 
                 control_input = obj.controller.control_law(r(:,i), rd(:,i),... 
                                     output.joint_position, output.joint_speed);
@@ -56,8 +56,11 @@ classdef Plant < handle
         function batch_rollouts = batch_run(obj, batch_trajectories)
             
             for i = 1:length(batch_trajectories)
-                batch_rollouts = obj.run(batch_trajectories(i));
+                disp(strcat('Sample nr : ', num2str(i)));
+                batch_trajectories(i) = obj.run(batch_trajectories(i));
             end
+            
+            batch_rollouts = batch_trajectories;
         end
     end
 end

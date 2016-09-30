@@ -9,17 +9,20 @@ classdef SystemUR5 < plant.System
     
     properties
         
-        arm;
-        
+        arm;        
         Ts;
+        dof;
         
     end
     
     methods
         
-        function obj = SystemUR5()
+        function obj = SystemUR5(system_par)
             
-            % obj.arm = UR5.driver.URArm();
+            obj.Ts = system_par.Ts;
+            obj.dof = system_par.dof;
+            
+            obj.arm = UR5.driver.URArm();
             obj.init();
             
         end
@@ -35,9 +38,15 @@ classdef SystemUR5 < plant.System
             obj.arm.fopen(obj.ip);
         end
         
-        function output = run_increment(control_input)
+        function output = run_increment(obj, control_input)
             
-            obj.arm.setJointSpeeds(control_input, obj.a, obj.Ts);
+            t_init = tic;
+            
+            obj.arm.setJointsSpeed(control_input, obj.a, 2*obj.Ts);
+            
+            while toc(t_init)< obj.Ts;
+            end
+            
             obj.arm.update();
             
             output.joint_position = obj.arm.getJointsPositions();

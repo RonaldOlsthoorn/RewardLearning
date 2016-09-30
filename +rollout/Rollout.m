@@ -15,6 +15,8 @@ classdef Rollout
         outcomes;
         sum_out;
         
+        xd;
+        
         r;
         R;
         R_expert;

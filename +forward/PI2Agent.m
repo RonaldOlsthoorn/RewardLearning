@@ -44,7 +44,7 @@ classdef PI2Agent < forward.Agent
             
             batch_trajectories(batch_size) = rollout.Rollout();
             
-            for i = 1:batch_size
+            for i = 1:batch_size              
                 
                 eps = obj.gen_epsilon();
                 ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
@@ -55,15 +55,88 @@ classdef PI2Agent < forward.Agent
             end
         end
         
-        function dtheta_per_sample = get_PI2_update_per_sample(batch_rollouts)
+        function update(obj, batch_rollouts)
             
+            update_PI2(obj, batch_rollouts);
         end
         
-        function update_policy(obj, batch_rollouts)
+        function update_PI2(obj, batch_rollouts)
+            
+            dtheta_per_sample = obj.get_PI2_update_per_sample(batch_rollouts);
+            dtheta = sum(dtheta_per_sample, 2);
+            
+            % and update the parameters by directly accessing the dmp data structure
+            obj.policy.update(dtheta);
             
             obj.iteration = obj.iteration + 1; %try to remove this later on
             obj.importance_sampling(batch_rollouts)
             obj.update_exploration();
+            
+        end
+        
+        
+        function [dtheta_per_sample] = get_PI2_update_per_sample(obj, batch_rollouts )
+            
+            % returns the new policy, based on the new set of roll-outs.
+            % S is the data structure of all roll outs.
+            
+            n_dof = obj.policy.n_dof;
+            n_rbfs = obj.policy.n_dof;
+            
+            n_reps = length(batch_rollouts); % number of roll-outs
+            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
+            
+            P = obj.get_probability_trajectories(batch_rollouts);
+            
+            % compute the projected noise term. It is computationally more efficient to break this
+            % operation into inner product terms.
+            PMeps = zeros(n_dof, n_reps, n_end, n_rbfs);
+            
+            for j=1:n_dof,
+                for k=1:n_reps,
+                    
+                    % compute g'*eps in vector form
+                    gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
+                    
+                    % compute g'g
+                    gTg  = sum(S.dmps(j).basesobj.policy.DoFs(j).bases.*obj.policy.DoFs(j).bases, 2);
+                    
+                    % compute P*M*eps = P*g*g'*eps/(g'g) from previous results
+                    PMeps(j,k,:,:) = obj.policy.DoFs(j).bases.*((P(:,k).*gTeps./(gTg + 1.e-10))*ones(1,n_rbfs));
+                end
+            end
+            
+            % compute the final parameter update for each DMP
+            dtheta_per_sample = reshape(sum(PMeps.*repmat(reshape(obj.policy.DoFs(j).time_normalized_psi, [1, 1, n_end, n_rbfs]), ...
+                [n_dof n_reps 1 1]), ...
+                3), ...
+                [n_dof n_reps n_rbfs]);
+            
+        end
+        
+        function [P] = get_probability_trajectories(~,batch_rollouts)
+            
+            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step  
+            n_reps = length(batch_rollouts);       % number of roll-outs
+            
+            R_cum = zeros(n_end, n_reps);
+            
+            for k=1:n_reps
+                R_cum(:,k) = -batch_rollouts(k).r;
+            end
+            
+            % compute the exponentiated cost with the special trick to automatically
+            % adjust the lambda scaling parameter
+            maxS = max(R_cum,[],2);
+            minS = min(R_cum,[],2);
+            
+            h = 10; % this is the scaling parameters in side of the exp() function (see README.pdf)
+            expS = exp(-h*(R_cum - minS*ones(1,n_reps))./...
+                ((maxS-minS+1e-20)*ones(1,n_reps)));
+            
+            % the probabilty of a trajectory
+            P = expS./(sum(expS,2)*ones(1,n_reps));
+            
         end
         
         function importance_sampling(obj, batch_rollouts)
@@ -80,15 +153,15 @@ classdef PI2Agent < forward.Agent
                 
                 rollout_temp = batch_rollouts(inds(j));
                 batch_rollouts(inds(j)) = batch_rollouts(j);
-                batch_rollouts(j) = rollout_temp;   
-            end          
+                batch_rollouts(j) = rollout_temp;
+            end
             
             obj.previous_batch = batch_rollouts;
         end
         
         function update_exploration_noise(obj)
             
-            obj.noise_mult = obj.noise_mult - obj.annealer;
+            obj.noise_mult = obj.noise_mult - obj.iteration*obj.annealer;
             
         end
         
@@ -104,4 +177,3 @@ classdef PI2Agent < forward.Agent
     end
     
 end
-

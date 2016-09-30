@@ -9,9 +9,9 @@ classdef Agent < handle
     
     methods(Abstract)
         
-        update_policy(obj, batch_rollouts)
+        update(obj, batch_rollouts)
 
-        create_batch_trajectories(obj)    
+        get_batch_trajectories(obj)    
         
     end
     
