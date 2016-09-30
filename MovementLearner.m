@@ -68,9 +68,9 @@ classdef MovementLearner < handle
             
             iteration = 1;
             
-            while converged(iteration)
+            while iteration<100;
                 
-                batch_trajectory = obj.agent.batch_create_trajectory();
+                batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollout = obj.environment.batch_run(batch_trajectory);
                 
                 % obj.environment.reward_model.update(batch_rollout)

@@ -5,7 +5,7 @@ classdef Policy < handle
     
     methods(Abstract)
         
-        trajectory = get_trajectory(obj);
+        trajectory = create_trajectory(obj, eps);
     end
     
 end

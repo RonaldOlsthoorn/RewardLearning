@@ -21,6 +21,8 @@ classdef PI2Agent < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
+            
+            rng(10);
         end
         
         function batch_trajectories = get_batch_trajectories(obj)
@@ -31,8 +33,8 @@ classdef PI2Agent < forward.Agent
                 return;
             else
                 batch_size = obj.reps - obj.n_reuse;
-                batch_trajectories = [obj.previous_batch(1:obj.n_reuse), ...
-                    obj.create_batch_trajectories(batch_size)];
+                batch_trajectories = [obj.create_batch_trajectories(batch_size), ...
+                    obj.previous_batch(1:obj.n_reuse)];
                 return;
             end
             
@@ -40,12 +42,12 @@ classdef PI2Agent < forward.Agent
         
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
-            batch_trajectories(batch_size) = Rollout();
+            batch_trajectories(batch_size) = rollout.Rollout();
             
-            for i = (obj.n_reuse+1):batch_size
+            for i = 1:batch_size
                 
                 eps = obj.gen_epsilon();
-                ro = policy.create_trajectory(eps); % push back storage policy to policy
+                ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
                 ro.iteration = obj.iteration;
                 ro.index = i;
                 
@@ -92,9 +94,11 @@ classdef PI2Agent < forward.Agent
         
         function eps = gen_epsilon(obj)
             
-            for j=1:length(obj.policy.n_dof),
-                std_eps = obj.noise_std(j) * ro_par.noise_mult;
-                eps = std_eps*randn(policy.n_rfs, 1);
+            eps = zeros(obj.policy.n_rfs, obj.policy.n_dof);
+            
+            for j=1:obj.policy.n_dof,
+                std_eps = obj.noise_std(j) * obj.noise_mult;
+                eps(:,j) = std_eps*randn(obj.policy.n_rfs, 1);
             end
         end
     end

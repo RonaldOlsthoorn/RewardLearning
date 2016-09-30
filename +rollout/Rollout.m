@@ -5,12 +5,13 @@ classdef Rollout
         index;
         
         policy;
+        control_input;
         joint_positions;
         joint_speeds;
         tool_positions;
         tool_speeds;
         time
-
+   
         outcomes;
         sum_out;
         

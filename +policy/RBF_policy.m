@@ -2,6 +2,8 @@ classdef RBF_policy < policy.Policy
     
     properties
         
+        n_rfs;
+        n_dof;
         DoFs;
         reference;
     end
@@ -11,25 +13,40 @@ classdef RBF_policy < policy.Policy
         function obj = RBF_policy(policy_par, ref)
             
             obj.reference = ref;
-            
+            obj.n_dof = policy_par.dof;  
+            obj.n_rfs = policy_par.n_rbfs;
+                        
             for i = 1:policy_par.dof
-                DoFs(i) = policy.RBF_trajectory(i, policy_par);
-                DoFs(i).batch_fit(obj.reference.r_joints(i,:));
+                
+                if i ==1 % Annoying MATLAB pre-allocation thingy
+                    obj.DoFs = policy.RBF_trajectory(i, policy_par);
+                else
+                    obj.DoFs(i) = policy.RBF_trajectory(i, policy_par);
+                end
+                
+                obj.DoFs(i).batch_fit(obj.reference.r_joints(i,:)');
             end           
         end
         
         function [trajectory] = create_trajectory(obj, eps)
             
-            trajectory = Rollout();
+            trajectory = rollout.Rollout();
             
-            for i = 1:policy_par.dof
+            for i = 1:obj.n_dof
                 
-                trajectory.policy.dof(i).xd = obj.DoFs(i).create_trajectory(eps);
-                trajectory.policy.dof(i).eps = eps;
-                trajectory.policy.dof(i).theta_eps = obj.DoFs(i).w+eps;       
+                [y, yd] = obj.DoFs(i).create_trajectory(eps(:,i));
+                xd = [y; yd];
+                dof.xd = xd;
+                dof.eps = (eps(:,i)*ones(1, length(obj.reference.t)))';
+                dof.theta_eps = (obj.DoFs(i).w*ones(1, length(obj.reference.t))+...
+                                    eps(:,i)*ones(1, length(obj.reference.t)))';  
+                
+                policy.dof(i) = dof;
+                
             end
+            
+            trajectory.policy = policy;
         end
-        
     end
 end
     

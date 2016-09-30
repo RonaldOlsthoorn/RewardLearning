@@ -11,7 +11,7 @@ classdef Agent < handle
         
         update_policy(obj, batch_rollouts)
 
-        batch_create_trajectory(obj)    
+        create_batch_trajectories(obj)    
         
     end
     

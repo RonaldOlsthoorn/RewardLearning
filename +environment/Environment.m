@@ -14,13 +14,13 @@ classdef Environment < handle
             obj.reward_model = r;
         end
         
-        function rollout = run(trajectory)
+        function rollout = run(obj, trajectory)
             
             rollout = obj.plant.run(trajectory);
             %implement reward;
         end
         
-        function batch_rollout = batch_run(batch_trajectory)
+        function batch_rollout = batch_run(obj, batch_trajectory)
             
             batch_rollout = obj.plant.batch_run(batch_trajectory);
             %implement reward;
