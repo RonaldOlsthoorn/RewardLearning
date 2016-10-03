@@ -16,12 +16,13 @@ classdef Plant < handle
         
         function rollout = run(obj, trajectory)
             
-            trajectory.control_input = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
-            trajectory.joint_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
-            trajectory.joint_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
-            trajectory.tool_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
-            trajectory.tool_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
-            
+            control_input = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            joint_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            joint_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            tool_positions = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            tool_speeds = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
+            time = zeros(1, length(trajectory.policy.dof(1).xd(1,:)));
+
             r = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
             rd = zeros(obj.system.dof, length(trajectory.policy.dof(1).xd(1,:)));
             
@@ -33,21 +34,39 @@ classdef Plant < handle
             end
             
             output = obj.system.reset();
+            joint_position = output.joint_position;
+            joint_speed = output.joint_speed;
+            
+            pause(0.1)
+            
+            t0 = tic;
             
             for i = 1:length(trajectory.policy.dof(1).xd(1,:))
                 
                 control_input = obj.controller.control_law(r(:,i), rd(:,i),... 
-                                    output.joint_position, output.joint_speed);
+                                    joint_position, joint_speed);
                                 
-                output = obj.system.run_increment(control_input);
+                [joint_position, joint_speed,...
+                    tool_position, tool_speed] = obj.system.run_increment(control_input);
                 
-                trajectory.control_input(:,i) = control_input;
-                trajectory.joint_positions(:,i) = output.joint_position;
-                trajectory.joint_speeds(:,i) = output.joint_speed;
-                trajectory.tool_positions(:,i) = output.tool_position;
-                trajectory.tool_speeds(:,i) = output.tool_speed;
+                control_input(:,i) = control_input;
+                joint_positions(:,i) = joint_position;
+                joint_speeds(:,i) = joint_speed;
+                tool_positions(:,i) = tool_position;
+                tool_speeds(:,i) = tool_speed;
+                
+                time(1,i) = toc(t0);
              
             end
+            
+            obj.system.gently_break();
+            
+            trajectory.control_input = control_input;
+            trajectory.joint_positions = joint_positions;
+            trajectory.joint_speeds = joint_speeds;
+            trajectory.tool_positions = tool_positions;
+            trajectory.tool_speeds = tool_speeds;
+            trajectory.time = time;
             
             rollout = trajectory;
             

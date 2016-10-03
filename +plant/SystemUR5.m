@@ -38,7 +38,8 @@ classdef SystemUR5 < plant.System
             obj.arm.fopen(obj.ip);
         end
         
-        function output = run_increment(obj, control_input)
+        function [joint_position, joint_speed,...
+                tool_position, tool_speed] = run_increment(obj, control_input)
             
             t_init = tic;
             
@@ -49,10 +50,10 @@ classdef SystemUR5 < plant.System
             
             obj.arm.update();
             
-            output.joint_position = obj.arm.getJointsPositions();
-            output.joint_speed = obj.arm.getJointsSpeeds();
-            output.tool_position = obj.arm.getToolPositions();
-            output.tool_speed = obj.arm.getToolSpeeds();
+            joint_position = obj.arm.getJointsPositions();
+            joint_speed = obj.arm.getJointsSpeeds();
+            tool_position = obj.arm.getToolPositions();
+            tool_speed = obj.arm.getToolSpeeds();
             
         end
         
