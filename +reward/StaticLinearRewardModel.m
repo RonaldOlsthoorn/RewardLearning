@@ -2,14 +2,24 @@ classdef StaticLinearRewardModel < reward.RewardModel
     
     properties(Constant)
         
-        weights = [1,1];
+        weights = 1;
+    end
+    
+    properties
+
     end
     
     methods
         
-        function reward = compute_reward(outcome)
+        function obj = StaticLinearRewardModel(reference)
             
-            reward = obj.weights*outcome;
+            obj.feature_block = reward.SimpleFeatureBlock(reference);
+            
+        end
+        
+        function reward = compute_reward(obj, outcomes)
+            
+            reward = obj.weights*outcomes;
             
         end
         

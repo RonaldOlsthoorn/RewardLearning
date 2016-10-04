@@ -2,7 +2,7 @@ classdef ControllerPID < handle
    
     properties(Constant)
        
-        sat = 0.2;
+        sat = 1;
     end
         
     properties
@@ -35,8 +35,10 @@ classdef ControllerPID < handle
                 
                 if control_input(i)< -obj.sat
                     control_input(i) = -obj.sat;
+                    disp('Saturation!!!');
                 elseif control_input(i)> obj.sat
                     control_input(i) = obj.sat;
+                    disp('Saturation!!!');
                 end
             end
                      

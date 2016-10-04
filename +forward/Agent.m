@@ -10,9 +10,8 @@ classdef Agent < handle
     methods(Abstract)
         
         update(obj, batch_rollouts)
-
-        get_batch_trajectories(obj)    
-        
+        batch_trajectories = get_batch_trajectories(obj) 
+        trajectory = get_noiseless_trajectory(obj)
     end
     
 end

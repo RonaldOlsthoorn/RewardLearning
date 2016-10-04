@@ -9,19 +9,13 @@ classdef FeatureBlock < handle
         
         function outcomes = compute_outcomes(obj, rollout)
             
+            outcomes = zeros(length(rollout.time), length(obj.reward_primitives));
 
             for i = length(obj.reward_primitives)
-                outcomes(i,:) = obj.reward_primitives(i).compute_outcome(rollout);
+                outcomes(:,i) = obj.reward_primitives(i).compute_outcome(rollout);
             end
         end
         
-        function batch_outcomes = batch_compute_outcomes(batch_rollouts)
-            
-
-            for i = length(obj.reward_primitives)
-                batch_outcomes(i,:) = obj.reward_primitives(i).batch_compute_outcome(batch_rollout);
-            end
-
-        end
+        
     end
 end

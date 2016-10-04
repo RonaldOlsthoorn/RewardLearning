@@ -25,16 +25,21 @@ classdef PI2Agent < forward.Agent
             rng(10);
         end
         
+        function trajectory = get_noiseless_trajectory(obj)
+            
+            trajectory = obj.policy.create_noiseless_trajectory(); % push back storage policy to policy
+            
+        end
+        
         function batch_trajectories = get_batch_trajectories(obj)
             
-            if isprop(obj, 'previous_batch'),
+            if isempty(obj.previous_batch),
                 batch_size = obj.reps;
                 batch_trajectories = obj.create_batch_trajectories(batch_size);
                 return;
             else
                 batch_size = obj.reps - obj.n_reuse;
-                batch_trajectories = [obj.create_batch_trajectories(batch_size), ...
-                    obj.previous_batch(1:obj.n_reuse)];
+                batch_trajectories = obj.create_batch_trajectories(batch_size);
                 return;
             end
             
@@ -55,6 +60,15 @@ classdef PI2Agent < forward.Agent
             end
         end
         
+        function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts_new)
+            
+            if isempty(obj.previous_batch)
+                batch_rollouts = batch_rollouts_new;
+                return;
+            end
+            batch_rollouts = [batch_rollouts_new, obj.previous_batch((obj.n_reuse+1):end)];
+        end
+        
         function update(obj, batch_rollouts)
             
             update_PI2(obj, batch_rollouts);
@@ -63,14 +77,14 @@ classdef PI2Agent < forward.Agent
         function update_PI2(obj, batch_rollouts)
             
             dtheta_per_sample = obj.get_PI2_update_per_sample(batch_rollouts);
-            dtheta = sum(dtheta_per_sample, 2);
+            dtheta = squeeze(sum(dtheta_per_sample, 2));
             
             % and update the parameters by directly accessing the dmp data structure
             obj.policy.update(dtheta);
             
             obj.iteration = obj.iteration + 1; %try to remove this later on
             obj.importance_sampling(batch_rollouts)
-            obj.update_exploration();
+            obj.update_exploration_noise();
             
         end
         
@@ -81,7 +95,7 @@ classdef PI2Agent < forward.Agent
             % S is the data structure of all roll outs.
             
             n_dof = obj.policy.n_dof;
-            n_rbfs = obj.policy.n_dof;
+            n_rbfs = obj.policy.n_rfs;
             
             n_reps = length(batch_rollouts); % number of roll-outs
             n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
@@ -99,7 +113,7 @@ classdef PI2Agent < forward.Agent
                     gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
                     
                     % compute g'g
-                    gTg  = sum(S.dmps(j).basesobj.policy.DoFs(j).bases.*obj.policy.DoFs(j).bases, 2);
+                    gTg  = sum(obj.policy.DoFs(j).bases.*obj.policy.DoFs(j).bases, 2);
                     
                     % compute P*M*eps = P*g*g'*eps/(g'g) from previous results
                     PMeps(j,k,:,:) = obj.policy.DoFs(j).bases.*((P(:,k).*gTeps./(gTg + 1.e-10))*ones(1,n_rbfs));
@@ -141,9 +155,9 @@ classdef PI2Agent < forward.Agent
         
         function importance_sampling(obj, batch_rollouts)
             
-            R = zeros(forward_par.reps, 1);
+            R = zeros(obj.reps, 1);
             
-            for k=1:forward_par.reps
+            for k=1:obj.reps
                 R(k) = batch_rollouts(k).R(1,1);
             end
             

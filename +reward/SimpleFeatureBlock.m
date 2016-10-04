@@ -6,7 +6,7 @@ classdef SimpleFeatureBlock < reward.FeatureBlock
     methods
 
         function obj = SimpleFeatureBlock(reference)
-            obj.reward_primitives = RewardPrimitiveSquaredErrorTool(reference);
+            obj.reward_primitives = reward.RewardPrimitiveSquaredErrorTool(reference);
         end
     end
 end

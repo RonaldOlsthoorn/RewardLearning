@@ -46,6 +46,20 @@ classdef RBF_policy < policy.Policy
             end
             
             trajectory.policy = policy;
+        end     
+        
+        function [trajectory] = create_noiseless_trajectory(obj)
+            
+            eps = zeros(obj.n_rfs, obj.n_dof); 
+            trajectory = obj.create_trajectory(eps);
+        end
+        
+        function update(obj, dtheta) 
+            
+            for i = obj.n_dof
+                
+                obj.DoFs(i).w = obj.DoFs(i).w + dtheta(i,:)';               
+            end            
         end
     end
 end

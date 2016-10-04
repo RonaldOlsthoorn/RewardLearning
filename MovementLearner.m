@@ -1,5 +1,12 @@
 classdef MovementLearner < handle
     
+    properties(Constant)
+        
+        handle_cost_figure = 5;
+        handle_noiseless_figure = 2;
+
+    end
+    
     properties
         
         W;
@@ -51,7 +58,7 @@ classdef MovementLearner < handle
 
             reward_model_protocol = str2func(strcat('protocols.', p.reward_model)); 
             reward_model_par = reward_model_protocol();
-            obj.reward_model = init.init_reward_model(reward_model_par);
+            obj.reward_model = init.init_reward_model(reward_model_par, obj.reference);
             
             obj.environment = Environment(obj.plant, obj.reward_model);
           
@@ -71,26 +78,40 @@ classdef MovementLearner < handle
             while iteration<100;
                 
                 batch_trajectory = obj.agent.get_batch_trajectories();
-                batch_rollout = obj.environment.batch_run(batch_trajectory);
+                batch_rollouts = obj.environment.batch_run(batch_trajectory);
+                batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
                 % obj.environment.reward_model.update(batch_rollout)
                 
-                obj.agent.update(batch_rollout);
+                noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+                noiseless_rollout = obj.environment.run(noiseless_trajectory);
                 
-                noiseless_rollout = obj.agent.create_noiseless_rollout();
-                noiseless_rollout.print();                
+                obj.print_noiseless_rollout(noiseless_rollout);       
+                
+                obj.agent.update(batch_rollouts);
                 
                 iteration = iteration + 1;
             end
-            
-            obj.print_result();
-            
+                        
             Weights = obj.W;
             Returns = obj.R;
         end
         
-        function print_result(obj)
+        function print_noiseless_rollout(obj, rollout)
             
+            disp(strcat('Return: ', num2str(rollout.R)));
+            
+            figure(obj.handle_noiseless_figure)
+            clf;
+            subplot(1,3,1)
+            hold on
+            plot(rollout.time, rollout.tool_positions(1,:));
+            subplot(1,3,2)
+            hold on
+            plot(rollout.time, rollout.tool_positions(2,:));
+            subplot(1,3,3)
+            hold on
+            plot(rollout.time, rollout.tool_positions(3,:));
         end
     end
     

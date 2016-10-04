@@ -1,4 +1,4 @@
-classdef RewardPrimitiveSquaredErrorTool < RewardPrimitive
+classdef RewardPrimitiveSquaredErrorTool < reward.RewardPrimitive
     
     properties
         
@@ -12,14 +12,14 @@ classdef RewardPrimitiveSquaredErrorTool < RewardPrimitive
             obj.ref = ref;
         end
         
-        function outcome = compute_outcome(rollout)
+        function outcome = compute_outcome(obj, rollout)
             
             % Implements a simple squared error cost function.
             % Struct S: Result of roll-outs.
             % Struct ro_par: rollout parameters.
             
             % Cost during trajectory
-            outcome  = -sum((rollout.ef_positions(1:3,:)'-obj.ref.r_tool(:,1:3)).^2, 2);
+            outcome  = -sum((rollout.tool_positions(1:3,:)'-obj.ref.r_tool(1:3,:)').^2, 2);
             
         end
     end
