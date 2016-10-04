@@ -14,13 +14,15 @@ classdef PlantUR5 < plant.Plant
         
         function obj = PlantUR5(plant_par, external_controller)
             
-            if ~plant_par.simulation
-                obj.system = plant.SystemUR5(plant_par);
+            if ~plant_par.sim
+                system = plant.SystemUR5(plant_par);
             else
-                obj.system = [];
+                system = [];
             end
             
-            obj.controller = external_controller;
+            controller = external_controller;
+            obj@plant.Plant(system, controller);
+            
             obj.print_batch = true;
             
             if obj.print_batch
@@ -86,8 +88,7 @@ classdef PlantUR5 < plant.Plant
             trajectory.time = time;
             
             rollout = trajectory;
-        end
-        
+        end        
         
         function print_rollout(obj, rollout)
             
@@ -101,8 +102,7 @@ classdef PlantUR5 < plant.Plant
             subplot(1,3,3)
             hold on
             plot(rollout.time, rollout.tool_positions(3,:));
-        end
-        
+        end      
     end
 end
 

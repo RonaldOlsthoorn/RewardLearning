@@ -29,8 +29,8 @@ classdef MovementLearner < handle
             obj.W = [];
             obj.R = [];
             
-            protocol_handle = str2fun(strcat('protocols.', protocol));
-            protocol = protocols.protocol_simple(protocol_handle);
+            protocol_handle = str2func(strcat('protocols.', protocol));
+            protocol = protocol_handle();
             obj.init_learner(protocol);
             
         end

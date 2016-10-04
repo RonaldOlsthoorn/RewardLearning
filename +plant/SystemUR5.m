@@ -10,8 +10,7 @@ classdef SystemUR5 < plant.System
         
         arm;        
         Ts;
-        dof;
-        
+        dof = 6;     
     end
     
     methods
@@ -19,7 +18,6 @@ classdef SystemUR5 < plant.System
         function obj = SystemUR5(system_par)
             
             obj.Ts = system_par.Ts;
-            obj.dof = system_par.dof;
             
             obj.arm = UR5.driver.URArm();
             obj.init();         

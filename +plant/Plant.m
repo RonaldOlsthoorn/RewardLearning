@@ -2,7 +2,6 @@ classdef Plant < handle
     
     properties(Constant)
         
-        handle_batch_figure = 1;
     end
     
     properties
