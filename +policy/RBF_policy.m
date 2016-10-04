@@ -56,7 +56,7 @@ classdef RBF_policy < policy.Policy
         
         function update(obj, dtheta) 
             
-            for i = obj.n_dof
+            for i = 1:obj.n_dof
                 
                 obj.DoFs(i).w = obj.DoFs(i).w + dtheta(i,:)';               
             end            

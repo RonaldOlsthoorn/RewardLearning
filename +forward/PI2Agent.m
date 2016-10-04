@@ -48,8 +48,9 @@ classdef PI2Agent < forward.Agent
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
             batch_trajectories(batch_size) = rollout.Rollout();
+            obj.noise_mult
             
-            for i = 1:batch_size              
+            for i = 1:batch_size
                 
                 eps = obj.gen_epsilon();
                 ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
@@ -130,7 +131,7 @@ classdef PI2Agent < forward.Agent
         
         function [P] = get_probability_trajectories(~,batch_rollouts)
             
-            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step  
+            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
             n_reps = length(batch_rollouts);       % number of roll-outs
             
             R_cum = zeros(n_end, n_reps);
@@ -175,7 +176,7 @@ classdef PI2Agent < forward.Agent
         
         function update_exploration_noise(obj)
             
-            obj.noise_mult = obj.noise_mult - obj.iteration*obj.annealer;
+            obj.noise_mult = obj.noise_mult - obj.annealer;
             
         end
         
