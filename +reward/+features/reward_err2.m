@@ -1,4 +1,8 @@
-function R = reward_err2(S, ro_par)
+class RewardPrimitiveSquaredError < RewardPrimitive
+
+    methods
+
+(S, ro_par)
 % Implements a simple squared error cost function. 
 % Struct S: Result of roll-outs.
 % Struct ro_par: rollout parameters.

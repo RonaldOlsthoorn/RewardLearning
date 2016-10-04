@@ -4,15 +4,18 @@ classdef Rollout
         iteration;
         index;
         
-        dmp;
+        policy;
+        control_input;
         joint_positions;
         joint_speeds;
-        ef_positions;
-        ef_speeds;
+        tool_positions;
+        tool_speeds;
         time
-
+   
         outcomes;
         sum_out;
+        
+        xd;
         
         r;
         R;
@@ -36,4 +39,3 @@ classdef Rollout
     end
     
 end
-

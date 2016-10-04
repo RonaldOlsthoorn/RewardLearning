@@ -45,7 +45,7 @@ forward_par_eval.std     = zeros(6, 1);
 forward_par_eval.n_reuse = 0;
 
 % simulation parameters
-sim_par.wrapflag     = 0;
+sim_par.wrapflag    = 0;
 sim_par.arm         = init.read_par;
 sim_par.controller  = str2func(strcat('controllers.', p.controller));
 sim_par.Ts          = p.Ts;
@@ -78,7 +78,7 @@ else
 end
 
 S.run_rollouts = str2func(strcat('rollout.', 'run_rollouts_', p.system));
-S_eval = S;     % used for noiseless cost assessment
+S_eval = S; % used for noiseless cost assessment
 
 rm = init.init_rm(S, rm);
 rm.outcome_handles = init.init_outcome_handles(rm);

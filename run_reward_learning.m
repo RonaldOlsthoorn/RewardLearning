@@ -63,7 +63,7 @@ while converged(rm, i)~=1,
         forward_par_eval, sim_par, rm, i);
     
     % update reward model
-    % reward.update_reward(S, rm, forward_par);
+    % rm = reward.update_reward(S, rm, forward_par);
     
     % perform the PI2 update
     [S, forward_par] = forward_par.forward_method(S, forward_par);

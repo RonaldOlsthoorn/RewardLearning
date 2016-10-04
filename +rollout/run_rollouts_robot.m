@@ -37,8 +37,7 @@ for i = 1:n_ro, % Run DMPs
     
     r = zeros(n_dmps, S.n_end);
     rd = zeros(n_dmps, S.n_end);
-    
-    
+        
     for k=1:n_dmps,
         
         [y, yd] = S.dmps(k).run(S.rollouts(i).dmp(k).eps(1, :)');

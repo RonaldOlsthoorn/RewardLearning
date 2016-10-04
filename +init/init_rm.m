@@ -1,4 +1,4 @@
-function [ rm ] = init_rm( S, rm )
+function [ rm ] = init_rm(S, rm)
 % setup the reward model by dividing the rollout time in pieces. Each piece
 % will have its own gp.
 

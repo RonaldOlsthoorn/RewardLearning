@@ -1,0 +1,11 @@
+% The protocol file has the following columns:
+%
+%
+% DO NOT USE WHITESPACE IN THE VALUE FIELDS   [100;50;50;10;100;0]
+
+reference           'reference_robot'
+system              'system_real_robot'
+controller          'lousy_PID'
+agent               'agent_PI2'
+reward_model        'reward_model_static_lin'
+policy              'policy_rbf'
