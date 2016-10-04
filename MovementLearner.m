@@ -12,16 +12,13 @@ classdef MovementLearner < handle
         W;
         R;
         
-        system;
-        controller;
         plant;
         
         reward_model;
         environment;
         
         reference;
-        
-        policy;
+
         agent;
     end
     
@@ -32,8 +29,9 @@ classdef MovementLearner < handle
             obj.W = [];
             obj.R = [];
             
-            p = init.read_protocol(protocol);
-            obj.init_learner(p);
+            protocol_handle = str2fun(strcat('protocols.', protocol));
+            protocol = protocols.protocol_simple(protocol_handle);
+            obj.init_learner(protocol);
             
         end
         
@@ -41,34 +39,20 @@ classdef MovementLearner < handle
             
             import plant.Plant;
             import environment.Environment;
+                        
+            controller = init.init_controller(p.controller_par);          
+            obj.plant = init.init_plant(p.plant_par, controller);
             
-            system_protocol = str2func(strcat('protocols.', p.system)); 
-            system_par = system_protocol();
-            obj.system = init.init_system(system_par);
-            
-            controller_protocol = str2func(strcat('protocols.', p.controller)); 
-            controller_par = controller_protocol();
-            obj.controller = init.init_controller(controller_par);
-            
-            obj.plant = Plant(obj.system, obj.controller);
-            
-            reference_protocol = str2func(strcat('protocols.', p.reference)); 
-            reference_par = reference_protocol();
-            obj.reference = init.init_reference(reference_par);
+            obj.reference = init.init_reference(p.reference_par);
 
-            reward_model_protocol = str2func(strcat('protocols.', p.reward_model)); 
-            reward_model_par = reward_model_protocol();
-            obj.reward_model = init.init_reward_model(reward_model_par, obj.reference);
+            obj.reward_model = init.init_reward_model(p.reward_model_par,...
+                                                        obj.reference);
             
             obj.environment = Environment(obj.plant, obj.reward_model);
           
-            policy_protocol = str2func(strcat('protocols.', p.policy)); 
-            policy_par = policy_protocol();
-            obj.policy = init.init_policy(policy_par, obj.reference);
+            policy = init.init_policy(p.policy_par, obj.reference);
             
-            agent_protocol = str2func(strcat('protocols.', p.agent)); 
-            agent_par = agent_protocol();
-            obj.agent = init.init_agent(agent_par, obj.policy);
+            obj.agent = init.init_agent(p.agent_par, policy);
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
