@@ -33,10 +33,8 @@ for k = 1:ro_par.reps,
             S.rollouts(k).r(rm.seg_start(s):rm.seg_end(s)) = m;
         end
         
-        S.rollouts(k).R(s) = m(1);
-        
-    end
-    
+        S.rollouts(k).R(s) = m(1);     
+    end   
 end
 
 

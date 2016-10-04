@@ -3,14 +3,25 @@ classdef Rollout
     properties
         iteration;
         index;
-        dmp;
-        q;
-        u;
+        
+        policy;
+        control_input;
+        joint_positions;
+        joint_speeds;
+        tool_positions;
+        tool_speeds;
+        time
+   
         outcomes;
         sum_out;
+        
+        xd;
+        
         r;
         R;
         R_expert;
+        
+        v_feed;
     end
     
     methods
@@ -28,4 +39,3 @@ classdef Rollout
     end
     
 end
-

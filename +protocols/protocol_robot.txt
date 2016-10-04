@@ -1,0 +1,41 @@
+% The protocol file has the following columns:
+%
+% start_x  goal_x duration std repetitions cost_function updates
+%
+% where
+% start_x           : the start position of the DMP
+% goal_x            : the goal position of the DMP
+% duration          : the duration of the DMP
+% Ts                : sampling time
+% std               : standard deviation of added noise for parameters
+% repetitions       : repetitions of movement before learning update
+% cost_function     : name of the cost function to use
+% controller        : name of the controller function to use in cl
+% reference         : name of the reference trajectory to use in reward. 'none' if no such function is used.
+% n_reuse           : number of re-used trials per update
+% n_rfs             : number of basis functions used
+%
+% DO NOT USE WHITESPACE IN THE VALUE FIELDS   [1000;5000;5000;500;500;0]
+
+start_tool          [-0.2619;-0.1091;0.3623;1.2088;-1.2107;-1.2104]
+goal_tool           [-0.4619;-0.0091;0.3623;1.2088;-1.2109;-1.2103]
+start_joint         [0;-2*pi/3;2*pi/3;0;pi/2;0]
+goal_joint          [-0.2672;-1.6281;1.7727;-0.1439;1.3053;0]
+use_ik              true
+duration            8
+Ts                  0.01
+controller          'lousy_controller'
+ref                 'ref_robot'
+std                 [0.1;0.1;0.1;0.1;0.1;0.1]
+forward_method      'PI2'
+annealer            1/100
+reps                10
+n_reuse             5
+n_dmp_bf            40
+n_segments          4
+loss_tol            0.1
+improve_tol         1e-7
+af                  'acquisition_epd'
+rating_noise        0
+system              'robot'
+n_dmps              6

@@ -1,8 +1,11 @@
 % initialize gpml library on MATLAB startup
-
 cd('gpml');
-run('startup.m');
-cd('..')
+startup_gpml;
+cd('..');
+
+cd('rvctools');
+startup_rvc;
+cd('..');
 
 currentFolder = pwd;
 addpath(currentFolder);

@@ -17,6 +17,7 @@
 
 start               [0]
 goal                [1]
+use_ik              false
 duration            4
 Ts                  0.01
 controller          'lousy_controller'
@@ -32,3 +33,5 @@ loss_tol            0.1
 improve_tol         1e-7
 af                  'acquisition_epd'
 rating_noise        1
+system              'sim'
+n_dmps              1

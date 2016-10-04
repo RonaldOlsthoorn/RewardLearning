@@ -1,6 +1,6 @@
-classdef DMP < handle
+classdef Exact_Timed_DMP < handle
     
-    %  
+    %
     properties(Constant)
         
         alpha_z = 25;
@@ -8,7 +8,7 @@ classdef DMP < handle
         alpha_g = 25/2;
         alpha_x = 25/3;
         alpha_v = 25;
-        beta_v = 25/4;     
+        beta_v = 25/4;
     end
     
     
@@ -16,19 +16,14 @@ classdef DMP < handle
         
         index;
         
-        min_y;
-        max_y;
-        ID;
         n_rfs;
         c_order;
         
         x;
         
         goal = 0;
-        
         y0;
-        A = 0;
-        dG = 0;
+        
         scale = 1;
         
         c; % to be renamed
@@ -76,19 +71,19 @@ classdef DMP < handle
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
             obj.goal = dmp_par.goal;
+            obj.y0 = dmp_par.y0;
+            
             obj.n_rfs = dmp_par.n_dmp_bf;
             
         end
         
         function initialize_centers(obj, n_dmp_bf)
             
-            import dmp.DMP;
-            
             obj.n_rfs = n_dmp_bf;
             
             centers_time = (0:1/(obj.n_rfs-1):1)'*0.5;
-            obj.c = exp(-DMP.alpha_x*centers_time);
-            obj.cd = obj.c*(-DMP.alpha_x);
+            obj.c = exp(-obj.alpha_x*centers_time);
+            obj.cd = obj.c*(-obj.alpha_x);
         end
         
         function initialize_amplitudes(obj)
@@ -96,19 +91,17 @@ classdef DMP < handle
             obj.D = (diff(obj.c)*0.55).^2;
             obj.D = 1./[obj.D; obj.D(end)];
         end
-                    
+        
         function initialize_x(obj)
-            
-            import dmp.DMP;
             
             obj.x = zeros(length(obj.t), 1);
             obj.x(1) = 1;
             
             for i = 2:length(obj.t)
-                obj.x(i) = obj.x(i-1)-DMP.alpha_x.*obj.tau*obj.Ts*obj.x(i-1);
+                obj.x(i) = obj.x(i-1)-obj.alpha_x.*obj.tau*obj.Ts*obj.x(i-1);
             end
             
-            % obj.x = exp(-DMP.alpha_x.*obj.tau.*obj.t);       
+            % obj.x = exp(-obj.alpha_x.*obj.tau.*obj.t);
         end
         
         function initialize_psi(obj)
@@ -116,7 +109,7 @@ classdef DMP < handle
             for i = 1:obj.n_rfs
                 
                 obj.psi(:, i) = exp(-0.5*((obj.x - obj.c(i)).^2).*obj.D(i));
-            end      
+            end
         end
         
         function initialize_weighted_psi(obj)
@@ -140,12 +133,11 @@ classdef DMP < handle
                 
                 obj.bases(i,:) = obj.psi(i,:)*obj.x(i, 1)/sum(obj.psi(i,:));
             end
-
+            
         end
         
         function [y, yd, ydd] = run(obj, eps)
-                        
-            import dmp.DMP;
+            
             import rollout.Rollout;
             
             y = zeros(length(obj.t), 1);
@@ -154,8 +146,8 @@ classdef DMP < handle
             
             f = sum(obj.x(1)*(obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
             f = f*obj.scale;
-                
-            zd = (DMP.alpha_z*(DMP.beta_z*(obj.goal-y(1))-yd(1))+f)*obj.tau;
+            
+            zd = (obj.alpha_z*(obj.beta_z*(obj.goal-y(1))-yd(1))+f)*obj.tau;
             ydd(1) = zd*obj.tau;
             
             for i = 2:length(obj.t)
@@ -163,7 +155,7 @@ classdef DMP < handle
                 f = sum(obj.x(i).*(obj.w+eps).*obj.psi(i,:)')/sum(obj.psi(i,:)+1.e-10);
                 f = f*obj.scale;
                 
-                zd = (DMP.alpha_z*(DMP.beta_z*(obj.goal-y(i-1))-yd(i-1))+f)*obj.tau;
+                zd = (obj.alpha_z*(obj.beta_z*(obj.goal-y(i-1))-yd(i-1))+f)*obj.tau;
                 ydd(i) = zd*obj.tau;
                 yd(i) = zd*obj.Ts+yd(i-1);
                 y(i) = yd(i-1)*obj.Ts*obj.tau+y(i-1);
@@ -175,8 +167,6 @@ classdef DMP < handle
         
         function batch_fit(obj, T, Td, Tdd)
             
-            import dmp.DMP;
-            
             if (nargin < 3)
                 Td = diffnc(T, dt);
             end
@@ -187,9 +177,9 @@ classdef DMP < handle
             % the start state is the first state in the trajectory
             obj.y0 = T(1);
             
-            s  = 1;  % for fitting a new primitive, the scale factor is always equal to one  
+            s  = 1;  % for fitting a new primitive, the scale factor is always equal to one
             amp = s;
-            Ft  = (Tdd/obj.tau^2-DMP.alpha_z*(DMP.beta_z*(obj.goal-T)-Td/obj.tau)) / amp;
+            Ft  = (Tdd/obj.tau^2-obj.alpha_z*(obj.beta_z*(obj.goal-T)-Td/obj.tau)) / amp;
             
             % compute the weights for each local model along the trajectory
             %PSI = exp(-0.5*((obj.x*ones(1,length(obj.c))-ones(length(T),1)*obj.c').^2).*(ones(length(T), 1)*obj.D'));
@@ -198,12 +188,12 @@ classdef DMP < handle
             sx2  = sum(((obj.x.^2)*ones(1,length(obj.c))).*obj.psi, 1)';
             sxtd = sum(((obj.x.*Ft)*ones(1,length(obj.c))).*obj.psi, 1)';
             obj.w    = sxtd./(sx2+1.e-10);
-                      
+            
         end
         
-%         function run_increment()
-%             
-%         end
+        %         function run_increment()
+        %
+        %         end
         
     end
     
