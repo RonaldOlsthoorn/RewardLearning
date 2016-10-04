@@ -6,8 +6,6 @@ else
     reward_model = [];
 end
 
-
-
 end
 
 

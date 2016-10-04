@@ -25,8 +25,7 @@ classdef ControllerPID < handle
         function control_input = control_law(obj, r, r_d, x, v)
             
            control_input_raw = obj.Kp*(r-x)+obj.Kd*(r_d-v);
-           control_input = obj.saturation(control_input_raw);
-           
+           control_input = obj.saturation(control_input_raw);      
         end
         
         function control_input = saturation(obj, control_input)
