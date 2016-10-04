@@ -1,5 +1,10 @@
 classdef RBF_trajectory < handle
     
+    properties(Constant)
+       
+%         bw_scale = 0.55;
+    end
+    
     properties
         
         index;
@@ -61,6 +66,9 @@ classdef RBF_trajectory < handle
         function initialize_amplitudes(obj)
             
             obj.D = 3;
+            
+%             obj.D = (diff(obj.c)*obj.bw_scale).^2;
+%             obj.D = 1./[obj.D;obj.D(end)];
         end
         
         function initialize_psi(obj)
