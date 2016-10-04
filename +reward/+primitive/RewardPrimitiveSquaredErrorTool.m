@@ -1,4 +1,4 @@
-classdef RewardPrimitiveSquaredErrorTool < reward.RewardPrimitive
+classdef RewardPrimitiveSquaredErrorTool < reward.primitive.RewardPrimitive
     
     properties
         
