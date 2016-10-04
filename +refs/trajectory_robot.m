@@ -1,5 +1,7 @@
 function [r_tool, r_tool_d] = trajectory_robot(ref_par)
-%
+% returns a trajectory in cartesian tool space [x;y;z] which is constant in
+% the z-plane.
+
 t = 0:ref_par.Ts:(ref_par.duration-ref_par.Ts);
 goal = ref_par.goal_tool;
 start = ref_par.start_tool;

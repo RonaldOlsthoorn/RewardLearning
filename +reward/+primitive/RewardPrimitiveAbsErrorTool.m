@@ -1,4 +1,5 @@
 classdef RewardPrimitiveAbsErrorTool < reward.primitive.RewardPrimitive
+    % absolute error reward primitive.
     
     properties
         
@@ -13,14 +14,9 @@ classdef RewardPrimitiveAbsErrorTool < reward.primitive.RewardPrimitive
         end
         
         function outcome = compute_outcome(rollout)
+            % returns the absolute tracking error as a reward primitive.
             
-            % Implements a simple squared error cost function.
-            % Struct S: Result of roll-outs.
-            % Struct ro_par: rollout parameters.
-            
-            % Cost during trajectory
             outcome  = -sum(abs((rollout.ef_positions(1:3,:)'-obj.ref.r_tool(:,1:3))), 2);
-            
         end
     end
 end

@@ -1,4 +1,8 @@
 function [ reference ] = init_reference( reference_par )
+% initialise the reference trajectory. If needed use inverse kinematics
+% block.
+% reference_par: struct containing start and goal and trajectory function. 
+
 
 if strcmp(reference_par.trajectory, 'trajectory_robot')
     reference = refs.Reference(reference_par);

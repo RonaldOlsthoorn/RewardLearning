@@ -1,8 +1,9 @@
 classdef PI2Agent < forward.Agent
-    
+    %PI2Agent defines a PI2 reinforcement learning agent.
+
     properties
         
-        iteration = 1;
+        iteration = 1; %unfortunately needed to save this.
         
         previous_batch;
         noise_mult = 1;
@@ -22,18 +23,21 @@ classdef PI2Agent < forward.Agent
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
             
-            rng(10);
+            rng(10); % fix random seed. handy for comparisson
         end
         
+        % returns the noiseless input trajectory of the agents' 
+        % current policy
         function trajectory = get_noiseless_trajectory(obj)
             
-            trajectory = obj.policy.create_noiseless_trajectory(); % push back storage policy to policy
-            
+            trajectory = obj.policy.create_noiseless_trajectory();             
         end
         
+        % returns a batch of input trajectories for the environment to 
+        % run.
         function batch_trajectories = get_batch_trajectories(obj)
             
-            if isempty(obj.previous_batch),
+            if isempty(obj.previous_batch), % first batch
                 batch_size = obj.reps;
                 batch_trajectories = obj.create_batch_trajectories(batch_size);
                 return;
@@ -45,6 +49,7 @@ classdef PI2Agent < forward.Agent
             
         end
         
+        % returns a batch of input trajectories. 
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
             batch_trajectories(batch_size) = rollout.Rollout();
@@ -61,6 +66,8 @@ classdef PI2Agent < forward.Agent
             end
         end
         
+        % returns a batch of rollouts that mixes the best n_reuse rollouts
+        % with the batch of new rollouts.
         function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts_new)
             
             if isempty(obj.previous_batch)
@@ -70,17 +77,19 @@ classdef PI2Agent < forward.Agent
             batch_rollouts = [batch_rollouts_new, obj.previous_batch((obj.n_reuse+1):end)];
         end
         
+        % update the policy (wrapper)
         function update(obj, batch_rollouts)
             
             update_PI2(obj, batch_rollouts);
         end
         
+        % update the policy
         function update_PI2(obj, batch_rollouts)
             
             dtheta_per_sample = obj.get_PI2_update_per_sample(batch_rollouts);
             dtheta = squeeze(sum(dtheta_per_sample, 2));
             
-            % and update the parameters by directly accessing the dmp data structure
+            % and update the parameters.
             obj.policy.update(dtheta);
             
             obj.iteration = obj.iteration + 1; %try to remove this later on
@@ -89,7 +98,8 @@ classdef PI2Agent < forward.Agent
             
         end
         
-        
+        % returns the change in policy parameters per sample. This
+        % per-sample distinction is needed for the reward learning update
         function [dtheta_per_sample] = get_PI2_update_per_sample(obj, batch_rollouts )
             
             % returns the new policy, based on the new set of roll-outs.
@@ -129,6 +139,8 @@ classdef PI2Agent < forward.Agent
             
         end
         
+        % Returns the probability of a sample relative to the other samples
+        % in the batch according to the reward.
         function [P] = get_probability_trajectories(~,batch_rollouts)
             
             n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
@@ -154,6 +166,7 @@ classdef PI2Agent < forward.Agent
             
         end
         
+        % Saves the best n_reuse samples to be reused later on.
         function importance_sampling(obj, batch_rollouts)
             
             R = zeros(obj.reps, 1);
@@ -174,12 +187,14 @@ classdef PI2Agent < forward.Agent
             obj.previous_batch = batch_rollouts;
         end
         
+        % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
             obj.noise_mult = obj.noise_mult - obj.annealer;
             
         end
         
+        % Generate exploration noise.
         function eps = gen_epsilon(obj)
             
             eps = zeros(obj.policy.n_rfs, obj.policy.n_dof);
@@ -190,5 +205,4 @@ classdef PI2Agent < forward.Agent
             end
         end
     end
-    
 end

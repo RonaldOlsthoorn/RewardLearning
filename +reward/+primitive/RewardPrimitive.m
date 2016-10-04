@@ -1,6 +1,6 @@
 classdef RewardPrimitive < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % REEWARDPRIMITIVE reward primitve, aka feature function is a candidate
+    % reward function.
     
     properties
     end
@@ -12,6 +12,8 @@ classdef RewardPrimitive < handle
     methods
         
         function outcomes = batch_compute_outcome(sample_batch)
+            % returns a batch of outcomes, results of the reward
+            % primitives.
             
             for i=length(sample_batch)
                 outcomes(i) = compute_outcome(sample_batch);

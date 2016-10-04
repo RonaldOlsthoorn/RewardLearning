@@ -1,16 +1,16 @@
 classdef MovementLearner < handle
+    % God class handling the complete active reward learning algorhithm.
     
     properties(Constant)
         
         handle_cost_figure = 5;
         handle_noiseless_figure = 2;
-
     end
     
     properties
         
-        W;
-        R;
+        W; % policy weight trace
+        R; % Reward trace
         
         plant;
         
@@ -31,8 +31,7 @@ classdef MovementLearner < handle
             
             protocol_handle = str2func(strcat('protocols.', protocol));
             protocol = protocol_handle();
-            obj.init_learner(protocol);
-            
+            obj.init_learner(protocol);        
         end
         
         function init_learner(obj, p)    
@@ -59,7 +58,7 @@ classdef MovementLearner < handle
             
             iteration = 1;
             
-            while iteration<100;
+            while iteration<100; % for now. Replace with EPD
                 
                 batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollouts = obj.environment.batch_run(batch_trajectory);
@@ -82,9 +81,9 @@ classdef MovementLearner < handle
         end
         
         function print_noiseless_rollout(obj, rollout)
+            % print the noiseless rollout in a single figure.
             
-            disp(strcat('Return: ', num2str(rollout.R)));
-            
+            disp(strcat('Return: ', num2str(rollout.R))); 
             figure(obj.handle_noiseless_figure)
             clf;
             subplot(1,3,1)

@@ -1,6 +1,6 @@
-function [ p ] = init_policy( policy_par, ref)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function [ p ] = init_policy(policy_par, ref)
+% returns the policy parameterization.
+% policy_par: tuning parameters of the policy.
 
 if(strcmp(policy_par.type, 'rbf'))
    

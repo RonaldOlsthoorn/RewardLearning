@@ -1,5 +1,7 @@
 classdef ControllerPID < handle
    
+    % ControllerPID simple feedback controller
+    % Controller extended with a saturation
     properties(Constant)
        
         sat = 1;

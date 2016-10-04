@@ -1,4 +1,5 @@
 classdef SimpleFeatureBlock < reward.FeatureBlock
+    % SIMPLEFEATUREBLOCK feature block containing only squared error.
     
     properties
     end
