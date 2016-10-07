@@ -20,7 +20,7 @@ classdef RewardModel < handle
             outcomes = obj.feature_block.compute_outcomes(rollout);
         end
         
-        function rollout = add_outcomes_and_reward(obj, rollout)
+        function add_outcomes_and_reward(obj, rollout)
             % Complements the rollout with reward and the outcomes of
             % reward primitives.
             

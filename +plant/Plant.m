@@ -26,16 +26,19 @@ classdef Plant < handle
         
         function batch_rollouts = batch_run(obj, batch_trajectories)
             
-            for i = 1:length(batch_trajectories)
+            batch_rollouts = db.RolloutBatch();
+            
+            for i = 1:batch_trajectories.size
                 disp(strcat('Sample nr : ', num2str(i)));
-                batch_trajectories(i) = obj.run(batch_trajectories(i));
+                ro = obj.run(batch_trajectories(i));
+                
+                batch_rollouts.append(ro);
                 
                 if obj.print_batch
-                    obj.print_rollout(batch_trajectories(i));
+                    obj.print_rollout(ro);
                 end
             end
             
-            batch_rollouts = batch_trajectories;
         end
         
         function print_rollout(obj, rollout)

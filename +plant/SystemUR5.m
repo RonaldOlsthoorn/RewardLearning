@@ -3,14 +3,14 @@ classdef SystemUR5 < plant.System
     properties(Constant)
         
         ip = '192.168.1.50';
-        a = 10;     
+        a = 10;
     end
     
     properties
         
-        arm;        
+        arm;
         Ts;
-        dof = 6;     
+        dof = 6;
     end
     
     methods
@@ -20,12 +20,17 @@ classdef SystemUR5 < plant.System
             obj.Ts = system_par.Ts;
             
             obj.arm = UR5.driver.URArm();
-            obj.init();         
+            obj.init();
+        end
+        
+        function init(obj)
+            
+            % obj.connect();
         end
         
         function connect(obj)
             
-            obj.arm.fopen(obj.ip);           
+            obj.arm.fopen(obj.ip);
         end
         
         function disconnect(obj)
@@ -48,12 +53,7 @@ classdef SystemUR5 < plant.System
             joint_position = obj.arm.getJointsPositions();
             joint_speed = obj.arm.getJointsSpeeds();
             tool_position = obj.arm.getToolPositions();
-            tool_speed = obj.arm.getToolSpeeds();           
-        end
-        
-        function init(obj)
-            
-            obj.connect();
+            tool_speed = obj.arm.getToolSpeeds();
         end
         
         function [output] = reset(obj)
@@ -98,8 +98,8 @@ classdef SystemUR5 < plant.System
                 pause(0.1)
                 s = obj.arm.getJointsSpeeds();
                 
-            end 
-        end       
+            end
+        end
     end
 end
 
