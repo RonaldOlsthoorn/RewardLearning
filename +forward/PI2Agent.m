@@ -169,6 +169,7 @@ classdef PI2Agent < forward.Agent
         % Saves the best n_reuse samples to be reused later on.
         function importance_sampling(obj, batch_rollouts)
             
+            obj.previous_batch = batch_rollouts;
             R = zeros(obj.reps, 1);
             
             for k=1:obj.reps
@@ -177,14 +178,11 @@ classdef PI2Agent < forward.Agent
             
             [~,inds]=sort(R);
             
-            for j=1:(length(R)-obj.n_reuse),
+            for j=length(R):-1:(length(R)-obj.n_reuse),
                 
-                rollout_temp = batch_rollouts(inds(j));
-                batch_rollouts(inds(j)) = batch_rollouts(j);
-                batch_rollouts(j) = rollout_temp;
+                obj.previous_batch(j) = batch_rollouts(inds(j));
             end
             
-            obj.previous_batch = batch_rollouts;
         end
         
         % Update the exploration noise linearly.
