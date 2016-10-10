@@ -52,8 +52,7 @@ classdef PI2Agent < forward.Agent
         % returns a batch of input trajectories. 
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
-            batch_trajectories(batch_size) = rollout.Rollout();
-            obj.noise_mult
+            batch_trajectories = db.RolloutBatch();
             
             for i = 1:batch_size
                 
@@ -62,19 +61,19 @@ classdef PI2Agent < forward.Agent
                 ro.iteration = obj.iteration;
                 ro.index = i;
                 
-                batch_trajectories(i) = ro;
+                batch_trajectories.append_rollout(ro);
             end
         end
         
         % returns a batch of rollouts that mixes the best n_reuse rollouts
         % with the batch of new rollouts.
-        function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts_new)
+        function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts)
             
             if isempty(obj.previous_batch)
-                batch_rollouts = batch_rollouts_new;
                 return;
             end
-            batch_rollouts = [batch_rollouts_new, obj.previous_batch((obj.n_reuse+1):end)];
+            
+            batch_rollouts.append_batch(obj.previous_batch);
         end
         
         % update the policy (wrapper)
@@ -108,8 +107,8 @@ classdef PI2Agent < forward.Agent
             n_dof = obj.policy.n_dof;
             n_rbfs = obj.policy.n_rfs;
             
-            n_reps = length(batch_rollouts); % number of roll-outs
-            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
+            n_reps = batch_rollouts.size; % number of roll-outs
+            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:));           % final time step
             
             P = obj.get_probability_trajectories(batch_rollouts);
             
@@ -121,7 +120,7 @@ classdef PI2Agent < forward.Agent
                 for k=1:n_reps,
                     
                     % compute g'*eps in vector form
-                    gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
+                    gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts.get_rollout(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
                     
                     % compute g'g
                     gTg  = sum(obj.policy.DoFs(j).bases.*obj.policy.DoFs(j).bases, 2);
@@ -141,15 +140,15 @@ classdef PI2Agent < forward.Agent
         
         % Returns the probability of a sample relative to the other samples
         % in the batch according to the reward.
-        function [P] = get_probability_trajectories(~,batch_rollouts)
+        function [P] = get_probability_trajectories(~, batch_rollouts)
             
-            n_end = length(batch_rollouts(1).policy.dof(1).xd(1,:));           % final time step
-            n_reps = length(batch_rollouts);       % number of roll-outs
+            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:)); % final time step
+            n_reps = batch_rollouts.size;       % number of roll-outs
             
             R_cum = zeros(n_end, n_reps);
             
             for k=1:n_reps
-                R_cum(:,k) = -batch_rollouts(k).r;
+                R_cum(:,k) = -batch_rollouts.get_rollout(k).r;
             end
             
             % compute the exponentiated cost with the special trick to automatically
@@ -169,20 +168,22 @@ classdef PI2Agent < forward.Agent
         % Saves the best n_reuse samples to be reused later on.
         function importance_sampling(obj, batch_rollouts)
             
-            obj.previous_batch = batch_rollouts;
             R = zeros(obj.reps, 1);
             
             for k=1:obj.reps
-                R(k) = batch_rollouts(k).R(1,1);
+                R(k) = batch_rollouts.get_rollout(k).R(1,1);
             end
             
-            [~,inds]=sort(R);
+            [~, inds]=sort(R);   
+            
+            batch_tmp = db.RolloutBatch();
             
             for j=length(R):-1:(length(R)-obj.n_reuse),
                 
-                obj.previous_batch(j) = batch_rollouts(inds(j));
+                batch_tmp.append_rollout(batch_rollouts.get_rollout(inds(j)));
             end
             
+            obj.previous_batch = batch_tmp;
         end
         
         % Update the exploration noise linearly.

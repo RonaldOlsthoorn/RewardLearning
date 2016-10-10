@@ -31,10 +31,12 @@ classdef Environment < handle
             
             batch_rollouts = obj.plant.batch_run(batch_trajectory);
             
-            for i=1:length(batch_rollouts)
+            for i=1:batch_rollouts.size
                 
-                batch_rollouts(i) = obj.reward_model.add_outcomes_and_reward(batch_rollouts(i));
+                r = obj.reward_model.add_outcomes_and_reward(...
+                    batch_rollouts.get_rollout(i));     
                 
+                batch_rollouts.update_rollout(r);
             end
             
         end

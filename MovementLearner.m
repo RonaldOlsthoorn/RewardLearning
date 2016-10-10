@@ -20,6 +20,8 @@ classdef MovementLearner < handle
         reference;
 
         agent;
+        
+        db;
     end
     
     methods
@@ -31,7 +33,9 @@ classdef MovementLearner < handle
             
             protocol_handle = str2func(strcat('protocols.', protocol));
             protocol = protocol_handle();
-            obj.init_learner(protocol);        
+            obj.init_learner(protocol);       
+            
+            obj.db = db.DB();
         end
         
         function init_learner(obj, p)    
@@ -62,6 +66,7 @@ classdef MovementLearner < handle
                 
                 batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollouts = obj.environment.batch_run(batch_trajectory);
+                obj.db.append_row(batch_rollouts);
                 batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
                 % obj.environment.reward_model.update(batch_rollout)
