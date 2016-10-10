@@ -7,7 +7,6 @@ classdef PlantUR5 < plant.Plant
     
     properties
 
-        print_batch;
     end
     
     methods
@@ -22,13 +21,6 @@ classdef PlantUR5 < plant.Plant
             
             controller = external_controller;
             obj@plant.Plant(system, controller);
-            
-            obj.print_batch = true;
-            
-            if obj.print_batch
-                figure(obj.handle_batch_figure)
-                clf;
-            end
         end
         
         function rollout = run(obj, trajectory)
@@ -79,6 +71,7 @@ classdef PlantUR5 < plant.Plant
             end
             
             obj.system.gently_break();
+            obj.system.reset();
             
             trajectory.control_input = control_input;
             trajectory.joint_positions = joint_positions;
@@ -90,19 +83,6 @@ classdef PlantUR5 < plant.Plant
             rollout = trajectory;
         end        
         
-        function print_rollout(obj, rollout)
-            
-            figure(obj.handle_batch_figure)
-            subplot(1,3,1)
-            hold on
-            plot(rollout.time, rollout.tool_positions(1,:));
-            subplot(1,3,2)
-            hold on
-            plot(rollout.time, rollout.tool_positions(2,:));
-            subplot(1,3,3)
-            hold on
-            plot(rollout.time, rollout.tool_positions(3,:));
-        end      
     end
 end
 
