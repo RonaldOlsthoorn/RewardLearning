@@ -53,7 +53,6 @@ classdef PI2Agent < forward.Agent
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
             batch_trajectories = db.RolloutBatch();
-            obj.noise_mult
             
             for i = 1:batch_size
                 
@@ -62,20 +61,19 @@ classdef PI2Agent < forward.Agent
                 ro.iteration = obj.iteration;
                 ro.index = i;
                 
-                batch_trajectories.append(ro);
+                batch_trajectories.append_rollout(ro);
             end
         end
         
         % returns a batch of rollouts that mixes the best n_reuse rollouts
         % with the batch of new rollouts.
-        function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts_new)
+        function batch_rollouts = mix_previous_rollouts(obj, batch_rollouts)
             
             if isempty(obj.previous_batch)
-                batch_rollouts = batch_rollouts_new;
                 return;
             end
             
-            batch_rollouts = batch_rollouts_new.append_batch(obj.previous_batch);
+            batch_rollouts.append_batch(obj.previous_batch);
         end
         
         % update the policy (wrapper)
@@ -177,11 +175,11 @@ classdef PI2Agent < forward.Agent
             end
             
             [~, inds]=sort(R);            
-            batch_tmp = RolloutBatch();
+            batch_tmp = db.RolloutBatch();
             
-            for j=1:(length(R)-obj.n_reuse),
+            for j=length(R):-1:(length(R)-obj.n_reuse),
                 
-                batch_tmp.append(batch_rollouts.get_rollout(inds(j)));
+                batch_tmp.append_rollout(batch_rollouts.get_rollout(inds(j)));
             end
             
             obj.previous_batch = batch_tmp;

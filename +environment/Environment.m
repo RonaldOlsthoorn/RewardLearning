@@ -33,7 +33,10 @@ classdef Environment < handle
             
             for i=1:batch_rollouts.size
                 
-                obj.reward_model.add_outcomes_and_reward(batch_rollouts.get_rollout(i));           
+                r = obj.reward_model.add_outcomes_and_reward(...
+                    batch_rollouts.get_rollout(i));     
+                
+                batch_rollouts.update_rollout(r);
             end
             
         end

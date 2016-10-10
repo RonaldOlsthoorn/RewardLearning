@@ -25,7 +25,7 @@ classdef SystemUR5 < plant.System
         
         function init(obj)
             
-            % obj.connect();
+            obj.connect();
         end
         
         function connect(obj)

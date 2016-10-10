@@ -3,7 +3,7 @@ classdef RolloutBatch < handle
     properties
         
         batch;
-        size;
+        size = 0;
     end
     
     methods
@@ -16,7 +16,7 @@ classdef RolloutBatch < handle
         
         function append_batch(obj, batch)
             
-            obj.batch = [obj.batch batch];
+            obj.batch = [obj.batch batch.batch];
             obj.size = length(obj.batch);
         end
         
@@ -25,6 +25,15 @@ classdef RolloutBatch < handle
             for i= 1:obj.size
                 if r.equals(obj.batch(i))
                     rollout = obj.batch(i);
+                end
+            end
+        end
+        
+        function update_rollout(obj, r)
+            
+            for i= 1:obj.size
+                if r.equals(obj.batch(i))
+                    obj.batch(i) = r;
                 end
             end
         end

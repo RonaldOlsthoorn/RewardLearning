@@ -30,9 +30,9 @@ classdef Plant < handle
             
             for i = 1:batch_trajectories.size
                 disp(strcat('Sample nr : ', num2str(i)));
-                ro = obj.run(batch_trajectories(i));
+                ro = obj.run(batch_trajectories.get_rollout(i));
                 
-                batch_rollouts.append(ro);
+                batch_rollouts.append_rollout(ro);
                 
                 if obj.print_batch
                     obj.print_rollout(ro);
