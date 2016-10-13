@@ -70,6 +70,7 @@ classdef SystemUR5 < plant.System
                 
                 obj.arm.moveJoints(pos);
                 pos = obj.arm.getJointsPositions();
+                vel = obj.arm.getJointsSpeeds();
                 
                 while abs(pos(i)-pos0(i)) > tolerance
                     
