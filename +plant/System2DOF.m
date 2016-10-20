@@ -11,6 +11,7 @@ classdef System2DOF < plant.System
         
         par;      
         state;
+        
     end
     
     methods
@@ -19,19 +20,21 @@ classdef System2DOF < plant.System
             
             obj.Ts = system_par.Ts;
             obj.par = system_par.par;
+            
+            
         end
         
         function [joint_position, joint_speed,...
                 tool_position, tool_speed] = run_increment(obj, control_input)
             
-            [xnext] = obj.f_open_loop(obj, obj.state, control_input);
+            [xnext] = obj.f_open_loop(obj.state, control_input);
             
             obj.state = xnext;
             
-            joint_position = [xnext(1); x_next(3)];
-            joint_speed = [xnext(2); x_next(4)];
+            joint_position = [xnext(1); xnext(3)];
+            joint_speed = [xnext(2); xnext(4)];
             
-            x_ef = obj.forward_kinematics(xnext);
+            x_ef = obj.forward_kinematics(xnext');
             
             tool_position = [x_ef(1); x_ef(3)];
             tool_speed = [x_ef(2); x_ef(4)];
@@ -65,7 +68,7 @@ classdef System2DOF < plant.System
             C = [-beta*sin(x(3,:))*x(4,:)+obj.par.b1, -beta*sin(x(3,:))*(x(2,:)+x(4,:))
                 beta*sin(x(3,:))*x(2,:), obj.par.b2];       % Coriolis and damping matrix
             
-            G = [objpar.m1*obj.par.g*obj.par.r1*cos(x(1,:))+obj.par.m2*obj.par.g*(obj.par.l1*cos(x(1,:))+obj.par.r2*cos(x(1,:)+x(3,:)))
+            G = [obj.par.m1*obj.par.g*obj.par.r1*cos(x(1,:))+obj.par.m2*obj.par.g*(obj.par.l1*cos(x(1,:))+obj.par.r2*cos(x(1,:)+x(3,:)))
                 2*obj.par.m2*obj.par.g*obj.par.r2*cos(x(1,:)+x(3,:))];     % Gravity matrix
             
             dx = (M)\(u-C*[x(2,:); x(4,:)]-G);
@@ -137,10 +140,10 @@ classdef System2DOF < plant.System
             for i = 2:N
                 hi = h(i-1);
                 yi = Y(:,i-1);
-                F(:,1) = feval(obj.eompend,yi,u);
-                F(:,2) = feval(obj.eompend,yi+0.5*hi*F(:,1),u);
-                F(:,3) = feval(obj.eompend,yi+0.5*hi*F(:,2),u);
-                F(:,4) = feval(obj.eompend,yi+hi*F(:,3),u);
+                F(:,1) = obj.eompend(yi,u);
+                F(:,2) = obj.eompend(yi+0.5*hi*F(:,1),u);
+                F(:,3) = obj.eompend(yi+0.5*hi*F(:,2),u);
+                F(:,4) = obj.eompend(yi+hi*F(:,3),u);
                 Y(:,i) = yi + (hi/6)*(F(:,1) + 2*F(:,2) + 2*F(:,3) + F(:,4));
             end
             Y = Y.';
@@ -160,10 +163,12 @@ classdef System2DOF < plant.System
             x_ef = [x_end; x_vel_end; y_end; y_vel_end];
         end        
         
-        function [output] = reset(~, pos)
+        function [output] = reset(obj, pos)
             
             output.joint_position = pos;
-            output.joint_speed = [0;0];
+            output.joint_speed = [0; 0];
+            
+            obj.state = [pos(1); 0; pos(2); 0];
         end
         
     end

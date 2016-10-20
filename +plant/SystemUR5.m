@@ -52,8 +52,10 @@ classdef SystemUR5 < plant.System
             
             joint_position = obj.arm.getJointsPositions();
             joint_speed = obj.arm.getJointsSpeeds();
-            tool_position = obj.arm.getToolPositions();
-            tool_speed = obj.arm.getToolSpeeds();
+            tp = obj.arm.getToolPositions();
+            tool_position = tp(1:3);
+            ts = obj.arm.getToolSpeeds();
+            tool_speed = ts(1:3);
         end
         
         function [output] = reset(obj)

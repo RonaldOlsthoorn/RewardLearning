@@ -102,7 +102,7 @@ classdef RBF_trajectory < handle
             end
         end
         
-        function [y, yd] = create_trajectory(obj, eps)
+        function [y, yd, ydd] = create_trajectory(obj, eps)
             
             y = (obj.bases*(obj.w+eps))';
             
@@ -111,6 +111,8 @@ classdef RBF_trajectory < handle
             end
             
             yd = [0 diff(y)/obj.Ts];
+            
+            ydd = [0 diff(yd)/obj.Ts];
         end
         
         function batch_fit(obj, T)

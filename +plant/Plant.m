@@ -72,9 +72,9 @@ classdef Plant < handle
             subplot(1,3,2)
             hold on
             plot(rollout.time, rollout.tool_positions(2,:));
-            subplot(1,3,3)
-            hold on
-            plot(rollout.time, rollout.tool_positions(3,:));
+%             subplot(1,3,3)
+%             hold on
+%             plot(rollout.time, rollout.tool_positions(3,:));
         end   
     end
 end

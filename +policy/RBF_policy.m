@@ -34,8 +34,8 @@ classdef RBF_policy < policy.Policy
             
             for i = 1:obj.n_dof
                 
-                [y, yd] = obj.DoFs(i).create_trajectory(eps(:,i));
-                xd = [y; yd];
+                [y, yd, ydd] = obj.DoFs(i).create_trajectory(eps(:,i));
+                xd = [y; yd; ydd];
                 dof.xd = xd;
                 dof.eps = (eps(:,i)*ones(1, length(obj.reference.t)))';
                 dof.theta_eps = (obj.DoFs(i).w*ones(1, length(obj.reference.t))+...
@@ -46,6 +46,7 @@ classdef RBF_policy < policy.Policy
             end
             
             trajectory.policy = policy;
+            trajectory.time = obj.reference.t;
         end     
         
         function [trajectory] = create_noiseless_trajectory(obj)

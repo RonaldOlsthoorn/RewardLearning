@@ -11,7 +11,7 @@ classdef Rollout
         joint_speeds;
         tool_positions;
         tool_speeds;
-        time
+        time;
    
         outcomes;
         sum_out;

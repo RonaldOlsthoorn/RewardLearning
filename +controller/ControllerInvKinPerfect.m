@@ -9,10 +9,7 @@ classdef ControllerInvKinPerfect < handle
     
     properties
         
-        
-        M;
-        C;
-        G;
+        par
         
         Kd = eye(2);
         Kp = .10*eye(2);
@@ -21,26 +18,36 @@ classdef ControllerInvKinPerfect < handle
     
     methods
         
-        function obj = ControllerPID(M, C, G)
+        function obj = ControllerInvKinPerfect(~, system)
             
-            obj.M = M;
-            obj.C = C;
-            obj.G = G;
+            obj.par = system.par;
         end
         
         
-        function [control_input] = control_law(obj, r, ~, x, ~)
+        function [control_input] = control_law(obj, r, rd, rdd, x, v)
             % Controller for trajectory tracking. Combination of
             % feed-forward (inverted EoM) and feedback control.
+            alpha = obj.par.Iz1+obj.par.Iz2+obj.par.m1*obj.par.r1^2 + obj.par.m2*(obj.par.l1^2 + obj.par.r2^2);
+            beta = obj.par.m2*obj.par.l1*obj.par.r2;
+            delta = obj.par.Iz2 + obj.par.m2*obj.par.r2^2;
             
-            r_acc = [r(3,:); r(6,:)];
-            r_vel = [r(2,:); r(5,:)];
-            r_pos = [r(1,:); r(4,:)];
+            M = [alpha+2*beta*cos(x(2,:)), delta+beta*cos(x(2,:))
+                delta+beta*cos(x(2,:)), delta];         % Mass matrix
             
-            x_vel = [x(2,:); x(4,:)];
-            x_pos = [x(1,:); x(3,:)];
+            C = [-beta*sin(x(2,:))*v(2,:)+obj.par.b1, -beta*sin(x(1,:))*(v(1,:)+v(2,:))
+                beta*sin(x(2,:))*v(1,:), obj.par.b2];       % Coriolis and damping matrix
             
-            ff  = obj.M*r_acc+obj.C*r_vel+obj.G;
+            G = [obj.par.m1*obj.par.g*obj.par.r1*cos(x(1,:))+obj.par.m2*obj.par.g*(obj.par.l1*cos(x(1,:))+obj.par.r2*cos(x(1,:)+x(2,:)))
+                2*obj.par.m2*obj.par.g*obj.par.r2*cos(x(1,:)+x(2,:))];     % Gravity matrix
+            
+            r_acc = [rdd(1,:); rdd(2,:)];
+            r_vel = [rd(1,:); rd(2,:)];
+            r_pos = [r(1,:); r(2,:)];
+            
+            x_vel = [v(1,:); v(2,:)];
+            x_pos = [x(1,:); x(2,:)];
+            
+            ff  = M*r_acc+C*r_vel+G;
       
             fb = obj.Kp*(r_pos-x_pos)+obj.Kd*(r_vel-x_vel);
             

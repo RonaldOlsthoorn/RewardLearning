@@ -4,28 +4,30 @@ plant_par.type = '2-dof';
 plant_par.sim = true;
 plant_par.Ts = 0.01;
 
-plant_par.par.l1  = 0.5;          % Length link 1
-plant_par.par.l2  = 0.5;          % Length link 2
-plant_par.par.r1  = 0.5*par.l1;   % Distance CoG link 1
-plant_par.par.r2  = 0.5*par.l2;   % Distance CoG link 2
-plant_par.par.m1  = 0.5;          % Mass link 1
-plant_par.par.m2  = 0.5;          % Mass link 2
-plant_par.par.Iz1 = 0.01;         % Inertia link 1
-plant_par.par.Iz2 = 0.01;         % Inertia link 2
-plant_par.par.b1  = 3e-5;         % Viscuous dampink link 1
-plant_par.par.b2  = 3e-5;         % Viscuous dampink link 2
-plant_par.par.g   = 9.81;         % Gravity constant
+par.l1  = 0.5;          % Length link 1
+par.l2  = 0.5;          % Length link 2
+par.r1  = 0.5*par.l1;   % Distance CoG link 1
+par.r2  = 0.5*par.l2;   % Distance CoG link 2
+par.m1  = 0.5;          % Mass link 1
+par.m2  = 0.5;          % Mass link 2
+par.Iz1 = 0.01;         % Inertia link 1
+par.Iz2 = 0.01;         % Inertia link 2
+par.b1  = 3e-5;         % Viscuous dampink link 1
+par.b2  = 3e-5;         % Viscuous dampink link 2
+par.g   = 9.81;         % Gravity constant
 
-controller_par.type = 'controllerPID';
+plant_par.par = par;
+
+controller_par.type = 'controllerInvKin';
 controller_par.Kp = 3;
 controller_par.Ki = 0;
 controller_par.Kd = 0.0375;
 
-reference_par.start_tool=[-0.2619;-0.1091;0.3623;1.2088;-1.2107;-1.2104];
-reference_par.goal_tool=[-0.4619;-0.0091;0.3623;1.2088;-1.2109;-1.2103];
-reference_par.start_joint=[0;-2*pi/3;2*pi/3;0;pi/2;0];
-reference_par.goal_joint=[-0.2672;-1.6281;1.7727;-0.1439;1.3053;0];
-reference_par.use_ik=false;
+reference_par.start_tool=[0;0.5];
+reference_par.goal_tool=[0.8;0.5];
+reference_par.start_joint=[pi/6;(2*pi/3)];
+reference_par.goal_joint=[0.2203;0.6767];
+reference_par.use_ik=true;
 reference_par.duration=8;
 reference_par.Ts=0.01;
 reference_par.trajectory='2dof';    

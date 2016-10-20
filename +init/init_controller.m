@@ -1,4 +1,4 @@
-function [ c ] = init_controller(controller_par)
+function [ c ] = init_controller(controller_par, system)
 % create and initialise controller.
 
 switch controller_par.type
@@ -7,12 +7,9 @@ switch controller_par.type
         controller_par.Ki,...
         controller_par.Kd);
     case 'controllerInvKin'
-        c = controller.ControllerPID();
+        c = controller.ControllerInvKinPerfect(controller_par, system);
     otherwise 
         c = [];
 end
         
 end
-
-end
-

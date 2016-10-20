@@ -104,10 +104,10 @@ classdef MovementLearner < handle
             plot(obj.reference.t, obj.reference.r_tool(2,:));
             plot(obj.reference.t, rollout.tool_positions(2,:));
             
-            subplot(1,3,3)
-            hold on
-            plot(obj.reference.t, obj.reference.r_tool(3,:));
-            plot(obj.reference.t, rollout.tool_positions(3,:));
+%             subplot(1,3,3)
+%             hold on
+%             plot(obj.reference.t, obj.reference.r_tool(3,:));
+%             plot(obj.reference.t, rollout.tool_positions(3,:));
             
         end
         

@@ -8,8 +8,9 @@ switch plant_par.type
         c = init.init_controller(controller_par);
         p = plant.PlantUR5(plant_par, c);
     case '2-dof'
-        s = plant.
-        p = plant.Plant2DOF(plant_par, controller);
+        s = plant.System2DOF(plant_par);
+        c = init.init_controller(controller_par, s);
+        p = plant.Plant2DOF(s, c);
     otherwise
         p = [];
 end
