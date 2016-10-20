@@ -43,8 +43,7 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
-            controller = init.init_controller(p.controller_par);
-            obj.plant = init.init_plant(p.plant_par, controller);
+            obj.plant = init.init_plant(p.plant_par, p.controller_par);
             
             obj.reference = init.init_reference(p.reference_par);
             
