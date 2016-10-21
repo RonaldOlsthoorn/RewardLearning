@@ -186,7 +186,8 @@ classdef PI2Agent < forward.Agent
         % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
-            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);         
+            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]); 
+            disp(num2str(obj.noise_mult));
         end
         
         % Generate exploration noise.

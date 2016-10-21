@@ -19,6 +19,7 @@ classdef Rollout
         xd;
         
         r;
+        r_cum;
         R;
         R_expert;
         

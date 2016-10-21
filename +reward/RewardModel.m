@@ -9,8 +9,7 @@ classdef RewardModel < handle
     
     methods(Abstract)
         
-        reward = compute_reward(outcome);
-          
+        reward = compute_reward(outcome);  
     end
     
     methods
@@ -29,14 +28,13 @@ classdef RewardModel < handle
             
             rollout.outcomes = outcomes;
             rollout.r = reward;
-            rollout.r_cum = cumulative_reward(r);
-            
+            rollout.r_cum = obj.cumulative_reward(reward);            
             rollout.R = sum(reward);
         end
         
-        function r_cum = cumulative_reward(r)
+        function r_cum = cumulative_reward(~, r)
            
-            
+            r_cum = rot90(rot90(cumsum(rot90(rot90(r)))));
         end
     end
 end

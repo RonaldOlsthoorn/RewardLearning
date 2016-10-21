@@ -100,66 +100,51 @@ classdef PI2AgentBB < forward.Agent
         function [dtheta] = get_PI2_update(obj, batch_rollouts )
             
             % returns the new policy, based on the new set of roll-outs.
-            % S is the data structure of all roll outs.
-            
+            % S is the data structure of all roll outs.       
             n_dof = obj.policy.n_dof;
             n_rbfs = obj.policy.n_rfs;
             
             n_reps = batch_rollouts.size; % number of roll-outs
-            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:));           % final time step
             
             P = obj.get_probability_trajectories(batch_rollouts);
             
             % compute the projected noise term. It is computationally more efficient to break this
             % operation into inner product terms.
-            PMeps = zeros(n_dof, n_reps, n_end, n_rbfs);
+            Peps = zeros(n_dof, n_reps, n_rbfs);
             
             for j=1:n_dof,
                 for k=1:n_reps,
-                    
-                    % compute g'*eps in vector form
-                    gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts.get_rollout(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
-                    
-                    % compute g'g
-                    gTg  = sum(obj.policy.DoFs(j).bases.*obj.policy.DoFs(j).bases, 2);
-                    
-                    % compute P*M*eps = P*g*g'*eps/(g'g) from previous results
-                    PMeps(j,k,:,:) = obj.policy.DoFs(j).bases.*((P(:,k).*gTeps./(gTg + 1.e-10))*ones(1,n_rbfs));
+
+                    Peps(j,k,:) = P(k,:).*batch_rollouts.get_rollout(k).policy.dof(j).eps(end,:);
                 end
             end
             
             % compute the parameter update per time step
-            dtheta = reshape(sum(PMeps,2), n_dof, n_end, n_rbfs);
-            
-            dtheta = reshape(sum(dtheta.*repmat(reshape(obj.policy.DoFs(1).time_normalized_psi,...
-                [1,n_end,n_rbfs]),[n_dof 1 1]),2),n_dof, n_rbfs);            
+            dtheta = squeeze(sum(Peps,2));
         end
         
         % Returns the probability of a sample relative to the other samples
         % in the batch according to the reward.
         function [P] = get_probability_trajectories(~, batch_rollouts)
             
-            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:)); % final time step
-            n_reps = batch_rollouts.size;       % number of roll-outs
-            
-            R_cum = zeros(n_end, n_reps);
+            n_reps = batch_rollouts.size;       % number of roll-outs           
+            R_cum = zeros(n_reps, 1);
             
             for k=1:n_reps
-                R_cum(:,k) = -batch_rollouts.get_rollout(k).r;
+                R_cum(k,1) = -batch_rollouts.get_rollout(k).R;
             end
             
             % compute the exponentiated cost with the special trick to automatically
             % adjust the lambda scaling parameter
-            maxS = max(R_cum,[],2);
-            minS = min(R_cum,[],2);
+            maxS = max(R_cum);
+            minS = min(R_cum);
             
             h = 10; % this is the scaling parameters in side of the exp() function (see README.pdf)
-            expS = exp(-h*(R_cum - minS*ones(1,n_reps))./...
-                ((maxS-minS+1e-20)*ones(1,n_reps)));
+            expS = exp(-h*(R_cum - minS)./...
+                ((maxS-minS+1e-20)));
             
             % the probabilty of a trajectory
-            P = expS./(sum(expS,2)*ones(1,n_reps));
-            
+            P = expS./(sum(expS));          
         end
         
         % Saves the best n_reuse samples to be reused later on.
@@ -171,8 +156,7 @@ classdef PI2AgentBB < forward.Agent
                 R(k) = batch_rollouts.get_rollout(k).R(1,1);
             end
             
-            [~, inds]=sort(R);   
-            
+            [~, inds]=sort(R);              
             batch_tmp = db.RolloutBatch();
             
             for j=length(R):-1:(length(R)-obj.n_reuse),

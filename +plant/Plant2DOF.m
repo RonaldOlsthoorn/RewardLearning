@@ -38,7 +38,7 @@ classdef Plant2DOF < plant.Plant
                 rdd(i,:) = trajectory.policy.dof(i).xd(3,:);
             end
             
-            output = obj.system.reset(r(:,1));
+            output = obj.system.reset();
             
             joint_position = output.joint_position;
             joint_speed = output.joint_speed;
@@ -67,6 +67,11 @@ classdef Plant2DOF < plant.Plant
             
             rollout = trajectory;
         end 
+        
+        function set_init_state(obj, s)
+            
+            obj.system.set_init_state(s);
+        end
         
         function print_rollout(obj, rollout)
             

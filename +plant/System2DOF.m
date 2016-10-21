@@ -12,6 +12,8 @@ classdef System2DOF < plant.System
         par;      
         state;
         
+        init_state;
+        
     end
     
     methods
@@ -20,8 +22,6 @@ classdef System2DOF < plant.System
             
             obj.Ts = system_par.Ts;
             obj.par = system_par.par;
-            
-            
         end
         
         function [joint_position, joint_speed,...
@@ -161,14 +161,18 @@ classdef System2DOF < plant.System
                 +obj.par.l2*cos(x(1,:)+x(3,:)).*x(4,:);
             
             x_ef = [x_end; x_vel_end; y_end; y_vel_end];
-        end        
+        end      
         
-        function [output] = reset(obj, pos)
+        function set_init_state(obj, init_state)
             
-            output.joint_position = pos;
-            output.joint_speed = [0; 0];
+            obj.init_state = [init_state(1); 0; init_state(2); 0];
+        end
+        
+        function [output] = reset(obj)
             
-            obj.state = [pos(1); 0; pos(2); 0];
+            obj.state = obj.init_state;
+            output.joint_position = [obj.state(1) ; obj.state(3)];
+            output.joint_speed = [obj.state(2) ; obj.state(4)];
         end
         
     end
