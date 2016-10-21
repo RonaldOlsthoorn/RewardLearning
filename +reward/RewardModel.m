@@ -29,8 +29,14 @@ classdef RewardModel < handle
             
             rollout.outcomes = outcomes;
             rollout.r = reward;
+            rollout.r_cum = cumulative_reward(r);
             
             rollout.R = sum(reward);
+        end
+        
+        function r_cum = cumulative_reward(r)
+           
+            
         end
     end
 end

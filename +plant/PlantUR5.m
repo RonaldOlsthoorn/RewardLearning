@@ -2,7 +2,7 @@ classdef PlantUR5 < plant.Plant
     
     properties(Constant)
         
-        handle_batch_figure = 1;
+        handle_batch_figure = 4;
     end
     
     properties
@@ -81,7 +81,21 @@ classdef PlantUR5 < plant.Plant
             trajectory.time = time;
             
             rollout = trajectory;
-        end        
+        end   
+        
+        function print_rollout(obj, rollout)
+            
+            figure(obj.handle_batch_figure)
+            subplot(1,3,1)
+            hold on
+            plot(rollout.time, rollout.tool_positions(1,:));
+            subplot(1,3,2)
+            hold on
+            plot(rollout.time, rollout.tool_positions(2,:));
+            subplot(1,3,3)
+            hold on
+            plot(rollout.time, rollout.tool_positions(3,:));
+        end   
         
     end
 end

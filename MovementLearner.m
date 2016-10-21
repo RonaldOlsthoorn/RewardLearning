@@ -90,24 +90,7 @@ classdef MovementLearner < handle
         function print_noiseless_rollout(obj, rollout)
             % print the noiseless rollout in a single figure.
             
-            disp(strcat('Return: ', num2str(rollout.R)));
-            figure(obj.handle_noiseless_figure)
-            clf;
-            
-            subplot(1,3,1)
-            hold on
-            plot(obj.reference.t, obj.reference.r_tool(1,:));
-            plot(obj.reference.t, rollout.tool_positions(1,:));
-            
-            subplot(1,3,2)
-            hold on
-            plot(obj.reference.t, obj.reference.r_tool(2,:));
-            plot(obj.reference.t, rollout.tool_positions(2,:));
-            
-%             subplot(1,3,3)
-%             hold on
-%             plot(obj.reference.t, obj.reference.r_tool(3,:));
-%             plot(obj.reference.t, rollout.tool_positions(3,:));
+            obj.plant.print_rollout(rollout);
             
         end
         

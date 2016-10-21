@@ -50,32 +50,10 @@ classdef Plant < handle
             figure(obj.handle_batch_figure);
             set(double(obj.handle_batch_figure),...
                 'units','normalized','outerposition',[0 0 1 1]);
-            clf
-            subplot(1,3,1)
-            xlabel('t [s]');
-            ylabel('x_{ef} [m]');
-            subplot(1,3,2)
-            xlabel('t [s]');
-            ylabel('y_{ef} [m]');
-            subplot(1,3,3)
-            xlabel('t [s]');
-            ylabel('z_{ef} [m]');
+            clf;
 
         end
         
-        function print_rollout(obj, rollout)
-            
-            figure(obj.handle_batch_figure)
-            subplot(1,3,1)
-            hold on
-            plot(rollout.time, rollout.tool_positions(1,:));
-            subplot(1,3,2)
-            hold on
-            plot(rollout.time, rollout.tool_positions(2,:));
-%             subplot(1,3,3)
-%             hold on
-%             plot(rollout.time, rollout.tool_positions(3,:));
-        end   
     end
 end
 
