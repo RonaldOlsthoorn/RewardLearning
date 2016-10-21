@@ -2,7 +2,8 @@ function [ r, r_d, r_dd ] = ref_2dof(reference_par)
 % Generates a trajectory in cartesian space. velocity and
 % acceleration trajectory also included
 
-global Ts;
+Ts = reference_par.Ts;
+
 t = 0:Ts:reference_par.duration-Ts;
 n_end = length(t);
 amp  = 0.25;

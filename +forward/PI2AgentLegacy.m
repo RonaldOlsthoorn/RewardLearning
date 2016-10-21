@@ -1,4 +1,4 @@
-classdef PI2Agent < forward.Agent
+classdef PI2AgentLegacy < forward.Agent
     %PI2Agent defines a PI2 reinforcement learning agent.
 
     properties
@@ -15,7 +15,7 @@ classdef PI2Agent < forward.Agent
     
     methods
         
-        function obj = PI2Agent(agent_par, p)
+        function obj = PI2AgentLegacy(agent_par, p)
             
             obj.policy = p;
             obj.noise_std = agent_par.noise_std;
@@ -85,19 +85,21 @@ classdef PI2Agent < forward.Agent
         % update the policy
         function update_PI2(obj, batch_rollouts)
             
-            dtheta = obj.get_PI2_update(batch_rollouts);
+            dtheta_per_sample = obj.get_PI2_update_per_sample(batch_rollouts);
+            dtheta = squeeze(sum(dtheta_per_sample, 2));
             
             % and update the parameters.
             obj.policy.update(dtheta);
             
             obj.iteration = obj.iteration + 1; %try to remove this later on
             obj.importance_sampling(batch_rollouts)
-            obj.update_exploration_noise();   
+            obj.update_exploration_noise();
+            
         end
         
         % returns the change in policy parameters per sample. This
         % per-sample distinction is needed for the reward learning update
-        function [dtheta] = get_PI2_update(obj, batch_rollouts )
+        function [dtheta_per_sample] = get_PI2_update_per_sample(obj, batch_rollouts )
             
             % returns the new policy, based on the new set of roll-outs.
             % S is the data structure of all roll outs.
@@ -128,11 +130,12 @@ classdef PI2Agent < forward.Agent
                 end
             end
             
-            % compute the parameter update per time step
-            dtheta = reshape(sum(PMeps,2), n_dof, n_end, n_rbfs);
+            % compute the final parameter update for each DMP
+            dtheta_per_sample = reshape(sum(PMeps.*repmat(reshape(obj.policy.DoFs(j).time_normalized_psi, [1, 1, n_end, n_rbfs]), ...
+                [n_dof n_reps 1 1]), ...
+                3), ...
+                [n_dof n_reps n_rbfs]);
             
-            dtheta = reshape(sum(dtheta.*repmat(reshape(obj.policy.DoFs(1).time_normalized_psi,...
-                [1,n_end,n_rbfs]),[n_dof 1 1]),2),n_dof, n_rbfs);            
         end
         
         % Returns the probability of a sample relative to the other samples
@@ -145,7 +148,7 @@ classdef PI2Agent < forward.Agent
             R_cum = zeros(n_end, n_reps);
             
             for k=1:n_reps
-                R_cum(:,k) = -batch_rollouts.get_rollout(k).r_cum;
+                R_cum(:,k) = -batch_rollouts.get_rollout(k).r;
             end
             
             % compute the exponentiated cost with the special trick to automatically
@@ -186,7 +189,8 @@ classdef PI2Agent < forward.Agent
         % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
-            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);         
+            obj.noise_mult = obj.noise_mult - obj.annealer;
+            
         end
         
         % Generate exploration noise.

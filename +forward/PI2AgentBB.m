@@ -1,4 +1,4 @@
-classdef PI2Agent < forward.Agent
+classdef PI2AgentBB < forward.Agent
     %PI2Agent defines a PI2 reinforcement learning agent.
 
     properties
@@ -15,7 +15,7 @@ classdef PI2Agent < forward.Agent
     
     methods
         
-        function obj = PI2Agent(agent_par, p)
+        function obj = PI2AgentBB(agent_par, p)
             
             obj.policy = p;
             obj.noise_std = agent_par.noise_std;
@@ -82,7 +82,7 @@ classdef PI2Agent < forward.Agent
             update_PI2(obj, batch_rollouts);
         end
         
-        % update the policy
+% update the policy
         function update_PI2(obj, batch_rollouts)
             
             dtheta = obj.get_PI2_update(batch_rollouts);
@@ -145,7 +145,7 @@ classdef PI2Agent < forward.Agent
             R_cum = zeros(n_end, n_reps);
             
             for k=1:n_reps
-                R_cum(:,k) = -batch_rollouts.get_rollout(k).r_cum;
+                R_cum(:,k) = -batch_rollouts.get_rollout(k).r;
             end
             
             % compute the exponentiated cost with the special trick to automatically
@@ -186,7 +186,7 @@ classdef PI2Agent < forward.Agent
         % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
-            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);         
+            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);             
         end
         
         % Generate exploration noise.
