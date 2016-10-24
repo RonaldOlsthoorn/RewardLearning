@@ -92,7 +92,7 @@ classdef MovementLearner < handle
         function print_progress(obj)
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
-            disp('Noiseless rollout');
+            %disp('Noiseless rollout');
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             obj.print_noiseless_rollout(noiseless_rollout);

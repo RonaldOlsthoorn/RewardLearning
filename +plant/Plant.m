@@ -33,7 +33,7 @@ classdef Plant < handle
             batch_rollouts = db.RolloutBatch();
             
             for i = 1:batch_trajectories.size
-                disp(strcat('Sample nr : ', num2str(i)));
+                %disp(strcat('Sample nr : ', num2str(i)));
                 ro = obj.run(batch_trajectories.get_rollout(i));
                 
                 batch_rollouts.append_rollout(ro);

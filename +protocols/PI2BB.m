@@ -39,7 +39,7 @@ agent_par.reps = 10;
 agent_par.n_reuse = 5;
 
 policy_par.dof = 2;
-policy_par.type = 'rbf';
+policy_par.type = 'rbf_ref';
 policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts = 0.01;
