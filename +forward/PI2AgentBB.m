@@ -114,8 +114,8 @@ classdef PI2AgentBB < forward.Agent
             
             for j=1:n_dof,
                 for k=1:n_reps,
-
-                    Peps(j,k,:) = P(k,:).*batch_rollouts.get_rollout(k).policy.dof(j).eps(end,:);
+                    Peps(j,k,:) = P(k,:).*(batch_rollouts.get_rollout(k).policy.dof(j).theta_eps(end,:)-obj.policy.DoFs(j).w');
+                    %Peps(j,k,:) = P(k,:).*batch_rollouts.get_rollout(k).policy.dof(j).eps(end,:);
                 end
             end
             

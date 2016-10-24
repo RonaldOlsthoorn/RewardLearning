@@ -9,6 +9,8 @@ classdef MovementLearner < handle
     
     properties
         
+        protocol_s;
+        
         W; % policy weight trace
         R; % Reward trace
         
@@ -26,12 +28,14 @@ classdef MovementLearner < handle
     
     methods
         
-        function obj = MovementLearner(protocol)
+        function obj = MovementLearner(p)
+            
+            obj.protocol_s = p;
             
             obj.W = [];
             obj.R = [];
             
-            protocol_handle = str2func(strcat('protocols.', protocol));
+            protocol_handle = str2func(strcat('protocols.', obj.protocol_s));
             protocol = protocol_handle();
             obj.init_learner(protocol);
             
@@ -98,18 +102,23 @@ classdef MovementLearner < handle
         
         function print_result(obj)
             
+            noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+            disp('Noiseless rollout');
+            noiseless_rollout = obj.environment.run(noiseless_trajectory);
             obj.print_noiseless_rollout(noiseless_rollout);
-            
+
             figure;
             plot(obj.R);
+            title(obj.protocol_s);
+            xlabel('iteration');
+            ylabel('Return');
         end
         
         function print_noiseless_rollout(obj, rollout)
             % print the noiseless rollout in a single figure.
             
             disp(strcat('Return: ', num2str(rollout.R)));
-            obj.plant.print_rollout(rollout);
-            
+            obj.plant.print_rollout(rollout);            
         end
         
         function reset_figure(obj)
@@ -128,10 +137,11 @@ classdef MovementLearner < handle
             ylabel('y_{ef} [m]');
             
             subplot(1,3,3)
-            xlabel('t [s]');
-            ylabel('z_{ef} [m]');
+            xlabel('x_{ef} [m]');
+            ylabel('y_{ef} [m]');
+            
+            drawnow;
         end
-    end
-    
+    end   
 end
 

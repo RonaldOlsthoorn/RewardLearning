@@ -77,15 +77,21 @@ classdef Plant2DOF < plant.Plant
         function print_rollout(obj, rollout)
             
             figure(obj.handle_batch_figure)
-            subplot(1,3,1)
+            subplot(1,3,1)            
             hold on
             plot(rollout.time, rollout.tool_positions(1,:));
+            xlabel('t [s]');
+            ylabel('x_{ef} [m]');
             subplot(1,3,2)
             hold on
             plot(rollout.time, rollout.tool_positions(2,:));
+            xlabel('t [s]');
+            ylabel('y_{ef} [m]');
             subplot(1,3,3)
             hold on
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:));
+            xlabel('x_{ef} [m]');
+            ylabel('y_{ef} [m]');
             drawnow;
         end        
     end

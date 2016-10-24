@@ -18,7 +18,7 @@ par.g   = 9.81;         % Gravity constant
 
 plant_par.par = par;
 
-controller_par.type = 'controllerImperfect';
+controller_par.type = 'controllerInvKin';
 controller_par.Kp = 3;
 controller_par.Ki = 0;
 controller_par.Kd = 0.0375;

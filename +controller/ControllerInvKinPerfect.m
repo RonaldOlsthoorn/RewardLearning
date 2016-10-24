@@ -71,6 +71,10 @@ classdef ControllerInvKinPerfect < handle
             end
             
         end
+        
+        function reset(obj)
+            
+        end
     end
     
 end
