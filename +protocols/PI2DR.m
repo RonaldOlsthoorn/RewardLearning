@@ -1,4 +1,4 @@
-function [ protocol ] = PI2DR()
+function [ protocol ] = PI2()
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
@@ -32,7 +32,7 @@ reference_par.duration=8;
 reference_par.Ts=0.01;
 reference_par.trajectory='2dof';    
 
-agent_par.type = 'agent_PI2';
+agent_par.type = 'agent_PI2DR';
 agent_par.noise_std = [0.01;0.01];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;

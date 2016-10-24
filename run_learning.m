@@ -3,7 +3,7 @@ function run_learning(protocol_name)
 
 m1 = MovementLearner(protocol_name);
 
-[W, R] = m1.run_movement_learning();
+m1.run_movement_learning();
 
-disp(W);
-disp(R);
+% disp(W);
+% disp(R);

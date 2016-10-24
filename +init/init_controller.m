@@ -8,6 +8,8 @@ switch controller_par.type
         controller_par.Kd);
     case 'controllerInvKin'
         c = controller.ControllerInvKinPerfect(controller_par, system);
+    case 'controllerImperfect'
+        c = controller.ControllerImperfect();
     otherwise 
         c = [];
 end

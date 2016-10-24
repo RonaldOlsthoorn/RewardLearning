@@ -46,7 +46,7 @@ classdef MovementLearner < handle
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
             obj.plant.set_init_state(obj.reference.r_joints(:,1));
-  
+            
             obj.reward_model = init.init_reward_model(p.reward_model_par,...
                 obj.reference);
             
@@ -65,18 +65,14 @@ classdef MovementLearner < handle
             
             while iteration<50; % for now. Replace with EPD
                 
+                obj.print_progress();
+                
                 batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollouts = obj.environment.batch_run(batch_trajectory);
                 obj.db.append_row(batch_rollouts);
                 batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
                 % obj.environment.reward_model.update(batch_rollout)
-                
-                noiseless_trajectory = obj.agent.get_noiseless_trajectory();
-                disp('Noiseless rollout');
-                noiseless_rollout = obj.environment.run(noiseless_trajectory);
-                
-                obj.print_noiseless_rollout(noiseless_rollout);
                 
                 obj.agent.update(batch_rollouts);
                 
@@ -85,6 +81,27 @@ classdef MovementLearner < handle
             
             Weights = obj.W;
             Returns = obj.R;
+            
+            obj.print_result();
+        end
+        
+        function print_progress(obj)
+            
+            noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+            disp('Noiseless rollout');
+            noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            
+            obj.print_noiseless_rollout(noiseless_rollout);
+            
+            obj.R = [obj.R noiseless_rollout.R];
+        end
+        
+        function print_result(obj)
+            
+            obj.print_noiseless_rollout(noiseless_rollout);
+            
+            figure;
+            plot(obj.R);
         end
         
         function print_noiseless_rollout(obj, rollout)

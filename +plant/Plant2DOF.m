@@ -39,19 +39,20 @@ classdef Plant2DOF < plant.Plant
             end
             
             output = obj.system.reset();
+            obj.controller.reset();
             
             joint_position = output.joint_position;
             joint_speed = output.joint_speed;
                                     
             for i = 1:length(trajectory.policy.dof(1).xd(1,:))
                 
-                control_input = obj.controller.control_law(r(:,i), rd(:,i), rdd(:,i), ...
+                u = obj.controller.control_law(r(:,i), rd(:,i), rdd(:,i), ...
                     joint_position, joint_speed);
                 
                 [joint_position, joint_speed,...
-                    tool_position, tool_speed] = obj.system.run_increment(control_input);
+                    tool_position, tool_speed] = obj.system.run_increment(u);
                 
-                control_input(:,i) = control_input;
+                control_input(:,i) = u;
                 joint_positions(:,i) = joint_position;
                 joint_speeds(:,i) = joint_speed;
                 tool_positions(:,i) = tool_position;
@@ -85,6 +86,7 @@ classdef Plant2DOF < plant.Plant
             subplot(1,3,3)
             hold on
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:));
+            drawnow;
         end        
     end
 end

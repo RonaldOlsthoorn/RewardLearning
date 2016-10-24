@@ -135,6 +135,33 @@ classdef PI2AgentDR < forward.Agent
                 [1,n_end,n_rbfs]),[n_dof 1 1]),2),n_dof, n_rbfs);            
         end
         
+        % Returns the probability of a sample relative to the other samples
+        % in the batch according to the reward.
+        function [P] = get_probability_trajectories(~, batch_rollouts)
+            
+            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:)); % final time step
+            n_reps = batch_rollouts.size;       % number of roll-outs
+            
+            R_cum = zeros(n_end, n_reps);
+            
+            for k=1:n_reps
+                R_cum(:,k) = -batch_rollouts.get_rollout(k).r;
+            end
+            
+            % compute the exponentiated cost with the special trick to automatically
+            % adjust the lambda scaling parameter
+            maxS = max(R_cum,[],2);
+            minS = min(R_cum,[],2);
+            
+            h = 10; % this is the scaling parameters in side of the exp() function (see README.pdf)
+            expS = exp(-h*(R_cum - minS*ones(1,n_reps))./...
+                ((maxS-minS+1e-20)*ones(1,n_reps)));
+            
+            % the probabilty of a trajectory
+            P = expS./(sum(expS,2)*ones(1,n_reps));
+            
+        end
+        
         % Saves the best n_reuse samples to be reused later on.
         function importance_sampling(obj, batch_rollouts)
             
@@ -159,7 +186,8 @@ classdef PI2AgentDR < forward.Agent
         % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
-            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);             
+            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]); 
+            disp(num2str(obj.noise_mult));
         end
         
         % Generate exploration noise.

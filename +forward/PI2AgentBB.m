@@ -82,7 +82,7 @@ classdef PI2AgentBB < forward.Agent
             update_PI2(obj, batch_rollouts);
         end
         
-% update the policy
+        % update the policy
         function update_PI2(obj, batch_rollouts)
             
             dtheta = obj.get_PI2_update(batch_rollouts);
