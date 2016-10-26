@@ -67,7 +67,7 @@ classdef MovementLearner < handle
             
             iteration = 1;
             
-            while iteration<50; % for now. Replace with EPD
+            while iteration<50 % for now. Replace with EPD
                 
                 obj.print_progress();
                 
