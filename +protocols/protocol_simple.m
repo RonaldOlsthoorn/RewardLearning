@@ -18,14 +18,14 @@ reference_par.duration=8;
 reference_par.Ts=0.01;
 reference_par.trajectory='trajectory_robot';    
 
-agent_par.type = 'agent_PI2';
+agent_par.type = 'agent_PI2DRLegacy';
 agent_par.noise_std = [0.1;0.1;0.1;0.1;0.1;0];
 agent_par.annealer = 6/100;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
 
 policy_par.dof = 6;
-policy_par.type = 'rbf';
+policy_par.type = 'rbf_ff';
 policy_par.n_rbfs = 40;
 policy_par.duration = 8;
 policy_par.Ts = 0.01;

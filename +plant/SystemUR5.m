@@ -23,6 +23,11 @@ classdef SystemUR5 < plant.System
             obj.init();
         end
         
+        function set_init_state(obj, is)
+            
+            obj.init_state = is;
+        end
+        
         function init(obj)
             
             obj.connect();
@@ -45,7 +50,7 @@ classdef SystemUR5 < plant.System
             
             obj.arm.setJointsSpeed(control_input, obj.a, 2*obj.Ts);
             
-            while toc(t_init)< obj.Ts;
+            while toc(t_init)< obj.Ts
             end
             
             obj.arm.update();
@@ -53,16 +58,16 @@ classdef SystemUR5 < plant.System
             joint_position = obj.arm.getJointsPositions();
             joint_speed = obj.arm.getJointsSpeeds();
             tp = obj.arm.getToolPositions();
-            tool_position = tp(1:3);
+            tool_position = tp(1:3)';
             ts = obj.arm.getToolSpeeds();
-            tool_speed = ts(1:3);
+            tool_speed = ts(1:3)';
         end
         
         function [output] = reset(obj)
             
             tolerance = 0.001;
             
-            pos0 = [0; -2*pi/3; 2*pi/3; 0; pi/2; 0];
+            pos0 = obj.init_state;
             
             obj.arm.update();
             pos = obj.arm.getJointsPositions();

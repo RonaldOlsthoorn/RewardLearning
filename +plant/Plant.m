@@ -14,6 +14,7 @@ classdef Plant < handle
     methods(Abstract)
          
         rollout = run(obj, trajectory)
+        set_init_state(obj, is)
     end
     
     methods

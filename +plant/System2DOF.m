@@ -11,9 +11,7 @@ classdef System2DOF < plant.System
         
         par;      
         state;
-        
-        init_state;
-        
+                
     end
     
     methods

@@ -10,6 +10,8 @@ switch agent_par.type
         agent = forward.PI2AgentBB(agent_par, policy);
     case 'agent_PI2DR'
         agent = forward.PI2AgentDR(agent_par, policy);
+    case 'agent_PI2DRLegacy'
+        agent = forward.PI2AgentLegacy(agent_par, policy);
     otherwise
         agent = [];
 end

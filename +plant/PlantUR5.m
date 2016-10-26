@@ -23,6 +23,11 @@ classdef PlantUR5 < plant.Plant
             obj@plant.Plant(system, controller);
         end
         
+        function set_init_state(obj, is)
+            
+            obj.system.set_init_state(is)
+        end
+        
         function rollout = run(obj, trajectory)
             
             n_end = length(trajectory.policy.dof(1).xd(1,:));
@@ -30,8 +35,8 @@ classdef PlantUR5 < plant.Plant
             control_input = zeros(obj.system.dof, n_end);
             joint_positions = zeros(obj.system.dof, n_end);
             joint_speeds = zeros(obj.system.dof, n_end);
-            tool_positions = zeros(obj.system.dof, n_end);
-            tool_speeds = zeros(obj.system.dof, n_end);
+            tool_positions = zeros(3, n_end);
+            tool_speeds = zeros(3, n_end);
             time = zeros(1, n_end);
             
             r = zeros(obj.system.dof, n_end);
@@ -67,7 +72,6 @@ classdef PlantUR5 < plant.Plant
                 tool_speeds(:,i) = tool_speed;
                 
                 time(1,i) = toc(t0);
-                
             end
             
             obj.system.gently_break();
