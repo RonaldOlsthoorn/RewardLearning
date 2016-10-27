@@ -37,11 +37,8 @@ classdef Environment < handle
                     batch_rollouts.get_rollout(i));     
                 
                 batch_rollouts.update_rollout(r);
-            end
-            
+            end   
         end
-        
     end
-    
 end
 
