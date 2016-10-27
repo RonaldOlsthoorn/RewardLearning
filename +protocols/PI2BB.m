@@ -29,7 +29,7 @@ reference_par.start_joint=[pi/6;(2*pi/3)];
 reference_par.goal_joint=[0.2203;0.6767];
 reference_par.use_ik=true;
 reference_par.duration=8;
-reference_par.Ts=0.01;
+reference_par.Ts= plant_par.Ts;
 reference_par.trajectory='2dof';    
 
 agent_par.type = 'agent_PI2BB';
@@ -42,7 +42,7 @@ policy_par.dof = 2;
 policy_par.type = 'rbf_ref';
 policy_par.n_rbfs = 20;
 policy_par.duration = 8;
-policy_par.Ts = 0.01;
+policy_par.Ts =  plant_par.Ts;
 
 reward_model_par.type = 'reward_model_static_lin';
 reward_model_par.feature_block = 'SimpleFeatureBlock';

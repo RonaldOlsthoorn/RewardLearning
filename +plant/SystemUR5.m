@@ -19,8 +19,8 @@ classdef SystemUR5 < plant.System
             
             obj.Ts = system_par.Ts;
             
-            obj.arm = UR5.driver.URArm();
-            obj.init();
+%             obj.arm = UR5.driver.URArm();
+%             obj.init();
         end
         
         function set_init_state(obj, is)

@@ -1,4 +1,4 @@
-function [ protocol ] = protocol_hard_coded_expert()
+clear; close all; clc;
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
@@ -62,12 +62,40 @@ gp_par.hyp = hyp;
 
 reward_model.gp_par = gp_par;
 
-protocol.plant_par = plant_par;
-protocol.controller_par = controller_par;
-protocol.reference_par = reference_par;
-protocol.agent_par = agent_par;
-protocol.policy_par = policy_par;
-protocol.env_par = env_par;
-protocol.reward_model_par = reward_model;
+p.plant_par = plant_par;
+p.controller_par = controller_par;
+p.reference_par = reference_par;
+p.agent_par = agent_par;
+p.policy_par = policy_par;
+p.env_par = env_par;
+p.reward_model_par = reward_model;
+
+%%
+
+import plant.Plant;
+import environment.Environment;
+
+reference = init.init_reference(p.reference_par);
+plant = init.init_plant(p.plant_par, p.controller_par);
+plant.set_init_state(reference.r_joints(:,1));
+
+policy = init.init_policy(p.policy_par, reference);
+agent = init.init_agent(p.agent_par, policy);
+
+reward_model = init.init_reward_model(p.reward_model_par,...
+                reference);
+
+batch_trajectory = agent.create_batch_trajectories(4);
+batch_rollouts = plant.batch_run(batch_trajectory);
+
+for i = 1:batch_rollouts.size
+    
+    rollout = reward_model.add_outcomes(batch_rollouts.get_rollout(i));
+    rollout.R_expert = sum(rollout.outcomes);
+    batch_rollouts.update_rollout(rollout);
 end
 
+reward_model.add_batch_demonstrations(batch_rollouts);
+reward_model.gp.print();
+reward_model.gp.minimize();
+reward_model.gp.print();

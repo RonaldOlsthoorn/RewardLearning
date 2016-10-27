@@ -7,6 +7,14 @@ classdef Environment < handle
         
         plant;
         reward_model;     
+        iteration = 0;
+        index = 0;
+    end
+    
+    methods(Abstract)
+        
+        update_reward(obj, batch_rollouts);
+        prepare(obj);
     end
     
     methods
@@ -23,21 +31,33 @@ classdef Environment < handle
             
             rollout = obj.plant.run(trajectory);
             rollout = obj.reward_model.add_outcomes_and_reward(rollout);
+            
+            rollout.index = obj.index;
+            obj.index = obj.index + 1;
         end
         
         % returns the result of running the system with the specified
         % batch of control trajectories defined as input.
         function batch_rollouts = batch_run(obj, batch_trajectory)
             
-            batch_rollouts = obj.plant.batch_run(batch_trajectory);
+            obj.index = 1;
+            batch_trajectory = obj.plant.batch_run(batch_trajectory);
+            batch_rollouts = db.RolloutBatch();
             
-            for i=1:batch_rollouts.size
-                
+            for i=1:batch_trajectory.size
+                                                
                 r = obj.reward_model.add_outcomes_and_reward(...
-                    batch_rollouts.get_rollout(i));     
+                    batch_trajectory.get_rollout(i));   
                 
-                batch_rollouts.update_rollout(r);
-            end   
+                r.iteration = obj.iteration;
+                r.index = obj.index;
+                
+                obj.index = obj.index + 1;
+                
+                batch_rollouts.append_rollout(r);
+            end
+            
+            obj.iteration = obj.iteration + 1;
         end
     end
 end

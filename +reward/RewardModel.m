@@ -19,18 +19,28 @@ classdef RewardModel < handle
             outcomes = obj.feature_block.compute_outcomes(rollout);
         end
         
-        function rollout = add_outcomes_and_reward(obj, rollout)
+       function rollout = add_outcomes(obj, rollout)
+            
+            outcomes = obj.compute_outcomes(rollout);
+            rollout.outcomes = outcomes;
+            rollout.sum_out = sum(outcomes);
+       end
+        
+       function rollout = add_reward(obj, rollout)
+            
+            reward = obj.compute_reward(rollout.outcomes);
+            rollout.r = reward;
+            rollout.r_cum = obj.cumulative_reward(reward); 
+            rollout.R = sum(reward);
+       end 
+        
+       function rollout = add_outcomes_and_reward(obj, rollout)
             % Complements the rollout with reward and the outcomes of
             % reward primitives.
             
-            outcomes = obj.compute_outcomes(rollout);
-            reward = obj.compute_reward(outcomes);
-            
-            rollout.outcomes = outcomes;
-            rollout.r = reward;
-            rollout.r_cum = obj.cumulative_reward(reward);            
-            rollout.R = sum(reward);
-        end
+            rollout = obj.add_outcomes(rollout);
+            rollout = obj.add_reward(rollout);
+       end
         
         function r_cum = cumulative_reward(~, r)
            

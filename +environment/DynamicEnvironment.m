@@ -22,15 +22,27 @@ classdef DynamicEnvironment < environment.Environment
         
         function prepare(obj)
             
-            batch_trajectory = obj.agent.get_batch_trajectories();
-            batch_rollouts = obj.plant.batch_run(batch_trajectory);
+            obj.index = 1;
             
-            for i = 1:batch_rollouts.size
+            batch_trajectory = obj.agent.create_batch_trajectories(4);
+            batch_trajectory = obj.plant.batch_run(batch_trajectory);
+            
+            batch_rollouts = db.RolloutBatch();
+            
+            for i = 1:batch_trajectory.size
                 
-                rollout = obj.reward_model.add_outcomes(batch_rollouts.get_rollout(i));
+                rollout = batch_trajectory.get_rollout(i);
+                rollout.iteration = obj.iteration;
+                rollout.index = obj.index;
+                obj.index = obj.index + 1;
+                
+                rollout = obj.reward_model.add_outcomes(rollout);
+                
                 rollout.R_expert = obj.expert.query_expert(rollout);
-                batch_rollouts.update_rollout(rollout);
+                batch_rollouts.append_rollout(rollout);
             end
+            
+            obj.iteration = obj.iteration + 1;
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
             obj.reward_model.gp.print();
@@ -75,8 +87,7 @@ classdef DynamicEnvironment < environment.Environment
         function rollout = demonstrate_and_query_expert(obj, sample)
             
             rollout = obj.demonstrate_rollout(sample);
-            rollout.R_expert = obj.expert.query_expert(rollout);
-            
+            rollout.R_expert = obj.expert.query_expert(rollout);          
         end
         
         function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
@@ -104,19 +115,13 @@ classdef DynamicEnvironment < environment.Environment
             [m, s2] = obj.reward_model.gp.interpolate_rollout(rollout);
             sigma_points = m(end) + [1 -1].*sqrt(s2(end));
             
-            epd = zeros(1, 2);
-            
-            theta_tilda = obj.stack_theta(...
-                obj.agent.get_PI2_update_per_sample(obj.original_batch));
-            theta_tilda_mean = mean(theta_tilda,2);
-            theta_tilda_cov = diag(var(theta_tilda'));
+            epd = zeros(1, 2);         
+            theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
             for sigma = 1:length(sigma_points)
                 
-                batch = obj.original_batch;
-                
-                rollout.R_expert = sigma_points(sigma);
-                
+                batch = obj.original_batch;              
+                rollout.R_expert = sigma_points(sigma);               
                 obj.reward_model.add_demonstration(rollout);
                 
                 for i=1:batch.size
@@ -127,17 +132,9 @@ classdef DynamicEnvironment < environment.Environment
                     batch.update_rollout(r);
                 end
                 
-                obj.reward_model.remove_demonstration(rollout);
-                
-                theta_star = obj.stack_theta(...
-                    obj.agent.get_PI2_update_per_sample(batch));
-                theta_star_mean = mean(theta_star,2);
-                theta_star_cov = diag(var(theta_star'));
-                
-                theta_star_p = mvnpdf(theta_star', theta_star_mean', theta_star_cov);
-                theta_tilda_p = mvnpdf(theta_tilda', theta_tilda_mean', theta_tilda_cov);
-                
-                epd(sigma) = sum(theta_star_p.*log(theta_star_p./theta_tilda_p));
+                obj.reward_model.remove_demonstration(rollout);             
+                theta_star = obj.agent.get_probability_trajectories(batch);
+                epd(sigma) = sum(theta_star.*log(theta_star./theta_tilda));
             end
             
             res = mean(epd);

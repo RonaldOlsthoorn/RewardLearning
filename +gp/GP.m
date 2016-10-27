@@ -1,6 +1,12 @@
 classdef GP < handle
     %GP simple class used as a wrapper for the gpml library
     
+    properties(Constant)
+        
+        figID = 6;
+        
+    end
+    
     properties
         
         hyp;
@@ -20,6 +26,8 @@ classdef GP < handle
             obj.likfunc = gp_par.likfunc;
             obj.covfunc = gp_par.covfunc;
             obj.meanfunc = gp_par.meanfunc;
+            
+            obj.reset_figure();
         end
         
         function add_demonstration(obj, demonstration)
@@ -78,17 +86,22 @@ classdef GP < handle
         
         function print(obj)
             
-            x_grid = (-1:0.01:0)';
-            [m, s2] = obj.interpolate(x_grid);
-            f = [m+2*sqrt(s2); flipdim(m-2*sqrt(s2),1)];
+            minx = min(obj.outcomes);
+            maxx = max(obj.outcomes);
+            dx = (maxx-minx);
             
-            figure;
+            x_grid = ((minx-dx):(dx/100):(maxx+dx))';
+            
+            [m, s2] = obj.interpolate(x_grid);
+            f = [m+2*sqrt(s2); flip(m-2*sqrt(s2))];
+            
+            figure(obj.figID);
+            clf;
             hold on;
-            fill([x_grid; flipdim(x_grid,1)], f, [7 7 7]/8);
+            fill([x_grid; flip(x_grid)], f, [7 7 7]/8);
             plot(x_grid, m)
             plot(obj.outcomes, obj.ratings, ...
                 '+', 'MarkerSize', 10, 'Color',[0,0.7,0.9]);
-            
         end
         
         function extract_gp_points(obj)
@@ -103,11 +116,19 @@ classdef GP < handle
             end
         end
         
-        function minimize(obj)
+        function minimize(obj)        
             
             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
                 obj.meanfunc, obj.covfunc, obj.likfunc, ...
                 obj.outcomes, obj.ratings);
+        end
+        
+        function reset_figure(obj)
+            figure(obj.figID);
+            set(double(obj.figID),...
+                'units','normalized','outerposition',[0 0 1 1]);
+            clf;
+            
         end
         
     end
