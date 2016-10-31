@@ -3,8 +3,7 @@ classdef GP < handle
     
     properties(Constant)
         
-        figID = 6;
-        
+        figID = 6;       
     end
     
     properties

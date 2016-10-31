@@ -67,6 +67,7 @@ classdef DynamicEnvironment < environment.Environment
                 if(~obj.reward_model.gp.batch_rollouts.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     obj.reward_model.add_demonstration(rollout);
+                    obj.reward_model.gp.print();
                     unqueried_batch.delete(max_rollout);
                     
                     if unqueried_batch.is_empty()

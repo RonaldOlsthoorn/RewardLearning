@@ -15,10 +15,11 @@ classdef DynamicLinearRewardModel < reward.RewardModel
             obj.gp = gp;
         end
         
-        function reward = compute_reward(obj, outcomes)
+        function rollout = add_reward(obj, rollout)
             
-            reward = obj.gp.interpolate(outcomes);           
-        end
+            reward = obj.gp.interpolate(rollout.sum_out);
+            rollout.R = reward;
+       end 
         
         function add_demonstration(obj, demonstration)
             

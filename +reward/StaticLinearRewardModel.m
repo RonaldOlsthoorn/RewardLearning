@@ -15,17 +15,16 @@ classdef StaticLinearRewardModel < reward.RewardModel
         
         function obj = StaticLinearRewardModel(reference)
             
-            obj.feature_block = reward.SimpleFeatureBlock(reference);
-            
+            obj.feature_block = reward.SimpleFeatureBlock(reference);           
         end
         
-        function reward = compute_reward(obj, outcomes)
+        function rollout = add_reward(obj, rollout)
             
             reward = obj.weights*outcomes;
-            
-        end
-        
-    end
-    
+            rollout.r = reward;
+            rollout.r_cum = obj.cumulative_reward(reward); 
+            rollout.R = sum(reward);
+        end      
+    end    
 end
 
