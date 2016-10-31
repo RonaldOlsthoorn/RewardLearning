@@ -1,8 +1,8 @@
 classdef PI2AgentLegacy < forward.Agent
     %PI2Agent defines a PI2 reinforcement learning agent.
-
+    
     properties
-                
+        
         previous_batch;
         noise_mult = 1;
         noise_std;
@@ -20,18 +20,16 @@ classdef PI2AgentLegacy < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
-            
-            rng(10); % fix random seed. handy for comparisson
         end
         
-        % returns the noiseless input trajectory of the agents' 
+        % returns the noiseless input trajectory of the agents'
         % current policy
         function trajectory = get_noiseless_trajectory(obj)
             
-            trajectory = obj.policy.create_noiseless_trajectory();             
+            trajectory = obj.policy.create_noiseless_trajectory();
         end
         
-        % returns a batch of input trajectories for the environment to 
+        % returns a batch of input trajectories for the environment to
         % run.
         function batch_trajectories = get_batch_trajectories(obj)
             
@@ -47,7 +45,7 @@ classdef PI2AgentLegacy < forward.Agent
             
         end
         
-        % returns a batch of input trajectories. 
+        % returns a batch of input trajectories.
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
             batch_trajectories = db.RolloutBatch();
@@ -169,7 +167,7 @@ classdef PI2AgentLegacy < forward.Agent
                 R(k) = batch_rollouts.get_rollout(k).R(1,1);
             end
             
-            [~, inds]=sort(R);   
+            [~, inds]=sort(R);
             
             batch_tmp = db.RolloutBatch();
             

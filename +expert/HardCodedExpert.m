@@ -3,15 +3,21 @@ classdef HardCodedExpert < expert.Expert
     %   Detailed explanation goes here
     
     properties
+        
+        std;
     end
     
     methods
         
-        function rating = query_expert(~, rollout)
+        function obj = HardCodedExpert(s)
             
-            rating = sum(rollout.outcomes);
+            obj.std = s;
+        end
+        
+        function rating = query_expert(obj, rollout)
+            
+            rating = obj.std*randn()+rollout.sum_out;
         end
     end
-    
 end
 

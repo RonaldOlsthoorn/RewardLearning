@@ -20,8 +20,6 @@ classdef PI2AgentDR < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
-            
-            rng(10); % fix random seed. handy for comparisson
         end
         
         % returns the noiseless input trajectory of the agents' 

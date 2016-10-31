@@ -8,7 +8,7 @@ switch reward_model_par.type
     case 'reward_model_static_lin'
         reward_model = reward.StaticLinearRewardModel(reference);
     case 'reward_model_gp'
-        gp = gp.GP(reward_model_par.gp_par);
+        gp = gp.init_GP(reward_model_par.gp_par);
         reward_model = reward.DynamicLinearRewardModel(reference, gp);
     otherwise
         reward_model = [];

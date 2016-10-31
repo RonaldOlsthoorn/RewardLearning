@@ -12,22 +12,12 @@ classdef GP < handle
         likfunc;
         covfunc;
         meanfunc;
-        batch_rollouts = db.RolloutBatch();
+        batch_rollouts;
         outcomes = [];
         ratings = [];
     end
     
     methods
-        
-        function obj = GP(gp_par)
-            
-            obj.hyp = gp_par.hyp;
-            obj.likfunc = gp_par.likfunc;
-            obj.covfunc = gp_par.covfunc;
-            obj.meanfunc = gp_par.meanfunc;
-            
-            obj.reset_figure();
-        end
         
         function add_demonstration(obj, demonstration)
             
@@ -128,6 +118,23 @@ classdef GP < handle
                 'units','normalized','outerposition',[0 0 1 1]);
             clf;
             
+        end
+        
+        % Make a copy of a handle object.
+        function new = copy(this)
+            % Instantiate new object of the same class.
+            new = gp.GP();
+ 
+            % Copy all non-hidden properties.
+            p = properties(this);
+            for i = 1:length(p)
+                if strcmp(p{i}, 'batch_rollouts')
+                    new.(p{i}) = this.(p{i}).copy();
+                elseif strcmp(p{i}, 'figID')
+                else
+                    new.(p{i}) = this.(p{i});
+                end
+            end
         end
         
     end

@@ -1,8 +1,8 @@
 classdef PI2Agent < forward.Agent
     %PI2Agent defines a PI2 reinforcement learning agent.
-
+    
     properties
-                
+        
         previous_batch;
         noise_mult = 1;
         noise_std;
@@ -20,18 +20,16 @@ classdef PI2Agent < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
-            
-            rng(10); % fix random seed. handy for comparisson
         end
         
-        % returns the noiseless input trajectory of the agents' 
+        % returns the noiseless input trajectory of the agents'
         % current policy
         function trajectory = get_noiseless_trajectory(obj)
             
-            trajectory = obj.policy.create_noiseless_trajectory();             
+            trajectory = obj.policy.create_noiseless_trajectory();
         end
         
-        % returns a batch of input trajectories for the environment to 
+        % returns a batch of input trajectories for the environment to
         % run.
         function batch_trajectories = get_batch_trajectories(obj)
             
@@ -47,7 +45,7 @@ classdef PI2Agent < forward.Agent
             
         end
         
-        % returns a batch of input trajectories. 
+        % returns a batch of input trajectories.
         function batch_trajectories = create_batch_trajectories(obj, batch_size)
             
             batch_trajectories = db.RolloutBatch();
@@ -87,7 +85,7 @@ classdef PI2Agent < forward.Agent
             obj.policy.update(dtheta);
             
             obj.importance_sampling(batch_rollouts)
-            obj.update_exploration_noise();   
+            obj.update_exploration_noise();
         end
         
         % returns the change in policy parameters per sample. This
@@ -127,7 +125,7 @@ classdef PI2Agent < forward.Agent
             dtheta = reshape(sum(PMeps,2), n_dof, n_end, n_rbfs);
             
             dtheta = reshape(sum(dtheta.*repmat(reshape(obj.policy.DoFs(1).time_normalized_psi,...
-                [1,n_end,n_rbfs]),[n_dof 1 1]),2),n_dof, n_rbfs);            
+                [1,n_end,n_rbfs]),[n_dof 1 1]),2),n_dof, n_rbfs);
         end
         
         % Returns the probability of a sample relative to the other samples
@@ -166,7 +164,7 @@ classdef PI2Agent < forward.Agent
                 R(k) = batch_rollouts.get_rollout(k).R(1,1);
             end
             
-            [~, inds]=sort(R);   
+            [~, inds]=sort(R);
             
             batch_tmp = db.RolloutBatch();
             
@@ -181,7 +179,7 @@ classdef PI2Agent < forward.Agent
         % Update the exploration noise linearly.
         function update_exploration_noise(obj)
             
-            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]); 
+            obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);
             %disp(num2str(obj.noise_mult));
         end
         

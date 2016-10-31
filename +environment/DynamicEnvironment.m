@@ -22,6 +22,8 @@ classdef DynamicEnvironment < environment.Environment
         
         function prepare(obj)
             
+            rng(20);
+            
             obj.index = 1;
             
             batch_trajectory = obj.agent.create_batch_trajectories(4);
@@ -46,6 +48,8 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
             obj.reward_model.gp.print();
+            
+            rng(10);
         end
         
         function update_reward(obj, batch_rollouts)
@@ -121,19 +125,20 @@ classdef DynamicEnvironment < environment.Environment
             
             for sigma = 1:length(sigma_points)
                 
-                batch = obj.original_batch;              
+                batch = obj.original_batch.copy();              
                 rollout.R_expert = sigma_points(sigma);               
-                obj.reward_model.add_demonstration(rollout);
+                
+                gp_ext = obj.reward_model.gp.copy();
+                gp_ext.add_demonstration(rollout);
                 
                 for i=1:batch.size
                     
-                    r = obj.reward_model.add_outcomes_and_reward(...
-                        batch.get_rollout(i));
+                    ro = batch.get_rollout(i);
+                    ro.R = gp_ext.interpolate_rollout(ro);
                     
-                    batch.update_rollout(r);
+                    batch.update_rollout(ro);
                 end
                 
-                obj.reward_model.remove_demonstration(rollout);             
                 theta_star = obj.agent.get_probability_trajectories(batch);
                 epd(sigma) = sum(theta_star.*log(theta_star./theta_tilda));
             end

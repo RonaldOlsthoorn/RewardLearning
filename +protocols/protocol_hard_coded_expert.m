@@ -47,6 +47,8 @@ policy_par.Ts =  plant_par.Ts;
 env_par.dyn = true;
 env_par.acquisition = 'epd';
 env_par.expert = 'hard_coded_expert';
+env_par.expert_std = 1e-3;
+% env_par.expert_std = 0;
 env_par.tol = 0.1;
 
 reward_model.type = 'reward_model_gp';

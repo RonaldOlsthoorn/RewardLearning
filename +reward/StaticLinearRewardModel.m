@@ -20,7 +20,7 @@ classdef StaticLinearRewardModel < reward.RewardModel
         
         function rollout = add_reward(obj, rollout)
             
-            reward = obj.weights*outcomes;
+            reward = obj.weights*rollout.outcomes;
             rollout.r = reward;
             rollout.r_cum = obj.cumulative_reward(reward); 
             rollout.R = sum(reward);

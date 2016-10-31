@@ -44,6 +44,8 @@ policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
 
+env_par.dyn = false;
+
 reward_model_par.type = 'reward_model_static_lin';
 reward_model_par.feature_block = 'SimpleFeatureBlock';
 
@@ -52,6 +54,6 @@ protocol.controller_par = controller_par;
 protocol.reference_par = reference_par;
 protocol.agent_par = agent_par;
 protocol.policy_par = policy_par;
+protocol.env_par = env_par;
 protocol.reward_model_par = reward_model_par;
 end
-

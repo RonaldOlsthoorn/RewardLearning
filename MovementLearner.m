@@ -47,6 +47,8 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
+            rng(20); % fix random seed. handy for comparisson
+            
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
             obj.plant.set_init_state(obj.reference.r_joints(:,1));
@@ -58,7 +60,7 @@ classdef MovementLearner < handle
                 obj.reference);
             
             obj.environment = init.init_environment(p.env_par, ...
-                            obj.plant, obj.reward_model, obj.agent);
+                obj.plant, obj.reward_model, obj.agent);
             
             %obj.reset_figure();
         end
@@ -108,11 +110,11 @@ classdef MovementLearner < handle
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             obj.print_noiseless_rollout(noiseless_rollout);
             
-%             figure;
-%             plot(obj.R);
-%             title(obj.protocol_s);
-%             xlabel('iteration');
-%             ylabel('Return');
+            figure;
+            plot(obj.R);
+            title(obj.protocol_s);
+            xlabel('iteration');
+            ylabel('Return');
         end
         
         function print_noiseless_rollout(obj, rollout)

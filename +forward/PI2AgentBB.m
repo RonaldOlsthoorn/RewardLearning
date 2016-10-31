@@ -20,8 +20,6 @@ classdef PI2AgentBB < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
-            
-            rng(10); % fix random seed. handy for comparisson
         end
         
         % returns the noiseless input trajectory of the agents' 
@@ -153,7 +151,7 @@ classdef PI2AgentBB < forward.Agent
             [~, inds]=sort(R);              
             batch_tmp = db.RolloutBatch();
             
-            for j=length(R):-1:(length(R)-obj.n_reuse),
+            for j=length(R):-1:(length(R) - obj.n_reuse + 1),
                 
                 batch_tmp.append_rollout(batch_rollouts.get_rollout(inds(j)));
             end
