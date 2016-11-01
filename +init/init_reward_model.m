@@ -9,7 +9,7 @@ switch reward_model_par.type
         reward_model = reward.StaticLinearRewardModel(reference);
     case 'reward_model_gp'
         gp = gp.init_GP(reward_model_par.gp_par);
-        reward_model = reward.DynamicLinearRewardModel(reference, gp);
+        reward_model = reward.init_DynamicRewardModel(reference, gp);
     otherwise
         reward_model = [];
 end

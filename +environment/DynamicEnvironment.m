@@ -68,6 +68,8 @@ classdef DynamicEnvironment < environment.Environment
                 
                 [max_rollout, max_epd] = obj.find_max_acquisition(unqueried_batch);
                 
+                disp(strcat('max epd: ', num2str(max_epd)));
+                
                 if(~obj.reward_model.gp.batch_rollouts.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     obj.reward_model.add_demonstration(rollout);
@@ -128,13 +130,13 @@ classdef DynamicEnvironment < environment.Environment
                 batch = obj.original_batch.copy();              
                 rollout.R_expert = sigma_points(sigma);               
                 
-                gp_ext = obj.reward_model.gp.copy();
-                gp_ext.add_demonstration(rollout);
+                rm_ext = obj.reward_model.copy();
+                rm_ext.add_demonstration(rollout);
                 
                 for i=1:batch.size
                     
                     ro = batch.get_rollout(i);
-                    ro.R = gp_ext.interpolate_rollout(ro);
+                    ro = rm_ext.add_reward(ro);
                     
                     batch.update_rollout(ro);
                 end
@@ -156,8 +158,33 @@ classdef DynamicEnvironment < environment.Environment
             for i = 1:n_dof
                 
                 theta_per_sample(:,(i-1)*n_bf+1:i*n_bf) = squeeze(theta_ps(i,:,:));
+            end        
+        end
+        
+        function print_reward_kl(~, batch_tilda, batch_star)
+        
+            R_tilda = zeros(batch_tilda.size, 1);
+            R_star = zeros(batch_star.size, 1);
+            
+            for i = 1:batch_tilda.size
+                
+                R_tilda(i,1) = batch_tilda.get_rollout(i).R;
+                R_star(i,1) = batch_star.get_rollout(i).R;
             end
             
+            figure
+            hold on;
+            scatter(R_tilda, zeros(batch_tilda.size, 1));
+            scatter(R_star, zeros(batch_star.size, 1));
         end
+        
+        function print_kl(~, theta_tilda, theta_star)
+            
+            figure
+            hold on;
+            scatter(theta_tilda, zeros(length(theta_tilda), 1));
+            scatter(theta_star, zeros(length(theta_star), 1));          
+        end
+            
     end
 end

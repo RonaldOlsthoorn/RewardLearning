@@ -9,17 +9,11 @@ classdef DynamicLinearRewardModel < reward.RewardModel
     
     methods
         
-        function obj = DynamicLinearRewardModel(reference, gp)
-            
-            obj.feature_block = reward.SimpleFeatureBlock(reference);
-            obj.gp = gp;
-        end
-        
         function rollout = add_reward(obj, rollout)
             
             reward = obj.gp.interpolate(rollout.sum_out);
             rollout.R = reward;
-       end 
+        end
         
         function add_demonstration(obj, demonstration)
             
@@ -36,7 +30,21 @@ classdef DynamicLinearRewardModel < reward.RewardModel
             obj.gp.add_batch_demonstrations(batch_demonstrations)
         end
         
+        % Make a copy of a handle object.
+        function new = copy(this)
+            % Instantiate new object of the same class.
+            new = reward.DynamicLinearRewardModel();
+            
+            % Copy all non-hidden properties.
+            p = properties(this);
+            for i = 1:length(p)
+                if strcmp(p{i}, 'gp')
+                    new.(p{i}) = this.(p{i}).copy();
+                else
+                    new.(p{i}) = this.(p{i});
+                end
+            end
+        end
     end
-    
 end
 
