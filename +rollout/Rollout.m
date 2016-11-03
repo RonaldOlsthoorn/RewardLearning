@@ -36,8 +36,6 @@ classdef Rollout
             else
                 res=false;
             end
-        end
-        
-    end
-    
+        end 
+    end    
 end

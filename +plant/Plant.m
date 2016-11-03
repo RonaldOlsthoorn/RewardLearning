@@ -8,7 +8,7 @@ classdef Plant < handle
         
         system;
         controller;
-        print_batch = true;
+        print_batch = false;
     end
     
     methods(Abstract)

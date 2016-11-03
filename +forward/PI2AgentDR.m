@@ -2,9 +2,7 @@ classdef PI2AgentDR < forward.Agent
     %PI2Agent defines a PI2 reinforcement learning agent.
 
     properties
-        
-        iteration = 1; %unfortunately needed to save this.
-        
+                
         previous_batch;
         noise_mult = 1;
         noise_std;
@@ -22,8 +20,6 @@ classdef PI2AgentDR < forward.Agent
             obj.annealer = agent_par.annealer;
             obj.reps = agent_par.reps;
             obj.n_reuse = agent_par.n_reuse;
-            
-            rng(10); % fix random seed. handy for comparisson
         end
         
         % returns the noiseless input trajectory of the agents' 
@@ -58,8 +54,6 @@ classdef PI2AgentDR < forward.Agent
                 
                 eps = obj.gen_epsilon();
                 ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
-                ro.iteration = obj.iteration;
-                ro.index = i;
                 
                 batch_trajectories.append_rollout(ro);
             end
@@ -90,7 +84,6 @@ classdef PI2AgentDR < forward.Agent
             % and update the parameters.
             obj.policy.update(dtheta);
             
-            obj.iteration = obj.iteration + 1; %try to remove this later on
             obj.importance_sampling(batch_rollouts)
             obj.update_exploration_noise();   
         end

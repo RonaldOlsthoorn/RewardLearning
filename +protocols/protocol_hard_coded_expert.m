@@ -1,4 +1,4 @@
-function [ protocol ] = PI2BB()
+function [ protocol ] = protocol_hard_coded_expert()
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
@@ -44,10 +44,25 @@ policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
 
-env_par.dyn = false;
+env_par.dyn = true;
+env_par.acquisition = 'epd';
+env_par.expert = 'hard_coded_expert';
+env_par.expert_std = 1e-3;
+% env_par.expert_std = 0;
+env_par.tol = 0.1;
 
-reward_model_par.type = 'reward_model_static_lin';
-reward_model_par.feature_block = 'SimpleFeatureBlock';
+reward_model.type = 'reward_model_gp';
+
+hyp.cov = [0.03;0.03];
+hyp.mean = [1;0];
+hyp.lik = 1e-3;
+
+gp_par.likfunc = @likGauss;
+gp_par.meanfunc = {@meanSum, {@meanLinear, @meanConst}};
+gp_par.covfunc = @covSEard;
+gp_par.hyp = hyp;
+
+reward_model.gp_par = gp_par;
 
 protocol.plant_par = plant_par;
 protocol.controller_par = controller_par;
@@ -55,5 +70,5 @@ protocol.reference_par = reference_par;
 protocol.agent_par = agent_par;
 protocol.policy_par = policy_par;
 protocol.env_par = env_par;
-protocol.reward_model_par = reward_model_par;
+protocol.reward_model_par = reward_model;
 end

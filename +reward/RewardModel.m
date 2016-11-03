@@ -9,30 +9,27 @@ classdef RewardModel < handle
     
     methods(Abstract)
         
-        reward = compute_reward(outcome);  
+        rollout = add_reward(obj, rollout)
     end
     
     methods
         
-        function outcomes = compute_outcomes(obj, rollout)
+       function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
-        end
+            rollout.sum_out = sum(outcomes);
+            rollout.outcomes = outcomes;
+       end 
         
-        function rollout = add_outcomes_and_reward(obj, rollout)
+       function rollout = add_outcomes_and_reward(obj, rollout)
             % Complements the rollout with reward and the outcomes of
             % reward primitives.
             
-            outcomes = obj.compute_outcomes(rollout);
-            reward = obj.compute_reward(outcomes);
-            
-            rollout.outcomes = outcomes;
-            rollout.r = reward;
-            rollout.r_cum = obj.cumulative_reward(reward);            
-            rollout.R = sum(reward);
-        end
+            rollout = obj.add_outcomes(rollout);
+            rollout = obj.add_reward(rollout);
+       end
         
-        function r_cum = cumulative_reward(~, r)
+       function r_cum = cumulative_reward(~, r)
            
             r_cum = rot90(rot90(cumsum(rot90(rot90(r)))));
         end

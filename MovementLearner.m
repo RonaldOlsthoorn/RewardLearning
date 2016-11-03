@@ -47,25 +47,29 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
+            rng(20); % fix random seed. handy for comparisson
+            
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
             obj.plant.set_init_state(obj.reference.r_joints(:,1));
             
+            policy = init.init_policy(p.policy_par, obj.reference);
+            obj.agent = init.init_agent(p.agent_par, policy);
+            
             obj.reward_model = init.init_reward_model(p.reward_model_par,...
                 obj.reference);
             
-            obj.environment = Environment(obj.plant, obj.reward_model);
+            obj.environment = init.init_environment(p.env_par, ...
+                obj.plant, obj.reward_model, obj.agent);
             
-            policy = init.init_policy(p.policy_par, obj.reference);
-            
-            obj.agent = init.init_agent(p.agent_par, policy);
-            
-            obj.reset_figure();
+            %obj.reset_figure();
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
             
             iteration = 1;
+            
+            obj.environment.prepare();
             
             while iteration<50 % for now. Replace with EPD
                 
@@ -76,7 +80,7 @@ classdef MovementLearner < handle
                 obj.db.append_row(batch_rollouts);
                 batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
-                % obj.environment.reward_model.update(batch_rollout)
+                obj.environment.update_reward(batch_rollouts)
                 
                 obj.agent.update(batch_rollouts);
                 
@@ -92,7 +96,6 @@ classdef MovementLearner < handle
         function print_progress(obj)
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
-            %disp('Noiseless rollout');
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             obj.print_noiseless_rollout(noiseless_rollout);
@@ -106,7 +109,7 @@ classdef MovementLearner < handle
             disp('Noiseless rollout');
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             obj.print_noiseless_rollout(noiseless_rollout);
-
+            
             figure;
             plot(obj.R);
             title(obj.protocol_s);
@@ -118,7 +121,7 @@ classdef MovementLearner < handle
             % print the noiseless rollout in a single figure.
             
             disp(strcat('Return: ', num2str(rollout.R)));
-            obj.plant.print_rollout(rollout);            
+            obj.plant.print_rollout(rollout);
         end
         
         function reset_figure(obj)
@@ -142,6 +145,5 @@ classdef MovementLearner < handle
             
             drawnow;
         end
-    end   
+    end
 end
-
