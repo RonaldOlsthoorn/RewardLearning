@@ -53,9 +53,9 @@ env_par.tol = 0.1;
 
 reward_model.type = 'reward_model_gp';
 
-hyp.cov = [2;10];
+hyp.cov = [0.03;0.03];
 hyp.mean = [1;0];
-hyp.lik = log(0.01);
+hyp.lik = 1e-3;
 
 gp_par.likfunc = @likGauss;
 gp_par.meanfunc = {@meanSum, {@meanLinear, @meanConst}};
@@ -72,4 +72,3 @@ protocol.policy_par = policy_par;
 protocol.env_par = env_par;
 protocol.reward_model_par = reward_model;
 end
-

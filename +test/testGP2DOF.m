@@ -30,7 +30,7 @@ reference_par.goal_joint=[0.2203;0.6767];
 reference_par.use_ik=true;
 reference_par.duration=8;
 reference_par.Ts= plant_par.Ts;
-reference_par.trajectory='2dof';    
+reference_par.trajectory='2dof';
 
 agent_par.type = 'agent_PI2BB';
 agent_par.noise_std = [0.01;0.01];
@@ -51,9 +51,9 @@ env_par.tol = 0.1;
 
 reward_model.type = 'reward_model_gp';
 
-hyp.cov = [2;10];
+hyp.cov = [0.03; 5e-3];
 hyp.mean = [1;0];
-hyp.lik = log(0.01);
+hyp.lik = log(0.002);
 
 gp_par.likfunc = @likGauss;
 gp_par.meanfunc = {@meanSum, {@meanLinear, @meanConst}};
@@ -71,7 +71,6 @@ p.env_par = env_par;
 p.reward_model_par = reward_model;
 
 %%
-
 import plant.Plant;
 import environment.Environment;
 
@@ -83,19 +82,37 @@ policy = init.init_policy(p.policy_par, reference);
 agent = init.init_agent(p.agent_par, policy);
 
 reward_model = init.init_reward_model(p.reward_model_par,...
-                reference);
+    reference);
 
 batch_trajectory = agent.create_batch_trajectories(4);
-batch_rollouts = plant.batch_run(batch_trajectory);
+batch_trajectory = plant.batch_run(batch_trajectory);
+
+batch_rollouts = db.RolloutBatch();
+
+for i = 1:batch_trajectory.size
+    
+    rollout = batch_trajectory.get_rollout(i);
+    rollout.iteration = 0;
+    rollout.index = i;
+    
+    batch_rollouts.append_rollout(rollout);
+end
+
+expert_noise = 5e-3;
 
 for i = 1:batch_rollouts.size
     
     rollout = reward_model.add_outcomes(batch_rollouts.get_rollout(i));
-    rollout.R_expert = sum(rollout.outcomes);
+    
+    rollout.R_expert = expert_noise*randn()+sum(rollout.outcomes);
     batch_rollouts.update_rollout(rollout);
 end
 
 reward_model.add_batch_demonstrations(batch_rollouts);
+
+gpmp.gp_lin(reward_model.gp.outcomes', reward_model.gp.ratings', -0.1:0.001:0, hyp);
+
+
 reward_model.gp.print();
 reward_model.gp.minimize();
 reward_model.gp.print();

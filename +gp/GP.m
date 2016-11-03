@@ -3,7 +3,7 @@ classdef GP < handle
     
     properties(Constant)
         
-        figID = 6;       
+        figID = 6;
     end
     
     properties
@@ -67,10 +67,37 @@ classdef GP < handle
         
         function [reward, s2] = interpolate(obj, outcomes)
             
-            [reward, s2] = gp(obj.hyp, @infExact, ...
-                obj.meanfunc, obj.covfunc, obj.likfunc,...
-                obj.outcomes, obj.ratings, ...
-                outcomes);
+            lf = obj.hyp.cov(1);
+            lx = obj.hyp.cov(2);
+            sfm = obj.hyp.lik(1);
+            
+            Xm = obj.outcomes';
+            fmh = obj.ratings;
+            
+            Xs = outcomes';
+            
+            % We now set up the (squared exponential) covariance matrix and related terms.
+            nm = size(Xm,2); % This is the number of measurement points.
+            ns = size(Xs,2); % This is the number of trial points.
+            X = [Xm,Xs]; % We merge the measurement and trial points.
+            n = size(X,2); % This is the number of points.
+            diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
+            K = lf^2*exp(-1/2*diff.^2/lx^2); % This is the covariance matrix. It contains the covariances of each combination of points.
+            Kmm = K(1:nm,1:nm);
+            Kms = K(1:nm,nm+1:end);
+            Ksm = Kms';
+            Kss = K(nm+1:end,nm+1:end);
+            Sfm = sfm^2*eye(nm); % This is the noise covariance matrix.
+            mm = zeros(nm,1); % This is the mean vector m(Xm). We assume a zero mean function.
+            ms = zeros(ns,1); % This is the mean vector m(Xs). We assume a zero mean function.
+            
+            % Next, we apply GP regression.
+            mPost = ms + Ksm/(Kmm + Sfm)*(fmh - mm); % This is the posterior mean vector.
+            SPost = Kss - Ksm/(Kmm + Sfm)*Kms; % This is the posterior covariance matrix.
+            sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
+            
+            reward = mPost;
+            s2 = sPost;
         end
         
         function print(obj)
@@ -81,16 +108,18 @@ classdef GP < handle
             
             x_grid = ((minx-dx):(dx/100):(maxx+dx))';
             
-            [m, s2] = obj.interpolate(x_grid);
-            f = [m+2*sqrt(s2); flip(m-2*sqrt(s2))];
+            [mPost, sPost] = obj.interpolate(x_grid);
             
             figure(obj.figID);
             clf;
             hold on;
-            fill([x_grid; flip(x_grid)], f, [7 7 7]/8);
-            plot(x_grid, m)
-            plot(obj.outcomes, obj.ratings, ...
-                '+', 'MarkerSize', 10, 'Color',[0,0.7,0.9]);
+            grid on;
+            
+            patch([x_grid; flip(x_grid)], [mPost-2*sPost; flipud(mPost+2*sPost)], 1, 'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+            patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+            set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
+            plot(x_grid, mPost, 'b-', 'LineWidth', 1); % We plot the mean line.      
+            plot(obj.outcomes, obj.ratings, 'ro'); % We plot the measurement points.
         end
         
         function extract_gp_points(obj)
@@ -105,7 +134,7 @@ classdef GP < handle
             end
         end
         
-        function minimize(obj)        
+        function minimize(obj)
             
             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
                 obj.meanfunc, obj.covfunc, obj.likfunc, ...
@@ -124,7 +153,7 @@ classdef GP < handle
         function new = copy(this)
             % Instantiate new object of the same class.
             new = gp.GP();
- 
+            
             % Copy all non-hidden properties.
             p = properties(this);
             for i = 1:length(p)
