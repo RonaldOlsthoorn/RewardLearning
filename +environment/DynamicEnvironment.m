@@ -120,7 +120,7 @@ classdef DynamicEnvironment < environment.Environment
         function res = epd(obj, rollout)
             
             [m, s2] = obj.reward_model.gp.interpolate_rollout(rollout);
-            sigma_points = m(end) + [1 -1].*sqrt(s2(end));
+            sigma_points = m(end) + [1 -1]*s2(end);
             
             epd = zeros(1, 2);         
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
@@ -185,6 +185,25 @@ classdef DynamicEnvironment < environment.Environment
             scatter(theta_tilda, zeros(length(theta_tilda), 1));
             scatter(theta_star, zeros(length(theta_star), 1));          
         end
+        
+        function print_r_in_rm(~, batch_tilda, batch_star)
             
+            R_tilda = zeros(batch_tilda.size, 1);
+            O_tilda = zeros(batch_tilda.size, 1);
+            R_star = zeros(batch_star.size, 1);
+            O_star = zeros(batch_star.size, 1);
+            
+            for i = 1:batch_tilda.size
+                
+                R_tilda(i,1) = batch_tilda.get_rollout(i).R;
+                O_tilda(i,1) = batch_tilda.get_rollout(i).sum_out;
+                
+                R_star(i,1) = batch_star.get_rollout(i).R;
+                O_star(i,1) = batch_star.get_rollout(i).sum_out;
+            end
+            
+            scatter(O_tilda, R_tilda, '+', 'g');
+            scatter(O_star, R_star, '+', 'p');  
+        end
     end
 end
