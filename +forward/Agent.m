@@ -1,6 +1,6 @@
 classdef Agent < handle
-    %AGENT Summary of this class goes here
-    %   Detailed explanation goes here
+    %AGENT Defines a base class for episode based reinforcement learning
+    % agents.
     
     properties
         

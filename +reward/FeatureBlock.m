@@ -1,4 +1,6 @@
 classdef FeatureBlock < handle
+    % FEATUREBLOCK: manages reward primitives aka feature functions in one
+    % concise block and offers the outcomes of the reward primitives.
     
     properties
         
@@ -8,6 +10,8 @@ classdef FeatureBlock < handle
     methods
         
         function outcomes = compute_outcomes(obj, rollout)
+            % returns the outcome of the reward primitive functions, based
+            % on the rollout (Rollout object).
             
             outcomes = zeros(length(rollout.time), length(obj.reward_primitives));
 

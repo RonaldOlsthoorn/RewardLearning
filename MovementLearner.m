@@ -1,19 +1,19 @@
 classdef MovementLearner < handle
+    % God class handling the complete active reward learning algorhithm.
     
     properties(Constant)
         
         handle_cost_figure = 5;
         handle_noiseless_figure = 2;
-
     end
     
     properties
         
-        W;
-        R;
+        protocol_s;
         
-        system;
-        controller;
+        W; % policy weight trace
+        R; % Reward trace
+        
         plant;
         
         reward_model;
@@ -21,99 +21,127 @@ classdef MovementLearner < handle
         
         reference;
         
-        policy;
         agent;
+        
+        db;
     end
     
     methods
         
-        function obj = MovementLearner(protocol)
+        function obj = MovementLearner(p)
+            
+            obj.protocol_s = p;
             
             obj.W = [];
             obj.R = [];
             
-            p = init.read_protocol(protocol);
-            obj.init_learner(p);
+            protocol_handle = str2func(strcat('protocols.', obj.protocol_s));
+            protocol = protocol_handle();
+            obj.init_learner(protocol);
             
+            obj.db = db.DB();
         end
         
-        function init_learner(obj, p)    
+        function init_learner(obj, p)
             
             import plant.Plant;
             import environment.Environment;
             
-            system_protocol = str2func(strcat('protocols.', p.system)); 
-            system_par = system_protocol();
-            obj.system = init.init_system(system_par);
+            obj.reference = init.init_reference(p.reference_par);
+            obj.plant = init.init_plant(p.plant_par, p.controller_par);
+            obj.plant.set_init_state(obj.reference.r_joints(:,1));
             
-            controller_protocol = str2func(strcat('protocols.', p.controller)); 
-            controller_par = controller_protocol();
-            obj.controller = init.init_controller(controller_par);
-            
-            obj.plant = Plant(obj.system, obj.controller);
-            
-            reference_protocol = str2func(strcat('protocols.', p.reference)); 
-            reference_par = reference_protocol();
-            obj.reference = init.init_reference(reference_par);
-
-            reward_model_protocol = str2func(strcat('protocols.', p.reward_model)); 
-            reward_model_par = reward_model_protocol();
-            obj.reward_model = init.init_reward_model(reward_model_par, obj.reference);
+            obj.reward_model = init.init_reward_model(p.reward_model_par,...
+                obj.reference);
             
             obj.environment = Environment(obj.plant, obj.reward_model);
-          
-            policy_protocol = str2func(strcat('protocols.', p.policy)); 
-            policy_par = policy_protocol();
-            obj.policy = init.init_policy(policy_par, obj.reference);
             
-            agent_protocol = str2func(strcat('protocols.', p.agent)); 
-            agent_par = agent_protocol();
-            obj.agent = init.init_agent(agent_par, obj.policy);
+            policy = init.init_policy(p.policy_par, obj.reference);
+            
+            obj.agent = init.init_agent(p.agent_par, policy);
+            
+            obj.reset_figure();
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
             
             iteration = 1;
             
-            while iteration<100;
+            while iteration<50 % for now. Replace with EPD
+                
+                obj.print_progress();
                 
                 batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollouts = obj.environment.batch_run(batch_trajectory);
+                obj.db.append_row(batch_rollouts);
                 batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
                 % obj.environment.reward_model.update(batch_rollout)
-                
-                noiseless_trajectory = obj.agent.get_noiseless_trajectory();
-                noiseless_rollout = obj.environment.run(noiseless_trajectory);
-                
-                obj.print_noiseless_rollout(noiseless_rollout);       
                 
                 obj.agent.update(batch_rollouts);
                 
                 iteration = iteration + 1;
             end
-                        
+            
             Weights = obj.W;
             Returns = obj.R;
+            
+            obj.print_result();
+        end
+        
+        function print_progress(obj)
+            
+            noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+            %disp('Noiseless rollout');
+            noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            
+            obj.print_noiseless_rollout(noiseless_rollout);
+            
+            obj.R = [obj.R noiseless_rollout.R];
+        end
+        
+        function print_result(obj)
+            
+            noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+            disp('Noiseless rollout');
+            noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            obj.print_noiseless_rollout(noiseless_rollout);
+
+            figure;
+            plot(obj.R);
+            title(obj.protocol_s);
+            xlabel('iteration');
+            ylabel('Return');
         end
         
         function print_noiseless_rollout(obj, rollout)
+            % print the noiseless rollout in a single figure.
             
             disp(strcat('Return: ', num2str(rollout.R)));
-            
-            figure(obj.handle_noiseless_figure)
-            clf;
-            subplot(1,3,1)
-            hold on
-            plot(rollout.time, rollout.tool_positions(1,:));
-            subplot(1,3,2)
-            hold on
-            plot(rollout.time, rollout.tool_positions(2,:));
-            subplot(1,3,3)
-            hold on
-            plot(rollout.time, rollout.tool_positions(3,:));
+            obj.plant.print_rollout(rollout);            
         end
-    end
-    
+        
+        function reset_figure(obj)
+            
+            figure(obj.handle_noiseless_figure);
+            set(double(obj.handle_noiseless_figure),...
+                'units','normalized','outerposition',[0 0 1 1]);
+            clf;
+            
+            subplot(1,3,1)
+            xlabel('t [s]');
+            ylabel('x_{ef} [m]');
+            
+            subplot(1,3,2)
+            xlabel('t [s]');
+            ylabel('y_{ef} [m]');
+            
+            subplot(1,3,3)
+            xlabel('x_{ef} [m]');
+            ylabel('y_{ef} [m]');
+            
+            drawnow;
+        end
+    end   
 end
 

@@ -1,6 +1,9 @@
 classdef Reference < handle
+    % REFERENCE: container class holding the reference in tool and joint
+    % space.
     
     properties
+        
         r_joints
         r_joints_d
         r_tool
@@ -8,8 +11,7 @@ classdef Reference < handle
         
         duration
         Ts
-        t;
-        
+        t;      
     end
     
     methods

@@ -1,4 +1,6 @@
 classdef StaticLinearRewardModel < reward.RewardModel
+    % STATICLINEARREWARDMODEL: simple reward model based on the squared
+    % tracking error of the trajectory.
     
     properties(Constant)
         

@@ -1,6 +1,7 @@
 classdef Controller < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Controller base class of all controllers
+    % assumption is made for control laws that map 
+    % positions and velocities to control action
     
     properties
     end

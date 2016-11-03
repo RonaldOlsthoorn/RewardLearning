@@ -1,5 +1,6 @@
 classdef Rollout 
     % Container class used as a fancy struct.
+    
     properties
         iteration;
         index;
@@ -10,7 +11,7 @@ classdef Rollout
         joint_speeds;
         tool_positions;
         tool_speeds;
-        time
+        time;
    
         outcomes;
         sum_out;
@@ -18,6 +19,7 @@ classdef Rollout
         xd;
         
         r;
+        r_cum;
         R;
         R_expert;
         

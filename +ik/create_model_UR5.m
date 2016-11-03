@@ -1,4 +1,5 @@
 function [ model_UR5 ] = create_model_UR5()
+% Robotics library model of the UR5 robotic arm
 
 L(1) = Link('revolute', 'd', 0.089159, 'a', 0, 'alpha', pi/2,...
     'offset', 0);

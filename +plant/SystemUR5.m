@@ -4,15 +4,13 @@ classdef SystemUR5 < plant.System
         
         ip = '192.168.1.50';
         a = 10;
-        
     end
     
     properties
         
-        arm;        
+        arm;
         Ts;
-        dof;
-        
+        dof = 6;
     end
     
     methods
@@ -20,17 +18,24 @@ classdef SystemUR5 < plant.System
         function obj = SystemUR5(system_par)
             
             obj.Ts = system_par.Ts;
-            obj.dof = system_par.dof;
             
             obj.arm = UR5.driver.URArm();
             obj.init();
+        end
+        
+        function set_init_state(obj, is)
             
+            obj.init_state = is;
+        end
+        
+        function init(obj)
+            
+            obj.connect();
         end
         
         function connect(obj)
             
             obj.arm.fopen(obj.ip);
-            
         end
         
         function disconnect(obj)
@@ -45,30 +50,24 @@ classdef SystemUR5 < plant.System
             
             obj.arm.setJointsSpeed(control_input, obj.a, 2*obj.Ts);
             
-            while toc(t_init)< obj.Ts;
+            while toc(t_init)< obj.Ts
             end
             
             obj.arm.update();
             
             joint_position = obj.arm.getJointsPositions();
             joint_speed = obj.arm.getJointsSpeeds();
-            tool_position = obj.arm.getToolPositions();
-            tool_speed = obj.arm.getToolSpeeds();
-            
-        end
-        
-        function init(obj)
-            
-            obj.connect();
+            tp = obj.arm.getToolPositions();
+            tool_position = tp(1:3)';
+            ts = obj.arm.getToolSpeeds();
+            tool_speed = ts(1:3)';
         end
         
         function [output] = reset(obj)
             
-            obj.gently_break();
-            
             tolerance = 0.001;
             
-            pos0 = [0; -2*pi/3; 2*pi/3; 0; pi/2; 0];
+            pos0 = obj.init_state;
             
             obj.arm.update();
             pos = obj.arm.getJointsPositions();
@@ -78,6 +77,7 @@ classdef SystemUR5 < plant.System
                 
                 obj.arm.moveJoints(pos);
                 pos = obj.arm.getJointsPositions();
+                vel = obj.arm.getJointsSpeeds();
                 
                 while abs(pos(i)-pos0(i)) > tolerance
                     
@@ -107,9 +107,7 @@ classdef SystemUR5 < plant.System
                 s = obj.arm.getJointsSpeeds();
                 
             end
-            
         end
-        
     end
 end
 
