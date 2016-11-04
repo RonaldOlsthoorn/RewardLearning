@@ -1,5 +1,5 @@
 classdef GP < handle
-    %GP simple class used as a wrapper for the gpml library
+    %Gaussian Process class.
     
     properties(Constant)
         
@@ -19,6 +19,7 @@ classdef GP < handle
     
     methods
         
+        %add demonstration to the gp
         function add_demonstration(obj, demonstration)
             
             obj.batch_rollouts.append_rollout(demonstration);
@@ -34,6 +35,7 @@ classdef GP < handle
             %                 obj.outcomes, obj.ratings);
         end
         
+        %add multiple demo's
         function add_batch_demonstrations(obj, batch_demonstrations)
             
             obj.batch_rollouts.append_batch(batch_demonstrations);
@@ -49,6 +51,7 @@ classdef GP < handle
             %                 obj.outcomes, obj.ratings);
         end
         
+        %remove demonstration from the gp
         function remove_demonstration(obj, demonstration)
             
             obj.batch_rollouts.delete(demonstration);
@@ -60,6 +63,8 @@ classdef GP < handle
             %                 obj.outcomes, obj.ratings);
         end
         
+        %perform gp regression on the current set of demo's to predict the
+        %reward of rollout
         function [reward, s2] = interpolate_rollout(obj, rollout)
             
             [reward, s2] = obj.interpolate(rollout.sum_out);
@@ -100,6 +105,7 @@ classdef GP < handle
             s2 = sPost;
         end
         
+        % print mean and covariance of the gp.
         function print(obj)
             
             minx = min(obj.outcomes);
@@ -122,6 +128,7 @@ classdef GP < handle
             plot(obj.outcomes, obj.ratings, 'ro'); % We plot the measurement points.
         end
         
+        % creates arrays for inputs and outputs from rollout objects
         function extract_gp_points(obj)
             
             obj.outcomes = zeros(obj.batch_rollouts.size, 1);
@@ -134,6 +141,7 @@ classdef GP < handle
             end
         end
         
+        % deprecated
         function minimize(obj)
             
             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
@@ -165,7 +173,6 @@ classdef GP < handle
                 end
             end
         end
-        
     end
 end
 

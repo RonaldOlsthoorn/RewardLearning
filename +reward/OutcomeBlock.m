@@ -1,4 +1,4 @@
-classdef FeatureBlock < handle
+classdef OutcomeBlock < handle
     % FEATUREBLOCK: manages reward primitives aka feature functions in one
     % concise block and offers the outcomes of the reward primitives.
     

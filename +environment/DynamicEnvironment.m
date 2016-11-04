@@ -1,5 +1,6 @@
 classdef DynamicEnvironment < environment.Environment
-    
+% Environment with a dynamic reward function (also contains the expert).
+
     properties
         
         expert;
@@ -7,7 +8,7 @@ classdef DynamicEnvironment < environment.Environment
         
         original_batch;
         
-        tol;
+        tol; % tolerance for epd
     end
     
     methods
@@ -20,15 +21,19 @@ classdef DynamicEnvironment < environment.Environment
             obj.tol = t;
         end
         
+        % Prepares the environment by demonstrating 4 rollouts and
+        % initializing the reward function
         function prepare(obj)
             
             rng(20);
             
             obj.index = 1;
             
+            % create the controls for the first batch of rollouts
             batch_trajectory = obj.agent.create_batch_trajectories(4);
+            % run em
             batch_trajectory = obj.plant.batch_run(batch_trajectory);
-            
+            % allocate new batch (batch_trajectory is index-less)
             batch_rollouts = db.RolloutBatch();
             
             for i = 1:batch_trajectory.size
@@ -52,11 +57,15 @@ classdef DynamicEnvironment < environment.Environment
             rng(10);
         end
         
+        % wrapper function for reward update
         function update_reward(obj, batch_rollouts)
             
             obj.update_reward_epd(batch_rollouts);
         end
         
+        % Updates the reward if needed by demonstrating rollouts of the
+        % batch if this is beneficial according to the epd acquisition
+        % function.
         function update_reward_epd(obj, batch_rollouts)
             
             obj.original_batch = batch_rollouts;
@@ -68,8 +77,10 @@ classdef DynamicEnvironment < environment.Environment
                 
                 [max_rollout, max_epd] = obj.find_max_acquisition(unqueried_batch);
                 
-                disp(strcat('max epd: ', num2str(max_epd)));
+                %disp(strcat('max epd: ', num2str(max_epd)));
                 
+                % rollouts are reused! therefore always check if rollout
+                % already queried.
                 if(~obj.reward_model.gp.batch_rollouts.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     obj.reward_model.add_demonstration(rollout);

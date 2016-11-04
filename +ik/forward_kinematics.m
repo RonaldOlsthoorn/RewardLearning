@@ -1,4 +1,4 @@
-function [ x_ef ] = forward_kinematics( x, par )
+function [ x_ef ] = forward_kinematics(x, par)
 % Returns the cartesian coordinates of the end effector
 % as function of the state and the parameters.
 

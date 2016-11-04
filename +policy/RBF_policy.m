@@ -1,5 +1,6 @@
 classdef RBF_policy < policy.Policy
-    
+% DEPRECATED!!! USE RBF_ref_policy of RBF_ff_policy.
+
     properties
         
         n_rfs;

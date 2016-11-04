@@ -15,7 +15,7 @@ classdef StaticLinearRewardModel < reward.RewardModel
         
         function obj = StaticLinearRewardModel(reference)
             
-            obj.feature_block = reward.SimpleFeatureBlock(reference);           
+            obj.feature_block = reward.SimpleOutcomeBlock(reference);           
         end
         
         function rollout = add_reward(obj, rollout)

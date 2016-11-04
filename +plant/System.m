@@ -1,5 +1,6 @@
 classdef System < handle
-    
+% Base class for open-loop systems.
+
     properties
         
         init_state;
@@ -9,7 +10,6 @@ classdef System < handle
         
         output = run_increment(control_input)
         set_init_state(obj, is);
-    end
-    
+    end    
 end
 

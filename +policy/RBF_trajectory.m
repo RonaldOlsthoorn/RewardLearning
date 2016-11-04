@@ -1,5 +1,6 @@
 classdef RBF_trajectory < handle
-    
+% DEPRECATED!!! USE RBF_ff_trajectory or RBF_ref_trajectory.
+
     properties(Constant)
        
 %         bw_scale = 0.55;

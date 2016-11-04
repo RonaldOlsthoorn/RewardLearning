@@ -1,5 +1,6 @@
 classdef System2DOF < plant.System
-    
+% 2DoF robotic arm simulator
+
     properties(Constant)
         
     end
@@ -22,6 +23,7 @@ classdef System2DOF < plant.System
             obj.par = system_par.par;
         end
         
+        % Run timestep on the 2Dof sim.
         function [joint_position, joint_speed,...
                 tool_position, tool_speed] = run_increment(obj, control_input)
             
@@ -175,5 +177,3 @@ classdef System2DOF < plant.System
         
     end
 end
-            
-            

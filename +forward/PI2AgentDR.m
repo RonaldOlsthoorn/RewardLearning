@@ -1,5 +1,6 @@
 classdef PI2AgentDR < forward.Agent
-    %PI2Agent defines a PI2 reinforcement learning agent.
+    %PI2Agent defines a PI2 reinforcement learning agent. Direct reward is
+    %used instead of expected return
 
     properties
                 
@@ -33,7 +34,7 @@ classdef PI2AgentDR < forward.Agent
         % run.
         function batch_trajectories = get_batch_trajectories(obj)
             
-            if isempty(obj.previous_batch), % first batch
+            if isempty(obj.previous_batch) % first batch
                 batch_size = obj.reps;
                 batch_trajectories = obj.create_batch_trajectories(batch_size);
                 return;
@@ -107,8 +108,8 @@ classdef PI2AgentDR < forward.Agent
             % operation into inner product terms.
             PMeps = zeros(n_dof, n_reps, n_end, n_rbfs);
             
-            for j=1:n_dof,
-                for k=1:n_reps,
+            for j=1:n_dof
+                for k=1:n_reps
                     
                     % compute g'*eps in vector form
                     gTeps = sum(obj.policy.DoFs(j).bases.*(batch_rollouts.get_rollout(k).policy.dof(j).theta_eps-ones(n_end,1)*obj.policy.DoFs(j).w'),2);
@@ -168,7 +169,7 @@ classdef PI2AgentDR < forward.Agent
             
             batch_tmp = db.RolloutBatch();
             
-            for j=length(R):-1:(length(R)-obj.n_reuse),
+            for j=length(R):-1:(length(R)-obj.n_reuse)
                 
                 batch_tmp.append_rollout(batch_rollouts.get_rollout(inds(j)));
             end
@@ -176,7 +177,7 @@ classdef PI2AgentDR < forward.Agent
             obj.previous_batch = batch_tmp;
         end
         
-        % Update the exploration noise linearly.
+        % Update the exploration noise exponentially.
         function update_exploration_noise(obj)
             
             obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]); 
@@ -188,7 +189,7 @@ classdef PI2AgentDR < forward.Agent
             
             eps = zeros(obj.policy.n_rfs, obj.policy.n_dof);
             
-            for j=1:obj.policy.n_dof,
+            for j=1:obj.policy.n_dof
                 std_eps = obj.noise_std(j) * obj.noise_mult;
                 eps(:,j) = std_eps*randn(obj.policy.n_rfs, 1);
             end

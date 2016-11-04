@@ -1,4 +1,6 @@
 function obj = init_GP(gp_par)
+% Factory function for gp objects
+
 obj = gp.GP();
 obj.hyp = gp_par.hyp;
 obj.likfunc = gp_par.likfunc;

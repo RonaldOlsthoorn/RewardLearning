@@ -1,6 +1,6 @@
 classdef Environment < handle    
-    % Environment base class for reinforcement learning environments
-    % (see Sutton & Barto). Environment designed to return in an episodic
+    % Environment base class for reinforcement learning environments.
+    % Environment designed to return in an episodic
     % fashion due to the nature of the application.
     
     properties
@@ -61,4 +61,3 @@ classdef Environment < handle
         end
     end
 end
-

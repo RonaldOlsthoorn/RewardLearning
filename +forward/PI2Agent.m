@@ -53,7 +53,7 @@ classdef PI2Agent < forward.Agent
             for i = 1:batch_size
                 
                 eps = obj.gen_epsilon();
-                ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
+                ro = obj.policy.create_trajectory(eps); 
                 
                 batch_trajectories.append_rollout(ro);
             end
@@ -92,15 +92,11 @@ classdef PI2Agent < forward.Agent
         % per-sample distinction is needed for the reward learning update
         function [dtheta] = get_PI2_update(obj, batch_rollouts )
             
-            % returns the new policy, based on the new set of roll-outs.
-            % S is the data structure of all roll outs.
-            
             n_dof = obj.policy.n_dof;
             n_rbfs = obj.policy.n_rfs;
             
             n_reps = batch_rollouts.size; % number of roll-outs
-            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:));           % final time step
-            
+            n_end = length(batch_rollouts.get_rollout(1).policy.dof(1).xd(1,:));            
             P = obj.get_probability_trajectories(batch_rollouts);
             
             % compute the projected noise term. It is computationally more efficient to break this
@@ -176,7 +172,7 @@ classdef PI2Agent < forward.Agent
             obj.previous_batch = batch_tmp;
         end
         
-        % Update the exploration noise linearly.
+        % Update the exploration noise exponentially.
         function update_exploration_noise(obj)
             
             obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);

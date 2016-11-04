@@ -1,5 +1,7 @@
 classdef StaticEnvironment < environment.Environment
-    
+% Environment that has a static reward function. Only basic environment 
+% functions are implemented.
+
     properties
     end
     

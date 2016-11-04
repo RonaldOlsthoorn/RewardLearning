@@ -1,5 +1,5 @@
-classdef RewardPrimitiveAbsErrorTool < reward.primitive.RewardPrimitive
-    % absolute error reward primitive.
+classdef OutcomeAbsErrorTool < reward.outcome.Outcome
+    % absolute error reward feature function.
     
     properties
         
@@ -8,7 +8,7 @@ classdef RewardPrimitiveAbsErrorTool < reward.primitive.RewardPrimitive
     
     methods
         
-        function obj = RewardPrimitiveAbsErrorTool(ref)
+        function obj = OutcomeAbsErrorTool(ref)
             
             obj.ref = ref;
         end

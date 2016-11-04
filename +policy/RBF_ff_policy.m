@@ -1,5 +1,6 @@
 classdef RBF_ff_policy < policy.Policy
-    
+% implements the policy as a feed-forward term on the reference.
+
     properties
         
         n_rfs;
@@ -28,6 +29,7 @@ classdef RBF_ff_policy < policy.Policy
             end
         end
         
+        % Return the prescribed trajectory in joint-space.
         function [trajectory] = create_trajectory(obj, eps)
             
             trajectory = rollout.Rollout();
@@ -46,16 +48,17 @@ classdef RBF_ff_policy < policy.Policy
             end
             
             trajectory.policy = policy;
-            trajectory.time = obj.reference.t;
-            
+            trajectory.time = obj.reference.t;            
         end
         
+        % Return a noiseless trajectory in joint-space.
         function [trajectory] = create_noiseless_trajectory(obj)
             
             eps = zeros(obj.n_rfs, obj.n_dof);
             trajectory = obj.create_trajectory(eps);
         end
         
+        % Update the policy.
         function update(obj, dtheta)
             
             for i = 1:obj.n_dof
@@ -65,4 +68,3 @@ classdef RBF_ff_policy < policy.Policy
         end
     end
 end
-

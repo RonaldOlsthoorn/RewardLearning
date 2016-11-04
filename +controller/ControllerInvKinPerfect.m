@@ -1,7 +1,7 @@
 classdef ControllerInvKinPerfect < handle
+    % ControllerInvKinPerfect uses the inverse of the kinematic model
+    % to compute the control action.
     
-    % ControllerPID simple feedback controller
-    % Controller extended with a saturation
     properties(Constant)
         
         sat = 1;
@@ -48,14 +48,11 @@ classdef ControllerInvKinPerfect < handle
             x_pos = [x(1,:); x(2,:)];
             
             ff  = M*r_acc+C*r_vel+G;
-      
+            
             fb = obj.Kp*(r_pos-x_pos)+obj.Kd*(r_vel-x_vel);
             
-            control_input = ff+fb; 
-            
-            %control_input = obj.saturation(u);
+            control_input = ff+fb;
         end
-        
         
         function control_input = saturation(obj, control_input)
             
@@ -68,14 +65,11 @@ classdef ControllerInvKinPerfect < handle
                     control_input(i) = obj.sat;
                     disp('Saturation!!!');
                 end
-            end
-            
-        end
+            end 
+        end 
         
         function reset(obj)
             
         end
-    end
-    
+    end 
 end
-

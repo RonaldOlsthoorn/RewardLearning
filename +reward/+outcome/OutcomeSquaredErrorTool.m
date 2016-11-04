@@ -1,5 +1,5 @@
-classdef RewardPrimitiveSquaredErrorTool < reward.primitive.RewardPrimitive
-    % squared error reward primitive.
+classdef OutcomeSquaredErrorTool < reward.outcome.Outcome
+    % squared error reward feature function.
      
     properties
         
@@ -8,7 +8,7 @@ classdef RewardPrimitiveSquaredErrorTool < reward.primitive.RewardPrimitive
     
     methods
         
-        function obj = RewardPrimitiveSquaredErrorTool(ref)
+        function obj = OutcomeSquaredErrorTool(ref)
             
             obj.ref = ref;
         end

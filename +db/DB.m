@@ -1,6 +1,6 @@
 classdef DB < handle
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    % Container of all rollouts in the run. Permanent storage not
+    % implemented.
     
     properties
         
@@ -14,6 +14,5 @@ classdef DB < handle
             obj.table = [obj.table; batch_rollouts];
         end
     end
-    
 end
 

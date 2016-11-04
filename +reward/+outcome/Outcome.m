@@ -1,5 +1,5 @@
-classdef RewardPrimitive < handle
-    % REEWARDPRIMITIVE reward primitve, aka feature function is a candidate
+classdef Outcome < handle
+    % OUTCOME feature function is a candidate
     % reward function.
     
     properties
