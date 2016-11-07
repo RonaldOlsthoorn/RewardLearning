@@ -13,73 +13,22 @@ classdef GP < handle
         covfunc;
         meanfunc;
         batch_rollouts;
-        outcomes = [];
-        ratings = [];
+        x_measured = [];
+        y_measured = [];
     end
     
     methods
         
-        %add demonstration to the gp
-        function add_demonstration(obj, demonstration)
-            
-            obj.batch_rollouts.append_rollout(demonstration);
-            
-            obj.extract_gp_points();
-            
-            %             nlml = gp(obj.hyp, @infExact, ...
-            %                 obj.meanfunc, obj.covfunc, obj.likfunc,...
-            %                 obj.outcomes, obj.ratings);
-            %
-            %             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
-            %                 obj.meanfunc, obj.covfunc, obj.likfunc, ...
-            %                 obj.outcomes, obj.ratings);
-        end
-        
-        %add multiple demo's
-        function add_batch_demonstrations(obj, batch_demonstrations)
-            
-            obj.batch_rollouts.append_batch(batch_demonstrations);
-            
-            obj.extract_gp_points();
-            
-            %             nlml = gp(obj.hyp, @infExact, ...
-            %                 obj.meanfunc, obj.covfunc, obj.likfunc,...
-            %                 obj.outcomes, obj.ratings);
-            
-            %             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
-            %                 obj.meanfunc, obj.covfunc, obj.likfunc, ...
-            %                 obj.outcomes, obj.ratings);
-        end
-        
-        %remove demonstration from the gp
-        function remove_demonstration(obj, demonstration)
-            
-            obj.batch_rollouts.delete(demonstration);
-            
-            obj.extract_gp_points();
-            
-            %             obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
-            %                 obj.meanfunc, obj.covfunc, obj.likfunc, ...
-            %                 obj.outcomes, obj.ratings);
-        end
-        
-        %perform gp regression on the current set of demo's to predict the
-        %reward of rollout
-        function [reward, s2] = interpolate_rollout(obj, rollout)
-            
-            [reward, s2] = obj.interpolate(rollout.sum_out);
-        end
-        
-        function [reward, s2] = interpolate(obj, outcomes)
+        function [reward, s2] = assess(obj, x_infer)
             
             lf = obj.hyp.cov(1);
             lx = obj.hyp.cov(2);
             sfm = obj.hyp.lik(1);
             
-            Xm = obj.outcomes';
-            fmh = obj.ratings;
+            Xm = obj.x_measured';
+            fmh = obj.y_measured;
             
-            Xs = outcomes';
+            Xs = x_infer';
             
             % We now set up the (squared exponential) covariance matrix and related terms.
             nm = size(Xm,2); % This is the number of measurement points.
@@ -108,13 +57,13 @@ classdef GP < handle
         % print mean and covariance of the gp.
         function print(obj)
             
-            minx = min(obj.outcomes);
-            maxx = max(obj.outcomes);
+            minx = min(obj.x_measured);
+            maxx = max(obj.x_measured);
             dx = (maxx-minx);
             
             x_grid = ((minx-dx):(dx/100):(maxx+dx))';
             
-            [mPost, sPost] = obj.interpolate(x_grid);
+            [mPost, sPost] = obj.assess(x_grid);
             
             figure(obj.figID);
             clf;
@@ -125,28 +74,7 @@ classdef GP < handle
             patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
             set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
             plot(x_grid, mPost, 'b-', 'LineWidth', 1); % We plot the mean line.      
-            plot(obj.outcomes, obj.ratings, 'ro'); % We plot the measurement points.
-        end
-        
-        % creates arrays for inputs and outputs from rollout objects
-        function extract_gp_points(obj)
-            
-            obj.outcomes = zeros(obj.batch_rollouts.size, 1);
-            obj.ratings = zeros(obj.batch_rollouts.size, 1);
-            
-            for i = 1:obj.batch_rollouts.size
-                
-                obj.outcomes(i, :) = obj.batch_rollouts.get_rollout(i).sum_out;
-                obj.ratings(i, :) = obj.batch_rollouts.get_rollout(i).R_expert;
-            end
-        end
-        
-        % deprecated
-        function minimize(obj)
-            
-            obj.hyp = minimize(obj.hyp, @gp, -100, @infExact, ...
-                obj.meanfunc, obj.covfunc, obj.likfunc, ...
-                obj.outcomes, obj.ratings);
+            plot(obj.x_measured, obj.y_measured, 'ro'); % We plot the measurement points.
         end
         
         function reset_figure(obj)

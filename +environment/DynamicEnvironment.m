@@ -81,7 +81,7 @@ classdef DynamicEnvironment < environment.Environment
                 
                 % rollouts are reused! therefore always check if rollout
                 % already queried.
-                if(~obj.reward_model.gp.batch_rollouts.contains(max_rollout) && max_epd > obj.tol)
+                if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     obj.reward_model.add_demonstration(rollout);
                     obj.reward_model.gp.print();
@@ -130,7 +130,7 @@ classdef DynamicEnvironment < environment.Environment
         
         function res = epd(obj, rollout)
             
-            [m, s2] = obj.reward_model.gp.interpolate_rollout(rollout);
+            [m, s2] = obj.reward_model.gp.assess(sum(rollout.outcomes));
             sigma_points = m(end) + [1 -1]*s2(end);
             
             epd = zeros(1, 2);         

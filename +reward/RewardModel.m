@@ -17,7 +17,6 @@ classdef RewardModel < handle
        function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
-            rollout.sum_out = sum(outcomes);
             rollout.outcomes = outcomes;
        end 
         

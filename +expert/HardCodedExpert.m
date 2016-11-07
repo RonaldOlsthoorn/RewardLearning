@@ -15,7 +15,7 @@ classdef HardCodedExpert < expert.Expert
         
         function rating = query_expert(obj, rollout)
             
-            rating = obj.std*randn()+rollout.sum_out;
+            rating = obj.std*randn()+sum(rollout.outcomes);
         end
     end
 end
