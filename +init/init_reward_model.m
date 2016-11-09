@@ -10,6 +10,8 @@ switch reward_model_par.type
     case 'reward_model_gp'
         gp = gp.init_GP(reward_model_par.gp_par);
         reward_model = reward.init_DynamicRewardModel(reference, gp);
+    case 'reward_model_multi_gp'
+        reward_model = reward.init_MultiGPRewardModel(reference, reward_model_par);
     otherwise
         reward_model = [];
 end

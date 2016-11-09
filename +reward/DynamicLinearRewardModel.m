@@ -49,6 +49,11 @@ classdef DynamicLinearRewardModel < reward.RewardModel
             obj.gp.y_measured = y_meas;
         end
         
+        function print(obj)
+            
+            obj.gp.print(obj.figID);
+        end
+        
         % Make a copy of a handle object.
         function new = copy(this)
             % Instantiate new object of the same class.
@@ -59,6 +64,8 @@ classdef DynamicLinearRewardModel < reward.RewardModel
             for i = 1:length(p)
                 if strcmp(p{i}, 'gp') || strcmp(p{i}, 'batch_demonstrations')
                     new.(p{i}) = this.(p{i}).copy();
+                elseif strcmp(p{i}, 'figID')
+                    % Nothing, ow sweet nothing
                 else
                     new.(p{i}) = this.(p{i});
                 end

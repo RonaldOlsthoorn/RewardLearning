@@ -55,7 +55,7 @@ classdef GP < handle
         end
         
         % print mean and covariance of the gp.
-        function print(obj)
+        function print(obj, figID)
             
             minx = min(obj.x_measured);
             maxx = max(obj.x_measured);
@@ -65,7 +65,7 @@ classdef GP < handle
             
             [mPost, sPost] = obj.assess(x_grid);
             
-            figure(obj.figID);
+            figure(figID);
             clf;
             hold on;
             grid on;

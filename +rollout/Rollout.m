@@ -14,6 +14,7 @@ classdef Rollout
         time;
    
         outcomes;
+        sum_out;
         
         xd;
         

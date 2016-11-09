@@ -52,7 +52,7 @@ classdef DynamicEnvironment < environment.Environment
             obj.iteration = obj.iteration + 1;
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
-            obj.reward_model.gp.print();
+            obj.reward_model.print();
             
             rng(10);
         end
@@ -84,7 +84,7 @@ classdef DynamicEnvironment < environment.Environment
                 if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     obj.reward_model.add_demonstration(rollout);
-                    obj.reward_model.gp.print();
+                    obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
                     
                     if unqueried_batch.is_empty()
