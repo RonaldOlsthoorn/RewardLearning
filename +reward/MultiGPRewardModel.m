@@ -6,7 +6,7 @@ classdef MultiGPRewardModel < reward.RewardModel
         batch_demonstrations;
         gps;
         n_segments;
-        n; % number of time steps. rename
+        n; % number of time steps. rename.
         segment_start;
         segment_end;
     end
@@ -92,9 +92,9 @@ classdef MultiGPRewardModel < reward.RewardModel
             p = properties(this);
             for i = 1:length(p)
                 if strcmp(p{i}, 'gps')
-                    new_gps = [];           
-                    for j = 1:obj.n_segments
-                        new_gps(j) = obj.(j).copy();
+                               
+                    for j = 1:this.n_segments
+                        new_gps(j) = this.gps(j).copy();
                     end
                     new.(p{i}) = new_gps;
                 elseif strcmp(p{i}, 'batch_demonstrations') 

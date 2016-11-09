@@ -1,6 +1,6 @@
 classdef DynamicEnvironment < environment.Environment
-% Environment with a dynamic reward function (also contains the expert).
-
+    % Environment with a dynamic reward function (also contains the expert).
+    
     properties
         
         expert;
@@ -71,7 +71,7 @@ classdef DynamicEnvironment < environment.Environment
             obj.original_batch = batch_rollouts;
             unqueried_batch = batch_rollouts.copy();
             
-            find_nominee = true;   
+            find_nominee = true;
             
             while true == find_nominee
                 
@@ -105,7 +105,7 @@ classdef DynamicEnvironment < environment.Environment
         function rollout = demonstrate_and_query_expert(obj, sample)
             
             rollout = obj.demonstrate_rollout(sample);
-            rollout.R_expert = obj.expert.query_expert(rollout);          
+            rollout.R_expert = obj.expert.query_expert(rollout);
         end
         
         function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
@@ -130,16 +130,61 @@ classdef DynamicEnvironment < environment.Environment
         
         function res = epd(obj, rollout)
             
+            if  isa(obj.reward_model, 'reward.MultiGPRewardModel')
+                res = obj.epd_multi_segment(rollout);
+            else
+                res = obj.epd_single_segment(rollout);
+            end
+            
+        end
+        
+        function res = epd_multi_segment(obj, rollout)
+            
+            epd = zeros(obj.reward_model.n_segments, 2);
+            theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
+            
+            for segment = 1:obj.reward_model.n_segments
+                
+                [m, s2] = obj.reward_model.gps(segment).assess(rollout.sum_out');
+                sigma_points = m*[1 1];
+                sigma_points(segment,:) = sigma_points(segment,:) +[s2(segment) -s2(segment)];
+                
+                for sigma = 1:2
+                    
+                    batch = obj.original_batch.copy();
+                    rollout.R_expert = sigma_points(:, sigma);
+                    
+                    rm_ext = obj.reward_model.copy();
+                    rm_ext.add_demonstration(rollout);
+                    
+                    for i=1:batch.size
+                        
+                        ro = batch.get_rollout(i);
+                        ro = rm_ext.add_reward(ro);
+                        
+                        batch.update_rollout(ro);
+                    end
+                    
+                    theta_star = obj.agent.get_probability_trajectories(batch);
+                    epd(segment, sigma) = sum(theta_star.*log(theta_star./theta_tilda));
+                end
+            end
+            
+            res = mean(mean(epd));
+        end
+        
+        function res = epd_single_segment(obj, rollout)
+            
             [m, s2] = obj.reward_model.gp.assess(sum(rollout.outcomes));
             sigma_points = m(end) + [1 -1]*s2(end);
             
-            epd = zeros(1, 2);         
+            epd = zeros(1, 2);
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
             for sigma = 1:length(sigma_points)
                 
-                batch = obj.original_batch.copy();              
-                rollout.R_expert = sigma_points(sigma);               
+                batch = obj.original_batch.copy();
+                rollout.R_expert = sigma_points(sigma);
                 
                 rm_ext = obj.reward_model.copy();
                 rm_ext.add_demonstration(rollout);
@@ -169,11 +214,11 @@ classdef DynamicEnvironment < environment.Environment
             for i = 1:n_dof
                 
                 theta_per_sample(:,(i-1)*n_bf+1:i*n_bf) = squeeze(theta_ps(i,:,:));
-            end        
+            end
         end
         
         function print_reward_kl(~, batch_tilda, batch_star)
-        
+            
             R_tilda = zeros(batch_tilda.size, 1);
             R_star = zeros(batch_star.size, 1);
             
@@ -194,7 +239,7 @@ classdef DynamicEnvironment < environment.Environment
             figure
             hold on;
             scatter(theta_tilda, zeros(length(theta_tilda), 1));
-            scatter(theta_star, zeros(length(theta_star), 1));          
+            scatter(theta_star, zeros(length(theta_star), 1));
         end
         
         function print_r_in_rm(~, batch_tilda, batch_star)
@@ -214,7 +259,7 @@ classdef DynamicEnvironment < environment.Environment
             end
             
             scatter(O_tilda, R_tilda, '+', 'g');
-            scatter(O_star, R_star, '+', 'p');  
+            scatter(O_star, R_star, '+', 'p');
         end
     end
 end
