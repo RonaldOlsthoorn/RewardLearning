@@ -17,7 +17,10 @@ switch reference_par.trajectory
             reference.r_joints_d = j_d;
         end
         
+        reference.init_state = reference.r_joints(:,1);
+        
     case '2dof'
+        
         reference = refs.Reference(reference_par);
         [t, t_d] = refs.ref_2dof(reference_par);
         reference.r_tool = t;
@@ -30,11 +33,19 @@ switch reference_par.trajectory
             reference.r_joints_d = j_d;
         end
         
+        reference.init_state = reference.r_joints(:,1);
+        
+    case '2dof-via'
+        
+        reference = refs.Reference(reference_par);
+        [t] = refs.reference_viapoint(reference_par);
+        reference.r_tool = t;
+        reference.r_joints = reference_par.start_joint*ones(1,length(reference.t));
+        reference.init_state = reference_par.start_joint;
+        
     otherwise
         reference = [];
 end
-
-
 
 end
 

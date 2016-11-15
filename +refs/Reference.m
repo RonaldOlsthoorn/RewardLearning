@@ -4,13 +4,15 @@ classdef Reference < handle
     
     properties
         
-        r_joints
-        r_joints_d
-        r_tool
-        r_tool_d
+        r_joints;
+        r_joints_d;
+        r_tool;
+        r_tool_d;
         
-        duration
-        Ts
+        init_state;
+        
+        duration;
+        Ts;
         t;      
     end
     

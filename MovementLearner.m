@@ -51,7 +51,7 @@ classdef MovementLearner < handle
             
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
-            obj.plant.set_init_state(obj.reference.r_joints(:,1));
+            obj.plant.set_init_state(obj.reference.init_state);
             
             policy = init.init_policy(p.policy_par, obj.reference);
             obj.agent = init.init_agent(p.agent_par, policy);
@@ -62,7 +62,7 @@ classdef MovementLearner < handle
             obj.environment = init.init_environment(p.env_par, ...
                 obj.plant, obj.reward_model, obj.agent);
             
-            %obj.reset_figure();
+            % obj.reset_figure();
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
