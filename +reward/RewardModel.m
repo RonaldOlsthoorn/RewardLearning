@@ -14,8 +14,8 @@ classdef RewardModel < handle
     
     methods(Abstract)
         
-        rollout = add_reward(obj, rollout)
-        print(obj)
+        rollout = add_reward(obj, rollout);
+        print(obj);
     end
     
     methods
@@ -40,4 +40,3 @@ classdef RewardModel < handle
         end
     end
 end
-

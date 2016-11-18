@@ -61,8 +61,6 @@ classdef MovementLearner < handle
             
             obj.environment = init.init_environment(p.env_par, ...
                 obj.plant, obj.reward_model, obj.agent);
-            
-            % obj.reset_figure();
         end
         
         function [Weights, Returns] = run_movement_learning(obj)

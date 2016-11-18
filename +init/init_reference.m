@@ -37,7 +37,7 @@ switch reference_par.trajectory
         
     case '2dof-via'
         
-        reference = refs.Reference(reference_par);
+        reference = refs.VPReference(reference_par);
         [t] = refs.reference_viapoint(reference_par);
         reference.r_tool = t;
         reference.r_joints = reference_par.start_joint*ones(1,length(reference.t));
@@ -48,4 +48,3 @@ switch reference_par.trajectory
 end
 
 end
-

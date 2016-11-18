@@ -16,7 +16,7 @@ classdef OutcomeVP < reward.outcome.Outcome
         function outcome = compute_outcome(obj, rollout)
             % returns the squared tracking error as a reward primitive.
       
-            outcome  = -sum((rollout.tool_positions'-obj.ref.r_tool').^2, 2);           
+            outcome  = -sum((rollout.tool_positions(:, obj.ref.vp_t)'-obj.ref.vp').^2, 2);           
         end
     end
 end

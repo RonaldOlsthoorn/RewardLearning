@@ -28,10 +28,10 @@ reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
 reference_par.trajectory = '2dof-via'; 
 reference_par.viapoint_t = 150;
-reference_par.viapoint = [1; 1];
+reference_par.viapoint = [0.4; 0.5];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [0.01; 0.01];
+agent_par.noise_std = [1; 1];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
@@ -42,13 +42,13 @@ policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
 
-env_par.dyn = true;
+env_par.dyn = false;
 env_par.acquisition = 'epd';
 env_par.expert = 'hard_coded_expert';
 env_par.expert_std = 1e-3;
 env_par.tol = 0.1;
 
-reward_model.type = 'viapoint_single_gp';
+reward_model.type = 'reward_model_static_vp';
 
 hyp.cov = [0.01; 0.01];
 hyp.mean = [1; 0];

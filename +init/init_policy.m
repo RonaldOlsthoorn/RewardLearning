@@ -12,4 +12,3 @@ switch policy_par.type
 end
 
 end
-

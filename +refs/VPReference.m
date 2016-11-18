@@ -1,13 +1,14 @@
-classdef Reference < handle
-    % REFERENCE: container class holding the reference in tool and joint
-    % space.
+classdef VPReference < handle
+    %UNTITLED Summary of this class goes here
+    %   Detailed explanation goes here
     
     properties
         
+        vp;
+        vp_t;
+        
         r_joints;
-        r_joints_d;
         r_tool;
-        r_tool_d;
         
         init_state;
         
@@ -18,11 +19,19 @@ classdef Reference < handle
     
     methods
         
-        function obj = Reference(ref_par)
+        function obj = VPReference(ref_par)
+            
+            obj.vp = ref_par.viapoint;
+            obj.vp_t = ref_par.viapoint_t;
             
             obj.duration = ref_par.duration;
             obj.Ts = ref_par.Ts;      
             obj.t = 0:obj.Ts:(obj.duration-obj.Ts);
+            
+            
         end
-    end   
+        
+    end
+    
 end
+
