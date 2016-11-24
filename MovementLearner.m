@@ -60,7 +60,7 @@ classdef MovementLearner < handle
                 obj.reference);
             
             obj.environment = init.init_environment(p.env_par, ...
-                obj.plant, obj.reward_model, obj.agent);
+                obj.plant, obj.reward_model, obj.agent, obj.reference);
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
@@ -69,7 +69,7 @@ classdef MovementLearner < handle
             
             obj.environment.prepare();
             
-            while iteration<50 % for now. Replace with EPD
+            while iteration < 50 % for now. Replace with EPD
                 
                 obj.print_progress();
                 

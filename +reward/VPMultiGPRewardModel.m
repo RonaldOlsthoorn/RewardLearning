@@ -1,4 +1,4 @@
-classdef MultiGPRewardModel < reward.RewardModel
+classdef VPMultiGPRewardModel < reward.RewardModel
     
     
     properties
@@ -41,7 +41,7 @@ classdef MultiGPRewardModel < reward.RewardModel
             
             for i = 1:obj.n_segments
                 
-                R(i) = obj.gps(i).assess(rollout.sum_out(i));
+                R(i) = obj.gps(i).assess(rollout.outcomes(1));
             end
             
             rollout.R = sum(R);
@@ -49,7 +49,7 @@ classdef MultiGPRewardModel < reward.RewardModel
         
         function [m, s2] = assess(obj, rollout, segment)
             
-            [m, s2] = obj.gps(segment).assess(rollout.sum_out(segment));            
+            [m, s2] = obj.gps(segment).assess(rollout.outcomes(1));            
         end
         
         function add_demonstration(obj, demonstration)
@@ -79,7 +79,7 @@ classdef MultiGPRewardModel < reward.RewardModel
                 for j = 1:obj.batch_demonstrations.size
                     demo = obj.batch_demonstrations.get_rollout(j);
                     
-                    x_meas(j,1) = demo.sum_out(i);
+                    x_meas(j,1) = demo.outcomes(1);
                     y_meas(j,1) = demo.R_expert(i);
                 end
                 
@@ -91,7 +91,7 @@ classdef MultiGPRewardModel < reward.RewardModel
         % Make a copy of a handle object.
         function new = copy(this)
             % Instantiate new object of the same class.
-            new = reward.MultiGPRewardModel();
+            new = reward.VPMultiGPRewardModel();
             
             % Copy all non-hidden properties.
             p = properties(this);
@@ -140,4 +140,3 @@ classdef MultiGPRewardModel < reward.RewardModel
         end
     end
 end
-

@@ -7,7 +7,7 @@ classdef DynamicEnvironment < environment.Environment
         agent;
         
         original_batch;
-        
+        acquisition;
         tol; % tolerance for epd
     end
     
@@ -24,8 +24,6 @@ classdef DynamicEnvironment < environment.Environment
         % Prepares the environment by demonstrating 4 rollouts and
         % initializing the reward function
         function prepare(obj)
-            
-            rng(20);
             
             obj.index = 1;
             
@@ -53,8 +51,6 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
             obj.reward_model.print();
-            
-            rng(10);
         end
         
         % wrapper function for reward update
@@ -83,6 +79,7 @@ classdef DynamicEnvironment < environment.Environment
                 % already queried.
                 if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
+                    batch_rollouts.update_rollout(rollout);
                     obj.reward_model.add_demonstration(rollout);
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
@@ -130,7 +127,7 @@ classdef DynamicEnvironment < environment.Environment
         
         function res = epd(obj, rollout)
             
-            if  isa(obj.reward_model, 'reward.MultiGPRewardModel')
+            if  strcmp(obj.acquisition, 'epd_multi')
                 res = obj.epd_multi_segment(rollout);
             else
                 res = obj.epd_single_segment(rollout);
@@ -143,16 +140,26 @@ classdef DynamicEnvironment < environment.Environment
             epd = zeros(obj.reward_model.n_segments, 2);
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
+            m = zeros(obj.reward_model.n_segments, 1);
+            s2 = zeros(obj.reward_model.n_segments, 1);
+            
             for segment = 1:obj.reward_model.n_segments
                 
-                [m, s2] = obj.reward_model.gps(segment).assess(rollout.sum_out');
-                sigma_points = m*[1 1];
-                sigma_points(segment,:) = sigma_points(segment,:) +[s2(segment) -s2(segment)];
+                [m(segment), s2(segment)] = ...
+                    obj.reward_model.assess(rollout, segment);
+            end
+                    
+            for segment = 1:obj.reward_model.n_segments
+                
+                
+                sigma_points = m(segment)*[1 1];
+                sigma_points = sigma_points +[s2(segment) -s2(segment)];
                 
                 for sigma = 1:2
                     
                     batch = obj.original_batch.copy();
-                    rollout.R_expert = sigma_points(:, sigma);
+                    rollout.R_expert = m;
+                    rollout.R_expert(segment) = sigma_points(:, sigma);
                     
                     rm_ext = obj.reward_model.copy();
                     rm_ext.add_demonstration(rollout);

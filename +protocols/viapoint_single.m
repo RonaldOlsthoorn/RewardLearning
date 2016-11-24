@@ -27,11 +27,11 @@ reference_par.goal_joint=[0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
 reference_par.trajectory = '2dof-via'; 
-reference_par.viapoint_t = 150;
+reference_par.viapoint_t = 100;
 reference_par.viapoint = [0.4; 0.5];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [1; 1];
+agent_par.noise_std = [0.1; 0.1];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
