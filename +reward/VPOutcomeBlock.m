@@ -5,9 +5,15 @@ classdef VPOutcomeBlock< reward.OutcomeBlock
     end
     
     methods
-
+        
         function obj = VPOutcomeBlock(reference)
-            obj.reward_primitives = reward.outcome.OutcomeVP(reference);
+            
+            for i = 1:length(reference.viapoints(1,:))
+                
+                vp = reference.viapoints(:,i);
+                obj.reward_primitives = [obj.reward_primitives, ...
+                    reward.outcome.OutcomeVP(vp)];
+            end
         end
     end
 end

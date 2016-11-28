@@ -79,7 +79,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                 for j = 1:obj.batch_demonstrations.size
                     demo = obj.batch_demonstrations.get_rollout(j);
                     
-                    x_meas(j,1) = demo.outcomes(1);
+                    x_meas(j,1) = demo.sum_out(i);
                     y_meas(j,1) = demo.R_expert(i);
                 end
                 

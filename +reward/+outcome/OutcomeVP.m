@@ -1,27 +1,21 @@
 classdef OutcomeVP < reward.outcome.Outcome
     % viapoint error reward feature function.
-     
+    
     properties
         
-        ref;
+        viapoint;
     end
     
     methods
         
-        function obj = OutcomeVP(ref)
+        function obj = OutcomeVP(viapoint)
             
-            obj.ref = ref;
+            obj.viapoint = viapoint;
         end
         
         function outcome = compute_outcome(obj, rollout)
             
-            res = zeros(1, length(obj.ref.viapoints(1,:)));
-            for i = 1:length(obj.ref.viapoints(1,:))
-                res(i)  = -sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
-                                    -obj.ref.viapoints(:,i)').^2, 2);           
-            end
-            
-            outcome = sum(res);
+            outcome = -sum((rollout.tool_positions' - obj.viapoint').^2, 2);
         end
     end
 end

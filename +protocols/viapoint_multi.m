@@ -19,15 +19,12 @@ par.g   = 9.81;         % Gravity constant
 plant_par.par = par;
 
 controller_par.type = 'controllerInvKin';
-controller_par.Kp = 3;
-controller_par.Ki = 0;
-controller_par.Kd = 0.0375;
 
 reference_par.trajectory = '2dof-via';
-reference_par.start_tool=[0;0.5];
-reference_par.goal_tool=[0.8;0.5];
-reference_par.start_joint=[pi/6;(2*pi/3)];
-reference_par.goal_joint=[0.2203;0.6767];
+reference_par.start_tool = [0;0.5];
+reference_par.goal_tool = [0.8;0.5];
+reference_par.start_joint = [pi/6;(2*pi/3)];
+reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
 reference_par.viapoint_t = 300;
@@ -55,13 +52,10 @@ env_par.tol = 0.1;
 reward_model.type = 'viapoint_multi_gp';
 reward_model.n_segments = 4;
 
-hyp.cov = [0.05; 0.05];
+hyp.cov = [0.05; 4];
 hyp.mean = [1; 0];
-hyp.lik = 1e-5;
+hyp.lik = 1e-4;
 
-gp_par.likfunc = @likGauss;
-gp_par.meanfunc = {@meanSum, {@meanLinear, @meanConst}};
-gp_par.covfunc = @covSEard;
 gp_par.hyp = hyp;
 
 reward_model.gp_par = gp_par;

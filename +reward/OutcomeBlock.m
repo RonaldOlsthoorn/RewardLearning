@@ -19,7 +19,5 @@ classdef OutcomeBlock < handle
                 outcomes(:,i) = obj.reward_primitives(i).compute_outcome(rollout);
             end
         end
-        
-        
     end
 end
