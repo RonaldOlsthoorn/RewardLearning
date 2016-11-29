@@ -41,7 +41,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
             
             for i = 1:obj.n_segments
                 
-                R(i) = obj.gps(i).assess(rollout.outcomes(1));
+                R(i) = obj.gps(i).assess(rollout.sum_out(i));
             end
             
             rollout.R = sum(R);

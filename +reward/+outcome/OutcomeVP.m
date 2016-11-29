@@ -15,7 +15,8 @@ classdef OutcomeVP < reward.outcome.Outcome
         
         function outcome = compute_outcome(obj, rollout)
             
-            outcome = -sum((rollout.tool_positions' - obj.viapoint').^2, 2);
+            outcome = -sum((rollout.tool_positions' - ...
+                ones(length(rollout.tool_positions(1,:)), 1)*obj.viapoint').^2, 2);
         end
     end
 end
