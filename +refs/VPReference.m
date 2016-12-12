@@ -8,7 +8,12 @@ classdef VPReference < handle
         viapoints_t;
         
         r_joints;
+        r_joints_d;
+        r_joints_dd;
+        
         r_tool;
+        r_tool_d;
+        r_tool_dd;
         
         init_state;
         

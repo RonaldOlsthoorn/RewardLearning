@@ -22,9 +22,10 @@ switch reference_par.trajectory
     case '2dof'
         
         reference = refs.Reference(reference_par);
-        [t, t_d] = refs.ref_2dof(reference_par);
+        [t, t_d, t_dd] = refs.ref_2dof(reference_par);
         reference.r_tool = t;
         reference.r_tool_d = t_d;
+        reference.r_tool_dd = t_dd;
         
         if reference_par.use_ik
             
@@ -38,11 +39,13 @@ switch reference_par.trajectory
     case '2dof-via'
         
         reference = refs.VPReference(reference_par);
-        [t] = refs.reference_viapoint(reference_par);
-        reference.r_tool = t;
-        reference.r_joints = reference_par.start_joint*ones(1,length(reference.t));
         reference.init_state = reference_par.start_joint;
         
+        [t] = refs.ref_2doflin(reference_par);
+        reference.r_tool = t;
+        
+        [j] = ik.map_ref2(reference.r_tool, reference_par, ik.create_model_2DOF());
+        reference.r_joints = j;
     otherwise
         reference = [];
 end

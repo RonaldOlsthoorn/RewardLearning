@@ -7,6 +7,8 @@ switch policy_par.type
         p = policy.RBF_ff_policy(policy_par, ref);
     case 'rbf_ref'
         p = policy.RBF_ref_policy(policy_par, ref);
+    case 'dmp_ref'
+        p = policy.DMP_policy(policy_par, ref);
     otherwise
         p = [];
 end

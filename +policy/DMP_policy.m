@@ -1,5 +1,5 @@
 classdef DMP_policy < policy.Policy
-% DEPRECATED!!! USE RBF_ref_policy of RBF_ff_policy.
+% implements the policy as a trajectory generator.
 
     properties
         
@@ -11,12 +11,12 @@ classdef DMP_policy < policy.Policy
     
     methods
         
-        function obj = RBF_policy(policy_par, ref)
+        function obj = DMP_policy(policy_par, ref)
             
             obj.reference = ref;
-            obj.n_dof = policy_par.dof;  
+            obj.n_dof = policy_par.dof;
             obj.n_rfs = policy_par.n_rbfs;
-                        
+            
             for i = 1:policy_par.dof
                 
                 if i ==1 % Annoying MATLAB pre-allocation thingy
@@ -25,10 +25,11 @@ classdef DMP_policy < policy.Policy
                     obj.DoFs(i) = policy.DMP_trajectory(i, policy_par);
                 end
                 
-                obj.DoFs(i).batch_fit(obj.reference.r_joints(i,:)');
-            end           
+                % obj.DoFs(i).batch_fit(obj.reference.r_joints(i,:)');
+            end
         end
         
+        % Return the prescribed trajectory in joint-space.        
         function [trajectory] = create_trajectory(obj, eps)
             
             trajectory = rollout.Rollout();
@@ -40,28 +41,30 @@ classdef DMP_policy < policy.Policy
                 dof.xd = xd;
                 dof.eps = (eps(:,i)*ones(1, length(obj.reference.t)))';
                 dof.theta_eps = (obj.DoFs(i).w*ones(1, length(obj.reference.t))+...
-                                    eps(:,i)*ones(1, length(obj.reference.t)))';  
+                    eps(:,i)*ones(1, length(obj.reference.t)))';
                 
                 policy.dof(i) = dof;
                 
             end
             
             trajectory.policy = policy;
-            trajectory.time = obj.reference.t;
-        end     
+            trajectory.time = obj.reference.t;   
+        end
         
+        % Return a noiseless trajectory in joint-space.
         function [trajectory] = create_noiseless_trajectory(obj)
             
-            eps = zeros(obj.n_rfs, obj.n_dof); 
+            eps = zeros(obj.n_rfs, obj.n_dof);
             trajectory = obj.create_trajectory(eps);
         end
         
-        function update(obj, dtheta) 
+        % Update the policy.        
+        function update(obj, dtheta)
             
             for i = 1:obj.n_dof
                 
-                obj.DoFs(i).w = obj.DoFs(i).w + dtheta(i,:)';               
-            end            
+                obj.DoFs(i).w = obj.DoFs(i).w + dtheta(i,:)';
+            end
         end
     end
 end

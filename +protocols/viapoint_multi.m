@@ -31,16 +31,18 @@ reference_par.viapoint_t = 300;
 reference_par.viapoint = [0.4; 0.5];   
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [0.1; 0.1];
+agent_par.noise_std = [100; 100];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
 
-policy_par.type = 'rbf_ref';
+policy_par.type = 'dmp_ref';
 policy_par.dof = 2;
 policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
+policy_par.start = reference_par.start_joint;
+policy_par.goal = reference_par.goal_joint;
 
 env_par.dyn = true;
 env_par.acquisition = 'epd_multi';
