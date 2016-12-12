@@ -27,12 +27,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
             
-            rollout.outcomes = outcomes;
-            
-            for i=1:obj.n_segments
-                rollout.sum_out(i) = sum(...
-                    outcomes(obj.segment_start(i):obj.segment_end(i)));
-            end
+            rollout.outcomes = outcomes;          
         end
         
         function rollout = add_reward(obj, rollout)
@@ -41,7 +36,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
             
             for i = 1:obj.n_segments
                 
-                R(i) = obj.gps(i).assess(rollout.sum_out(i));
+                R(i) = obj.gps(i).assess(rollout.outcomes(i,:));
             end
             
             rollout.R = sum(R);
@@ -49,7 +44,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         
         function [m, s2] = assess(obj, rollout, segment)
             
-            [m, s2] = obj.gps(segment).assess(rollout.outcomes(1));            
+            [m, s2] = obj.gps(segment).assess(rollout.outcomes(segment,:));            
         end
         
         function add_demonstration(obj, demonstration)
@@ -73,13 +68,13 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         function update_gps(obj)
             
             for i = 1:obj.n_segments
-                x_meas = zeros(obj.batch_demonstrations.size, 1);
+                x_meas = zeros(obj.batch_demonstrations.size, 2);
                 y_meas = zeros(obj.batch_demonstrations.size, 1);
                 
                 for j = 1:obj.batch_demonstrations.size
                     demo = obj.batch_demonstrations.get_rollout(j);
                     
-                    x_meas(j,1) = demo.sum_out(i);
+                    x_meas(j,:) = demo.outcomes(i,:);
                     y_meas(j,1) = demo.R_expert(i);
                 end
                 
@@ -119,23 +114,37 @@ classdef VPMultiGPRewardModel < reward.RewardModel
             
             for i = 1:obj.n_segments
                 
-                minx = min(obj.gps(i).x_measured);
-                maxx = max(obj.gps(i).x_measured);
+                minx = min(obj.gps(i).x_measured(:,1));
+                miny = min(obj.gps(i).x_measured(:,2));
+                maxx = max(obj.gps(i).x_measured(:,1));
+                maxy = max(obj.gps(i).x_measured(:,2));
+                
                 dx = (maxx-minx);
+                dy = (maxy-miny);
                 
-                x_grid = ((minx-dx):(dx/100):(maxx+dx))';
+                [x_grid, y_grid] = meshgrid(((minx-dx):(dx/10):(maxx+dx))',...
+                                        ((miny-dy):(dy/10):(maxy+dy))');
                 
-                [mPost, sPost] = obj.gps(i).assess(x_grid);
+                mPost = zeros(size(x_grid));
+                sPost = zeros(size(x_grid));
+                
+                for j = 1:length(x_grid)
+                    
+                    tuples = [x_grid(:,j), y_grid(:,j)];
+                    [m, s] = obj.gps(i).assess(tuples);
+                    mPost(:,j) = m;
+                    sPost(:,j) = s;
+                end
                 
                 subplot(2,2,i);
                 hold on;
                 grid on;
                 
-                patch([x_grid; flip(x_grid)], [mPost-2*sPost; flipud(mPost+2*sPost)], 1, 'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
-                patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
-                set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
-                plot(x_grid, mPost, 'b-', 'LineWidth', 1); % We plot the mean line.
-                plot(obj.gps(i).x_measured, obj.gps(i).y_measured, 'ro'); % We plot the measurement points.
+%                 patch([x_grid; flip(x_grid)], [mPost-2*sPost; flipud(mPost+2*sPost)], 1, 'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
+                surface(x_grid, y_grid, mPost); % We plot the mean line.
+                scatter3(obj.gps(i).x_measured(:,1),obj.gps(i).x_measured(:,2) , obj.gps(i).y_measured, 'ro'); % We plot the measurement points.
             end
         end
     end

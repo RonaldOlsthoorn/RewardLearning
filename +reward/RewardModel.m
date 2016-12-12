@@ -10,7 +10,6 @@ classdef RewardModel < handle
     properties
         
         feature_block;
-        
     end  
     
     methods(Abstract)

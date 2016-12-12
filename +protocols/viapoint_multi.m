@@ -56,13 +56,13 @@ reward_model.n_segments = 4;
 % hyp.mean = [0.005];
 % hyp.lik = 1e-3;
 
-hyp.cov = [1];
+hyp.cov = [1,1];
 hyp.mean = [];
 hyp.lik = 1e-2;
 
 gp_par.hyp = hyp;
 gp_par.mean = 'zero';
-gp_par.cov = 'quadratic';
+gp_par.cov = 'squared_exponential';
 
 reward_model.gp_par = gp_par;
 
