@@ -4,14 +4,54 @@ classdef VPSingleGPRewardModel < reward.RewardModel
         
         gp;
         batch_demonstrations;
+        n_segments;
+        n; % number of time steps. rename.
+        segment_start;
+        segment_end;
     end
     
     methods
         
+        function init_segments(obj)
+            
+            segment = floor(obj.n/obj.n_segments);
+            obj.segment_end = segment*(1:(obj.n_segments-1));
+            obj.segment_start = obj.segment_end+1;
+            
+            obj.segment_start = [1 obj.segment_start];
+            obj.segment_end = [obj.segment_end obj.n];
+        end
+        
+       function rollout = add_outcomes(obj, rollout)
+            
+            outcomes = obj.feature_block.compute_outcomes(rollout);           
+            rollout.outcomes = outcomes;          
+        end
+        
         function rollout = add_reward(obj, rollout)
             
-            reward = obj.gp.assess(sum(rollout.outcomes));
+            input = zeros(1,obj.n_segments*length(rollout.outcomes(1,:)));
+            
+            for i = 1:length(rollout.outcomes(1,:))
+                
+                input(1,(i-1)*obj.n_segments+1:i*obj.n_segments) = ...
+                    rollout.outcomes(:,i)';
+            end
+            reward = obj.gp.assess(input);
             rollout.R = reward;
+        end
+             
+        function [m, s2] = assess(obj, rollout)
+            
+            input = zeros(1,obj.n_segments*length(rollout.outcomes(1,:)));
+            
+            for i = 1:length(rollout.outcomes(1,:))
+                
+                input(1,(i-1)*obj.n_segments+1:i*obj.n_segments) = ...
+                    rollout.outcomes(:,i)';
+            end
+            
+            [m, s2] = obj.gp.assess(input);            
         end
         
         function add_demonstration(obj, demonstration)
@@ -33,23 +73,29 @@ classdef VPSingleGPRewardModel < reward.RewardModel
         end
         
         function update_gps(obj)
-            
-            x_meas = zeros(obj.batch_demonstrations.size, 1);
+            % TODO automatically compute dimensionality of outcomes.
+            x_meas = zeros(obj.batch_demonstrations.size, obj.n_segments*2);
             y_meas = zeros(obj.batch_demonstrations.size, 1);
             
             for i = 1:obj.batch_demonstrations.size
                 
-                x_meas(i, :) = sum(obj.batch_demonstrations.get_rollout(i).outcomes);
-                y_meas(i, :) = obj.batch_demonstrations.get_rollout(i).R_expert;
+                demo = obj.batch_demonstrations.get_rollout(i);
+                
+                for j = 1:length(demo.outcomes(1,:))
+                    
+                    x_meas(i, (j-1)*obj.n_segments+1:j*obj.n_segments) = ...
+                        demo.outcomes(:,j)';
+                end
+                y_meas(i, :) = demo.R_expert;
             end
             
             obj.gp.x_measured = x_meas;
             obj.gp.y_measured = y_meas;
         end
         
-        function print(obj)
+        function print(~)
             
-            obj.gp.print(obj.figID);
+%            obj.gp.print(obj.figID);
         end
         
         % Make a copy of a handle object.

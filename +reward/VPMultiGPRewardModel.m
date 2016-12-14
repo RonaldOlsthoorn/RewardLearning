@@ -1,6 +1,5 @@
 classdef VPMultiGPRewardModel < reward.RewardModel
     
-    
     properties
         
         batch_demonstrations;
@@ -25,8 +24,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         
         function rollout = add_outcomes(obj, rollout)
             
-            outcomes = obj.feature_block.compute_outcomes(rollout);
-            
+            outcomes = obj.feature_block.compute_outcomes(rollout);           
             rollout.outcomes = outcomes;          
         end
         
