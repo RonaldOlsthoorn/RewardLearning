@@ -15,7 +15,19 @@ switch gp_par.cov
         obj.cov = [];
 end
 
-obj.batch_rollouts = db.RolloutBatch();
+switch gp_par.mean
+    case 'zero'
+        obj.mean = gp.mean.zero();
+    case 'constant'
+        obj.mean = gp.mean.constant();
+    case 'linear'
+        obj.mean = gp.mean.lin();
+    case 'affine'
+        obj.mean = gp.mean.affine();
+    otherwise
+        obj.mean = [];
+end
 
+obj.batch_rollouts = db.RolloutBatch();
 obj.reset_figure();
 end

@@ -1,7 +1,14 @@
-function [ m ] = linear( X, hyp )
-%LINEAR Summary of this function goes here
-%   Detailed explanation goes here
-
-m = hyp.*X;
-
+classdef linear
+    
+    properties
+    end
+    
+    methods
+        
+        function [res] = linear(~, X, hyp)
+            
+            w = eye(length(hyp))*hyp;
+            res = X'*w;
+        end
+    end
 end

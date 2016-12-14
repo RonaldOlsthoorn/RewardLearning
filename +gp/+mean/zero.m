@@ -1,8 +1,23 @@
-function [ m ] = zero(X, ~)
-%ZERO Summary of this function goes here
-%   Detailed explanation goes here
-
-m = zeros(1, length(X(1,:)));
-
+classdef zero
+    
+    properties
+    end
+    
+    methods
+        
+        function [res] = m(~, X, ~)
+            
+            res = zeros(length(X(1,:)),1);           
+        end
+        
+        function res = deriv(~, ~, ~, ~)
+            
+            res = [];
+        end
+        
+        function hyp = optimize_hypers(~, ~, ~, ~) 
+            
+            hyp = [];
+        end
+    end
 end
-

@@ -34,9 +34,9 @@ classdef GP < handle
             
             K = obj.cov.k(X, obj.hyp.cov);
             
-            %             n = size(X,2); % This is the number of points.
-            %             diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
-            %             K = lf^2*exp(-1/2*diff.^2/lx^2); % This is the covariance matrix. It contains the covariances of each combination of points.
+            % n = size(X,2); % This is the number of points.
+            % diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
+            % K = lf^2*exp(-1/2*diff.^2/lx^2); % This is the covariance matrix. It contains the covariances of each combination of points.
             
             Kmm = K(1:nm,1:nm);
             Kms = K(1:nm,nm+1:end);
@@ -59,23 +59,37 @@ classdef GP < handle
             s2 = sPost;
         end
         
-        function logp = minimize(obj, hyp0)
+        function logp = minimize(obj)
             
-            nm = length(obj.x_measured(1,:)); % This is the number of measurements we will do.
+            logp = obj.minimize_hypers(obj.hyp);
+        end
+        
+        function logp = minimize_hypers(obj, hyp0)
+            
+            nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
             
             % We take nm random input points and, according to the GP distribution, we randomly sample output values from it.
-            Xm = obj.x_measured;                       
-            fmh = obj.y_measured;
+            Xm = obj.x_measured';                       
+            fm = obj.y_measured;
             
             h = hyp0; 
             
+            hCov = hyp0.cov;
+            hMean = hyp0.mean;
+            hLik = hyp0.lik;
+            
             % We set things up for the gradient ascent algorithm.
             numSteps = 100;
-            stepSize = 1;
+            stepSizeCov = 1;
+            stepSizeLik = 1;
+            
             stepSizeFactor = 2; 
             maxReductions = 100; 
             clear logp; 
-            newHypDeriv = zeros(3,1); 
+            
+            newHypCovDeriv = zeros(length(hCov),1);
+            newHypLikDeriv = zeros(length(hLik),1);
+            
             
             % Now we can start iterating
             for i = 1:numSteps
@@ -87,37 +101,55 @@ classdef GP < handle
                     end
                     % We calculate new hyperparameters. Or at least, candidates. We still check them.
                     if ~exist('logp','var') % If no logp is defined, this is the first time we are looping. In this case, with no derivative data known yet either, we keep the hyperparameters the same.
-                        newHyp = hyp0;
+                        newHypCov = hyp0.cov;
+                        newHypLik = hyp0.lik;                       
                     else
-                        newHyp.cov = h.cov-stepSize.*hypDeriv.cov; % We apply a normal ass gradient descent.
+                        % We apply a normal ass gradient descent.
+                        newHypCov = hCov-stepSize.*newHypCovDeriv; 
+                        newHypLik = hMean-stepSize.*newHypLikDeriv;
                     end
+                    
                     % Now we check the new hyperparameters. If they are good, we will implement them.
-                    if min(newHyp > 0) % The parameters have to remain positive. If they are not, something is wrong. To be precise, the step size is too big.
+                    if min(newHypCov) > 0 && min(newHypLik) > 0 % The parameters have to remain positive. If they are not, something is wrong. To be precise, the step size is too big.
                         % We partly implement the new hyperparameters and check the new value of logp.
 
-                        Sfm = newHyp.lik^2*eye(nm); % This is the noise covariance matrix.       
-                        Kmm = obj.cov.k(Xm, newHyp.cov);
+                        Sfm = newHypLik^2*eye(nm); % This is the noise covariance matrix.       
+                        Kmm = obj.cov.k(Xm, newHypCov);
 
                         P = Kmm + Sfm;
-                        mb = (ones(nm,1)'/P*fmh)/(ones(nm,1)'/P*ones(nm,1)); % This is the (constant) mean function m(x) = \bar{m}. You can get rid of this line if you don't want to tune \bar{m}.
-                        am = (Xm'/P*fmh)/(Xm'/P*Xm);
-                        newLogp = -nm/2*log(2*pi) - 1/2*logdet(P) - 1/2*(fmh - mb)'/P*(fmh - mb);
-                        % If this is the first time we are in this loop, or if the new logp is better than the old one, we fully implement the new hyperparameters and recalculate the derivative.
+                        
+                        % optimize mean
+                        newHypMean = obj.mean.optimize_hypers(P, Xm, fm);
+                        mm = obj.mean.m(Xm, newHypMean);
+                        
+                        newLogp = -nm/2*log(2*pi) - 1/2*tools.logdet(P) - 1/2*(fm - mm)'/P*(fm - mm);
+                        % If this is the first time we are in this loop, 
+                        % or if the new logp is better than the old one, 
+                        % we fully implement the new hyperparameters and recalculate the derivative.
                         if ~exist('logp','var') || newLogp >= logp
                             % We calculate the new hyperparameter derivative.
-                            alpha = P\(fmh - mb);
+                            
+                            alpha = P\(fm - mm);
                             R = alpha*alpha' - inv(P);
                             
-                            newHypDeriv(1) = 1/2*trace(R*obj.cov.dkdlf);
-                            newHypDeriv(2) = 1/2*trace(R*obj.cov.dkdlx);
-                            newHypDeriv(end) = 1/2*trace(R);
+                            newHypCovDeriv = obj.cov.deriv(R, Xm, newHypCov);
+                            newHypLikDeriv = 1/2*trace(R);
                             
                             % If this is not the first time we run this, we also update the step size, based on how much the (normalized) derivative direction has changed. If the derivative is still in the
                             % same direction as earlier, we take a bigger step size. If the derivative is in the opposite direction, we take a smaller step size. And if the derivative is perpendicular to
                             % what is used to be, then the step size was perfect and we keep it. For this scheme, we use the dot product.
                             if exist('logp','var')
-                                directionConsistency = ((hypDeriv.*newHyp)'*(newHypDeriv.*newHyp))/norm(hypDeriv.*newHyp)/norm(newHypDeriv.*newHyp);
-                                stepSize = stepSize*stepSizeFactor^directionConsistency;
+                                
+                                directionConsistencyCov = ((hypDerivCov.*newHypCov)'*...
+                                    (newHypDerivCov.*newHypCov))/norm(hypDerivCov.*newHypCov)/...
+                                    norm(newHypDerivCov.*newHypCov);
+                                stepSizeCov = stepSizeCov*stepSizeFactor^directionConsistencyCov;
+                                
+                                directionConsistencyLik = ((hypDerivLik.*newHypLik)'*...
+                                    (newHypDerivLik.*newHypLik))/norm(hypDerivLik.*newHypLik)/...
+                                    norm(newHypDerivLik.*newHypLik);
+                                stepSizeLik = stepSizeLik*stepSizeFactor^directionConsistencyLik;
+                                
                             end
                             break; % We exit the step-size-reduction loop.
                         end
@@ -134,16 +166,6 @@ classdef GP < handle
             end
         end
         
-        function vec = hyper_to_vector(hyp)
-            
-            vec = [hyp.cov; hyp.lik];
-        end
-        
-        function hyp = vector_to_hyp(vec)
-            
-            hyp.cov = vec(1:(end-1));
-            hyp.lik = vec(end);
-        end
         
         function update_hyper_parameters(obj)
             

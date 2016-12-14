@@ -13,28 +13,37 @@ classdef squared_exponential
             Q = eye(2)*lx.^-2;
             %n = size(X,2);
             
-            res = lf.*X'*Q*X;
+            res = lf.*exp(X'*Q*X);
         end
         
-        function res = dkdlf(X, hyp)
+        function res = dkdlf(obj, X, hyp, R)
             
             lf = hyp(1);
-            lx = hyp(2:end);
-            n = size(X,2);
-            diff = repmat(X,n,1) - repmat(X',1,n);
-            res = 2*lf*exp(-1/2*diff.^2/lx^2);
+            dPdlf = (2/lf)*obj.k(X,hyp);
+            res = 1/2*trace(R*dPdlf);
         end
         
-        function res = dkdlx(X, hyp)
+        function res = dkdlx(obj, X, hyp, R)
             
             lx = hyp(2:end);
             n = size(X,2);
-            diff = repmat(X,n,1) - repmat(X',1,n);
-            res = k(X, hyp)*(diff.^2)*(lx^(-3));
+            
+            res = zeros(length(lx),1);
+            
+            for k = 1:length(lx)
+                
+                dPdlxk = lx(k)*obj.k(X, hyp);
+                dPdlxk = dPdlxk.*(X(k,:)'*ones(1,n)-ones(n,1)*X(k,:)/(lx(k)^2)).^2;
+                                
+                res(k) = 1/2*trace(R*dPdlxk);
+            end
+            
         end
         
-        
+        function res = deriv(obj, R, X, hyp)
+            
+            res = obj.dkdlf(X, hyp, R);
+            res = [res; obj.dkdlx(X, hyp, R)];
+        end      
     end
-    
 end
-
