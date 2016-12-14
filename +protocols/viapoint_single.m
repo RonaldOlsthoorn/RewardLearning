@@ -31,30 +31,35 @@ reference_par.viapoint_t = 300;
 reference_par.viapoint = [0.4; 0.5];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [0.1; 0.1];
+agent_par.noise_std = [100; 100];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
 
-policy_par.type = 'rbf_ref';
+policy_par.type = 'dmp_ref';
 policy_par.dof = 2;
 policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
+policy_par.start = reference_par.start_joint;
+policy_par.goal = reference_par.goal_joint;
 
 env_par.dyn = true;
 env_par.acquisition = 'epd';
 env_par.expert = 'vp_single_segment_expert';
-env_par.expert_std = 1e-3;
+env_par.expert_std = 1e-4;
 env_par.tol = 0.1;
 
-reward_model.type = 'reward_model_static_vp';
+reward_model.type = 'viapoint_single_gp';
+reward_model.n_segments = 4;
 
-hyp.cov = [0.05; 0.05];
-hyp.mean = [1; 0];
-hyp.lik = 1e-5;
+hyp.cov = ones(1,9);
+hyp.mean = [];
+hyp.lik = 1e-2;
 
 gp_par.hyp = hyp;
+gp_par.mean = 'zero';
+gp_par.cov = 'squared_exponential';
 
 reward_model.gp_par = gp_par;
 
