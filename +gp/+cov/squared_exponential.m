@@ -10,17 +10,17 @@ classdef squared_exponential
             
             lf = hyp(1);
             lx = hyp(2:end);
-            [d, n] = size(X);
+            [~, n] = size(X);
+            Q = diag(lx.^-2);
             
             res = zeros(n);
             
-            for i = 1:d
-                
-                diff = repmat(X(i,:),n,1) - repmat(X(i,:)',1,n);
-                res = res + diff.*(lx(i)^-2).*diff;       
+            for i=1:n
+                for j=1:n
+                    res(i,j) = (lf^2)*exp((-1/2)*(X(:,i)-X(:,j))'*Q*(X(:,i)-X(:,j)));
+                end
             end
             
-            res = lf.*res;
         end
         
         function res = dkdlf(obj, X, hyp, R)
