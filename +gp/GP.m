@@ -44,14 +44,14 @@ classdef GP < handle
             Kss = K(nm+1:end,nm+1:end);
             Sfm = sfm^2*eye(nm); % This is the noise covariance matrix.
             
-            mm = obj.mean(Xm, obj.hyp.mean);
-            ms = obj.mean(Xs, obj.hyp.mean);
+            mm = obj.mean.m(Xm, obj.hyp.mean);
+            ms = obj.mean.m(Xs, obj.hyp.mean);
             
             % mm = zeros(nm,1); % This is the mean vector m(Xm). We assume a zero mean function.
             % ms = zeros(ns,1); % This is the mean vector m(Xs). We assume a zero mean function.
             
             % Next, we apply GP regression.
-            mPost = ms' + Ksm/(Kmm + Sfm)*(fmh - mm'); % This is the posterior mean vector.
+            mPost = ms + Ksm/(Kmm + Sfm)*(fmh - mm); % This is the posterior mean vector.
             SPost = Kss - Ksm/(Kmm + Sfm)*Kms; % This is the posterior covariance matrix.
             sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
             
@@ -71,11 +71,9 @@ classdef GP < handle
             % We take nm random input points and, according to the GP distribution, we randomly sample output values from it.
             Xm = obj.x_measured';                       
             fm = obj.y_measured;
-            
-            h = hyp0; 
-            
-            hCov = hyp0.cov;
-            hMean = hyp0.mean;
+                        
+            hCov = hyp0.cov';
+            hMean = hyp0.mean';
             hLik = hyp0.lik;
             
             % We set things up for the gradient ascent algorithm.
@@ -89,8 +87,7 @@ classdef GP < handle
             
             newHypCovDeriv = zeros(length(hCov),1);
             newHypLikDeriv = zeros(length(hLik),1);
-            
-            
+                      
             % Now we can start iterating
             for i = 1:numSteps
                 % We try to improve the parameters, all the while checking the step size.
@@ -101,16 +98,17 @@ classdef GP < handle
                     end
                     % We calculate new hyperparameters. Or at least, candidates. We still check them.
                     if ~exist('logp','var') % If no logp is defined, this is the first time we are looping. In this case, with no derivative data known yet either, we keep the hyperparameters the same.
-                        newHypCov = hyp0.cov;
-                        newHypLik = hyp0.lik;                       
+                        newHypCov = hyp0.cov';
+                        newHypLik = hyp0.lik';                       
                     else
                         % We apply a normal ass gradient descent.
-                        newHypCov = hCov-stepSize.*newHypCovDeriv; 
-                        newHypLik = hMean-stepSize.*newHypLikDeriv;
+                        newHypCov = hCov+stepSizeCov.*newHypCovDeriv; 
+                        newHypLik = hLik+stepSizeLik.*newHypLikDeriv;
                     end
                     
                     % Now we check the new hyperparameters. If they are good, we will implement them.
-                    if min(newHypCov) > 0 && min(newHypLik) > 0 % The parameters have to remain positive. If they are not, something is wrong. To be precise, the step size is too big.
+                    if min(newHypCov) > 0 && min(newHypLik) > 0 % The parameters have to remain positive. 
+                        %If they are not, something is wrong. To be precise, the step size is too big.
                         % We partly implement the new hyperparameters and check the new value of logp.
 
                         Sfm = newHypLik^2*eye(nm); % This is the noise covariance matrix.       
@@ -133,21 +131,21 @@ classdef GP < handle
                             R = alpha*alpha' - inv(P);
                             
                             newHypCovDeriv = obj.cov.deriv(R, Xm, newHypCov);
-                            newHypLikDeriv = 1/2*trace(R);
+                            newHypLikDeriv = newHypLik*trace(R);
                             
                             % If this is not the first time we run this, we also update the step size, based on how much the (normalized) derivative direction has changed. If the derivative is still in the
                             % same direction as earlier, we take a bigger step size. If the derivative is in the opposite direction, we take a smaller step size. And if the derivative is perpendicular to
                             % what is used to be, then the step size was perfect and we keep it. For this scheme, we use the dot product.
                             if exist('logp','var')
                                 
-                                directionConsistencyCov = ((hypDerivCov.*newHypCov)'*...
-                                    (newHypDerivCov.*newHypCov))/norm(hypDerivCov.*newHypCov)/...
-                                    norm(newHypDerivCov.*newHypCov);
+                                directionConsistencyCov = ((hypCovDeriv.*newHypCov)'*...
+                                    (newHypCovDeriv.*newHypCov))/norm(hypCovDeriv.*newHypCov)/...
+                                    norm(newHypCovDeriv.*newHypCov);
                                 stepSizeCov = stepSizeCov*stepSizeFactor^directionConsistencyCov;
                                 
-                                directionConsistencyLik = ((hypDerivLik.*newHypLik)'*...
-                                    (newHypDerivLik.*newHypLik))/norm(hypDerivLik.*newHypLik)/...
-                                    norm(newHypDerivLik.*newHypLik);
+                                directionConsistencyLik = ((hypLikDeriv.*newHypLik)'*...
+                                    (newHypLikDeriv.*newHypLik))/norm(hypLikDeriv.*newHypLik)/...
+                                    norm(newHypLikDeriv.*newHypLik);
                                 stepSizeLik = stepSizeLik*stepSizeFactor^directionConsistencyLik;
                                 
                             end
@@ -156,17 +154,27 @@ classdef GP < handle
                     end
                     % If we reach this, it means the hyperparameters we tried were not suitable. In this case, we should reduce the step size and try again. If the step size is small enough, there will
                     % always be an improvement of the hyperparameters. (Unless they are fully perfect, which never really occurs.)
-                    stepSize = stepSize/stepSizeFactor;
+                    stepSizeCov = stepSizeCov/stepSizeFactor;
+                    stepSizeLik = stepSizeLik/stepSizeFactor;
                 end
                 % We update the important parameters.
-                h = newHyp;
                 logp = newLogp;
                 
-                obj.hyp = h;
+                hCov = newHypCov;
+                hMean = newHypMean;
+                hLik = newHypLik;   
+                
+                hypCovDeriv = newHypCovDeriv;
+                hypLikDeriv = newHypLikDeriv;
             end
+            
+            logp
+            
+            obj.hyp.cov = hCov;
+            obj.hyp.mean = hMean;
+            obj.hyp.lik =hLik;   
         end
-        
-        
+          
         function update_hyper_parameters(obj)
             
             obj.minimize(obj.hyp);
@@ -199,8 +207,7 @@ classdef GP < handle
             figure(obj.figID);
             set(double(obj.figID),...
                 'units','normalized','outerposition',[0 0 1 1]);
-            clf;
-            
+            clf;       
         end
         
         % Make a copy of a handle object.

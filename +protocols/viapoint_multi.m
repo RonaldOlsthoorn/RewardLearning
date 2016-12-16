@@ -47,7 +47,7 @@ policy_par.goal = reference_par.goal_joint;
 env_par.dyn = true;
 env_par.acquisition = 'epd_multi';
 env_par.expert = 'vp_multi_segment_expert';
-env_par.expert_std = 1e-4;
+env_par.expert_std = 1;
 % env_par.expert_std = 0;
 env_par.tol = 0.1;
 
@@ -58,9 +58,9 @@ reward_model.n_segments = 4;
 % hyp.mean = [0.005];
 % hyp.lik = 1e-3;
 
-hyp.cov = [1,1];
+hyp.cov = [1,1,1];
 hyp.mean = [];
-hyp.lik = 1e-2;
+hyp.lik = 0.01;
 
 gp_par.hyp = hyp;
 gp_par.mean = 'zero';
