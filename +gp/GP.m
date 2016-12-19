@@ -56,7 +56,7 @@ classdef GP < handle
             sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
             
             reward = mPost;
-            s2 = sPost;
+            s2 = real(sPost);
         end
         
         function logp = minimize(obj)
