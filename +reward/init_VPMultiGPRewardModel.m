@@ -6,7 +6,7 @@ obj.batch_demonstrations = db.RolloutBatch();
 
 for i = 1:reward_model_par.n_segments
     
-    gps(i) = gp.init_GP(reward_model_par.gp_par);
+    gps(i) = gp.init_GP(reward_model_par.gp_par(i));
 end
 
 obj.gps = gps;
