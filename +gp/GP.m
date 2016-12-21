@@ -168,8 +168,6 @@ classdef GP < handle
                 hypLikDeriv = newHypLikDeriv;
             end
             
-            logp
-            
             obj.hyp.cov = hCov;
             obj.hyp.mean = hMean;
             obj.hyp.lik =hLik;   

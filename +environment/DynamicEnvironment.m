@@ -50,7 +50,7 @@ classdef DynamicEnvironment < environment.Environment
             obj.iteration = obj.iteration + 1;
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
-            obj.reward_model.minimize();
+%            obj.reward_model.minimize();
             obj.reward_model.print();
         end
         
@@ -183,7 +183,7 @@ classdef DynamicEnvironment < environment.Environment
         
         function res = epd_single_segment(obj, rollout)
             
-            [m, s2] = obj.reward_model.gp.assess(sum(rollout.outcomes));
+            [m, s2] = obj.reward_model.assess(rollout);
             sigma_points = m(end) + [1 -1]*s2(end);
             
             epd = zeros(1, 2);

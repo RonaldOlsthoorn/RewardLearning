@@ -93,15 +93,15 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             obj.gp.y_measured = y_meas;
         end
         
-        function print(~)
+        function minimize(obj)
             
-%            obj.gp.print(obj.figID);
+            obj.gp.minimize();
         end
-        
+              
         % Make a copy of a handle object.
         function new = copy(this)
             % Instantiate new object of the same class.
-            new = reward.DynamicLinearRewardModel();
+            new = reward.VPSingleGPRewardModel();
             
             % Copy all non-hidden properties.
             p = properties(this);
@@ -115,5 +115,11 @@ classdef VPSingleGPRewardModel < reward.RewardModel
                 end
             end
         end
+        
+        function print(~)
+            
+            %            obj.gp.print(obj.figID);
+        end
+        
     end
 end
