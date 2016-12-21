@@ -60,19 +60,19 @@ reward_model.n_segments = 4;
 
 hyp(1).cov = [1,1,1];
 hyp(1).mean = [];
-hyp(1).lik = 0.01;
+hyp(1).lik = 0.1;
 
 hyp(2).cov = [1,1,1];
 hyp(2).mean = [];
-hyp(2).lik = 0.01;
+hyp(2).lik = 0.1;
 
 hyp(3).cov = [1,1,1];
 hyp(3).mean = [];
-hyp(3).lik = 0.01;
+hyp(3).lik = 0.1;
 
 hyp(4).cov = [1,1,1];
 hyp(4).mean = [];
-hyp(4).lik = 0.01;
+hyp(4).lik = 0.1;
 
 gp_par(1).hyp = hyp(1);
 gp_par(1).mean = 'zero';
