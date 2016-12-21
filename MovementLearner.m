@@ -13,6 +13,7 @@ classdef MovementLearner < handle
         
         W; % policy weight trace
         R; % Reward trace
+        R_true;
         
         plant;
         
@@ -34,6 +35,8 @@ classdef MovementLearner < handle
             
             obj.W = [];
             obj.R = [];
+            obj.R_true = [];
+            
             
             protocol_handle = str2func(strcat('protocols.', obj.protocol_s));
             protocol = protocol_handle();
@@ -95,10 +98,12 @@ classdef MovementLearner < handle
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            rating = obj.environment.expert.query_expert(noiseless_rollout);
             
             obj.print_noiseless_rollout(noiseless_rollout);
             
             obj.R = [obj.R noiseless_rollout.R];
+            obj.R_true = [obj.R_true sum(rating)];
         end
         
         function print_result(obj)
@@ -109,7 +114,9 @@ classdef MovementLearner < handle
             obj.print_noiseless_rollout(noiseless_rollout);
             
             figure;
+            hold on;
             plot(obj.R);
+            plot(obj.R_true);
             title(obj.protocol_s);
             xlabel('iteration');
             ylabel('Return');
