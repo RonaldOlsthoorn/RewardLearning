@@ -45,7 +45,7 @@ policy_par.start = reference_par.start_joint;
 policy_par.goal = reference_par.goal_joint;
 
 env_par.dyn = true;
-env_par.acquisition = 'epd';
+env_par.acquisition = 'epd_single';
 env_par.expert = 'vp_single_segment_expert';
 env_par.expert_std = 1e-4;
 env_par.tol = 0.1;
