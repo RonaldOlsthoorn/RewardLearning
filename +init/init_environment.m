@@ -13,8 +13,17 @@ if env_par.dyn
         otherwise
             ex = [];
     end
-    env = environment.DynamicEnvironment(plant, reward_model, ex, agent, env_par.tol);
-    env.acquisition = env_par.acquisition;
+        
+    switch env_par.acquisition
+        case 'epd_single'
+            env = environment.SingleSegmentEnvironment(plant, reward_model, ex, agent);
+        case 'epd_multi'
+            env = environment.MultiSegmentEnvironment(plant, reward_model, ex, agent);
+        otherwise
+            env = [];
+    end
+    
+    env.tol = env_par.tol;
 else   
     env = environment.StaticEnvironment(plant, reward_model);
 end
