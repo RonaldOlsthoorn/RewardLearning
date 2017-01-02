@@ -22,10 +22,10 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             obj.segment_end = [obj.segment_end obj.n];
         end
         
-       function rollout = add_outcomes(obj, rollout)
+        function rollout = add_outcomes(obj, rollout)
             
-            outcomes = obj.feature_block.compute_outcomes(rollout);           
-            rollout.outcomes = outcomes;          
+            outcomes = obj.feature_block.compute_outcomes(rollout);
+            rollout.outcomes = outcomes;
         end
         
         function rollout = add_reward(obj, rollout)
@@ -40,7 +40,7 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             reward = obj.gp.assess(input);
             rollout.R = reward;
         end
-             
+        
         function [m, s2] = assess(obj, rollout)
             
             input = zeros(1,obj.n_segments*length(rollout.outcomes(1,:)));
@@ -51,7 +51,7 @@ classdef VPSingleGPRewardModel < reward.RewardModel
                     rollout.outcomes(:,i)';
             end
             
-            [m, s2] = obj.gp.assess(input);            
+            [m, s2] = obj.gp.assess(input);
         end
         
         function add_demonstration(obj, demonstration)
@@ -97,7 +97,7 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             
             obj.gp.minimize();
         end
-              
+        
         % Make a copy of a handle object.
         function new = copy(this)
             % Instantiate new object of the same class.
@@ -116,9 +116,53 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             end
         end
         
-        function print(~)
+        function print(obj)
             
-            %            obj.gp.print(obj.figID);
+%             figure(obj.figID);
+%             clf;
+%             
+%             for i = 1:obj.n_segments
+%                 
+%                 minx = min(obj.gp.x_measured(:,i));
+%                 miny = min(obj.gp.x_measured(:,i+obj.n_segments));
+%                 maxx = max(obj.gp.x_measured(:,i));
+%                 maxy = max(obj.gp.x_measured(:,i+obj.n_segments));
+%                 
+%                 dx = (maxx-minx);
+%                 dy = (maxy-miny);
+%                 
+%                 [x_grid, y_grid] = meshgrid(((minx-dx):(dx/10):(maxx+dx))',...
+%                     ((miny-dy):(dy/10):(maxy+dy))');
+%                 
+%                 mPost = zeros(size(x_grid));
+%                 sPost = zeros(size(x_grid));
+%                 
+%                 for j = 1:length(x_grid)
+%                     
+%                     tuples = [x_grid(:,j), y_grid(:,j)];
+%                     [m, s] = obj.gp.assess(tuples);
+%                     mPost(:,j) = m;
+%                     sPost(:,j) = s;
+%                 end
+%                 
+%                 subplot(2,2,i);
+%                 hold on;
+%                 grid on;
+%                 
+%                 %                 patch([x_grid; flip(x_grid)], [mPost-2*sPost; flipud(mPost+2*sPost)], 1, 'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 %                 patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 %                 set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
+%                 
+%                 surface(x_grid, y_grid, mPost); % We plot the mean line.
+%                 surface(x_grid, y_grid, mPost-sPost);
+%                 surface(x_grid, y_grid, mPost+sPost);
+%                 
+%                 scatter3(obj.gp.x_measured(:,i),obj.gp.x_measured(:,i+obj.n_segments),...
+%                     obj.gp.y_measured, 'ro'); % We plot the measurement points.
+%                 xlabel('mean x');
+%                 ylabel('mean y');
+%                 zlabel('Return');
+%             end
         end
         
     end

@@ -55,7 +55,7 @@ reward_model.n_segments = 4;
 
 hyp.cov = ones(1,9);
 hyp.mean = [];
-hyp.lik = 1e-2;
+hyp.lik = 0.1;
 
 gp_par.hyp = hyp;
 gp_par.mean = 'zero';
