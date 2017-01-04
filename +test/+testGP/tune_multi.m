@@ -101,8 +101,7 @@ end
 
 for i = 1:batch_rollouts.size
     
-    rollout = reward_model.add_outcomes(batch_rollouts.get_rollout(i));
-    
+    rollout = reward_model.add_outcomes(batch_rollouts.get_rollout(i));    
     rollout.R_expert = ex.query_expert(rollout);
     
     % rollout.R_expert = p.env_par.expert_std*randn()+sum(rollout.outcomes);
