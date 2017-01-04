@@ -39,9 +39,13 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     batch_rollouts.update_rollout(rollout);
                     obj.reward_model.add_demonstration(rollout);
-                    obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
                     
+                    unqueried_batch = obj.reward_model.add_reward_batch(unqueried_batch);
+                    obj.original_batch = obj.reward_model.add_reward_batch(obj.original_batch);
+                    
+                    obj.reward_model.print();
+                                        
                     if unqueried_batch.is_empty()
                         find_nominee = false;
                     end
