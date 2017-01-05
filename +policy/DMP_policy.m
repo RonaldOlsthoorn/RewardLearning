@@ -7,6 +7,8 @@ classdef DMP_policy < policy.Policy
         n_dof;
         DoFs;
         reference;
+        
+        init_state;
     end
     
     methods
@@ -16,6 +18,8 @@ classdef DMP_policy < policy.Policy
             obj.reference = ref;
             obj.n_dof = policy_par.dof;
             obj.n_rfs = policy_par.n_rbfs;
+            
+            obj.init_state = ref.init_state; % TODO: remove. need for ik.
             
             for i = 1:policy_par.dof
                 
@@ -33,12 +37,13 @@ classdef DMP_policy < policy.Policy
         function [trajectory] = create_trajectory(obj, eps)
             
             trajectory = rollout.Rollout();
+            r_tool = zeros(obj.n_dof, length(obj.reference.t));
             
             for i = 1:obj.n_dof
                 
-                [y, yd, ydd] = obj.DoFs(i).create_trajectory(eps(:,i));
-                xd = [y; yd; ydd];
-                dof.xd = xd;
+                [y, ~, ~] = obj.DoFs(i).create_trajectory(eps(:,i));
+                dof.y = y;
+                r_tool(i,:) =  y;
                 dof.eps = (eps(:,i)*ones(1, length(obj.reference.t)))';
                 dof.theta_eps = (obj.DoFs(i).w*ones(1, length(obj.reference.t))+...
                     eps(:,i)*ones(1, length(obj.reference.t)))';
@@ -46,6 +51,25 @@ classdef DMP_policy < policy.Policy
                 policy.dof(i) = dof;
                 
             end
+            
+            [x, xd, xdd] = ik.map_ref2(r_tool, obj.init_state, obj.reference.Ts, ik.create_model_2DOF());
+            
+            r = zeros(obj.system.dof, n_end);
+            rd = zeros(obj.system.dof, n_end);
+            rdd = zeros(obj.system.dof, n_end);
+            
+            system_dof = 2; %TODO: remove static system dof
+            
+            for i=1:system_dof
+                
+                r(i,:) = x(i,:);
+                rd(i,:) = xd(i,:);
+                rdd(i,:) = xdd(i,:);
+            end
+            
+            policy.r = r;
+            policy.rd = rd;
+            policy.rdd = rdd;
             
             trajectory.policy = policy;
             trajectory.time = obj.reference.t;   
