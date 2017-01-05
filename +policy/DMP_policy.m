@@ -34,6 +34,9 @@ classdef DMP_policy < policy.Policy
             
             trajectory = rollout.Rollout();
             
+            n_system_dof = 2;
+            n_time = length(obj.reference.t);
+            
             for i = 1:obj.n_dof
                 
                 [y, yd, ydd] = obj.DoFs(i).create_trajectory(eps(:,i));
@@ -44,11 +47,25 @@ classdef DMP_policy < policy.Policy
                     eps(:,i)*ones(1, length(obj.reference.t)))';
                 
                 policy.dof(i) = dof;
-                
             end
             
+            r = zeros(n_system_dof, n_time);
+            rd = zeros(n_system_dof, n_time);
+            rdd = zeros(n_system_dof, n_time);
+            
+            for i = 1:obj.n_dof
+                
+                r(i,:) = policy.dof(i).xd(1,:);
+                rd(i,:) = policy.dof(i).xd(2,:);
+                rdd(i,:) = policy.dof(i).xd(3,:);
+            end
+            
+            policy.r = r;
+            policy.rd = rd;
+            policy.rdd = rdd;
+            
             trajectory.policy = policy;
-            trajectory.time = obj.reference.t;   
+            trajectory.time = obj.reference.t;
         end
         
         % Return a noiseless trajectory in joint-space.

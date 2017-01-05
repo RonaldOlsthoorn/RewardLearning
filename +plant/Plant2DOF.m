@@ -29,16 +29,9 @@ classdef Plant2DOF < plant.Plant
             tool_positions = zeros(obj.system.dof, n_end);
             tool_speeds = zeros(obj.system.dof, n_end);
             
-            r = zeros(obj.system.dof, n_end);
-            rd = zeros(obj.system.dof, n_end);
-            rdd = zeros(obj.system.dof, n_end);
-            
-            for i=1:obj.system.dof
-                
-                r(i,:) = trajectory.policy.dof(i).xd(1,:);
-                rd(i,:) = trajectory.policy.dof(i).xd(2,:);
-                rdd(i,:) = trajectory.policy.dof(i).xd(3,:);
-            end
+            r = trajectory.policy.r;
+            rd = trajectory.policy.rd;
+            rdd = trajectory.policy.rdd;
             
             output = obj.system.reset();
             obj.controller.reset();
