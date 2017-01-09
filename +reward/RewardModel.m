@@ -34,6 +34,15 @@ classdef RewardModel < handle
             rollout = obj.add_reward(rollout);
         end
         
+        function batch = add_reward_batch(obj, batch)
+            
+            for i = 1:batch.size
+                
+                rollout = obj.add_reward(batch.get_rollout(i));
+                batch.update_rollout(rollout);
+            end
+        end
+        
         function r_cum = cumulative_reward(~, r)
             
             r_cum = rot90(rot90(cumsum(rot90(rot90(r)))));
