@@ -53,13 +53,13 @@ env_par.tol = 0.1;
 reward_model.type = 'viapoint_single_gp';
 reward_model.n_segments = 4;
 
-hyp.cov = ones(1,9);
+hyp.cov = ones(37,1);
 hyp.mean = [];
-hyp.lik = 0.1;
+hyp.lik = 0.01;
 
 gp_par.hyp = hyp;
 gp_par.mean = 'zero';
-gp_par.cov = 'squared_exponential';
+gp_par.cov = 'quadratic';
 
 reward_model.gp_par = gp_par;
 

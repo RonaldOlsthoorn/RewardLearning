@@ -91,6 +91,7 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             
             obj.gp.x_measured = x_meas;
             obj.gp.y_measured = y_meas;
+            obj.gp.compute_features_measurements();
         end
         
         function minimize(obj)

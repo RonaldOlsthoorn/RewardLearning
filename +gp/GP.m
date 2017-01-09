@@ -15,6 +15,7 @@ classdef GP < handle
         batch_rollouts;
         x_measured = [];
         y_measured = [];
+        phi_measured = [];
     end
     
     methods
@@ -27,12 +28,16 @@ classdef GP < handle
             fmh = obj.y_measured;
             
             Xs = x_infer';
+            Phi_s = obj.gp_features(Xs);
+            Phi_m = obj.phi_measured;
             
             % We now set up the (squared exponential) covariance matrix and related terms.
             nm = size(Xm,2); % This is the number of measurement points.
             X = [Xm,Xs]; % We merge the measurement and trial points.
             
-            K = obj.cov.k(X, obj.hyp.cov);
+            Phi = [Phi_m, Phi_s];
+            
+            K = obj.cov.k(Phi, obj.hyp.cov);
             
             % n = size(X,2); % This is the number of points.
             % diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
@@ -50,13 +55,46 @@ classdef GP < handle
             % mm = zeros(nm,1); % This is the mean vector m(Xm). We assume a zero mean function.
             % ms = zeros(ns,1); % This is the mean vector m(Xs). We assume a zero mean function.
             
-            % Next, we apply GP regression.
             mPost = ms + Ksm/(Kmm + Sfm)*(fmh - mm); % This is the posterior mean vector.
             SPost = Kss - Ksm/(Kmm + Sfm)*Kms; % This is the posterior covariance matrix.
             sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
             
+            Kw = diag(obj.hyp.cov);
+            
+            % We calculate the posterior distribution of w.
+            muw = (Phi_m/Sfm*Phi_m' + inv(Kw))\Phi_m/Sfm*fmh;
+            Sw = inv(Phi_m/Sfm*Phi_m' + inv(Kw));
+            
             reward = mPost;
             s2 = real(sPost);
+        end
+        
+        function compute_features_measurements(obj)
+            
+            Xm = obj.x_measured';
+            Phi_m = obj.gp_features(Xm);
+            obj.phi_measured = Phi_m;
+        end
+        
+        function Phi = gp_features(~, X)
+           
+            [d, nm]  = size(X);
+
+            Phi = zeros((d*(d+1)/2)+1, nm);
+                        
+            index = 1;
+            k = 1;
+            
+            while k <= d
+                for i = k:d
+                    Phi(index,:) = X(k,:).*X(i,:);
+                    index = index + 1;
+                end
+                k = k + 1;
+            end
+            
+            Phi(end,:) = ones(1,nm);
+                    
         end
         
         function logp = minimize(obj)
