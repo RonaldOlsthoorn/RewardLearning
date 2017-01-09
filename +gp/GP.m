@@ -80,12 +80,14 @@ classdef GP < handle
            
             [d, nm]  = size(X);
 
-            Phi = zeros((d*(d+1)/2)+1, nm);
+            Phi = zeros((d*(d+1)/2)+d+1, nm);
                         
             index = 1;
             k = 1;
             
             while k <= d
+                Phi(index,:) = X(k,:);
+                index = index + 1;
                 for i = k:d
                     Phi(index,:) = X(k,:).*X(i,:);
                     index = index + 1;

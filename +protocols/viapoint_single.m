@@ -53,7 +53,7 @@ env_par.tol = 0.1;
 reward_model.type = 'viapoint_single_gp';
 reward_model.n_segments = 4;
 
-hyp.cov = ones(37,1);
+hyp.cov = ones(45,1);
 hyp.mean = [];
 hyp.lik = 0.01;
 
