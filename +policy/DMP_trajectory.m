@@ -140,6 +140,8 @@ classdef DMP_trajectory < handle
             yd = zeros(length(obj.t), 1);
             ydd = zeros(length(obj.t), 1);
             
+            y(1) = obj.y0;
+            
             f = sum(obj.x(1)*(obj.w+eps).*obj.psi(1,:)')/sum(obj.psi(1,:)+1.e-10);
             f = f*obj.scale;
             
