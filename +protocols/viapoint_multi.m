@@ -28,21 +28,21 @@ reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
 reference_par.viapoint_t = 300;
-reference_par.viapoint = [0.4; 0.5];   
+reference_par.viapoint = [0.3; 0.5];   
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [100; 100];
+agent_par.noise_std = [100; 10];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
 
-policy_par.type = 'dmp_ref';
+policy_par.type = 'dmp_ref_ik';
 policy_par.dof = 2;
 policy_par.n_rbfs = 20;
 policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
-policy_par.start = reference_par.start_joint;
-policy_par.goal = reference_par.goal_joint;
+policy_par.start = reference_par.start_tool;
+policy_par.goal = reference_par.goal_tool;
 
 env_par.dyn = true;
 env_par.acquisition = 'epd_multi';

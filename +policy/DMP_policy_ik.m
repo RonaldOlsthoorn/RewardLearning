@@ -54,8 +54,7 @@ classdef DMP_policy_ik < policy.Policy
                 
                 policy.dof(i) = dof;
             end
-            
-            
+                    
             [r, rd, rdd] = ik.map_ref2(r_tool, obj.init_state, obj.reference.Ts, ik.create_model_2DOF());
                         
             policy.r = r;
