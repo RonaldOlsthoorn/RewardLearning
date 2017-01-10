@@ -54,7 +54,7 @@ classdef DynamicEnvironment < environment.Environment
             obj.iteration = obj.iteration + 1;
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
-%            obj.reward_model.minimize();
+            %obj.reward_model.minimize();
             obj.reward_model.print();
         end
       

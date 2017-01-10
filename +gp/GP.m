@@ -101,7 +101,101 @@ classdef GP < handle
         
         function logp = minimize(obj)
             
-            logp = obj.minimize_hypers(obj.hyp);
+            %logp = obj.minimize_hypers(obj.hyp);
+            logp = obj.minimize_sigma();
+        end
+        
+        function logp = minimize_sigma(obj)
+            
+            nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
+            
+            % We take nm random input points and, according to the GP distribution, we randomly sample output values from it.
+            Xm = obj.x_measured';                       
+            fm = obj.y_measured;
+            
+            Phi_m = obj.phi_measured;
+                        
+            hCov = obj.hyp.cov;
+            hMean = obj.hyp.mean;
+            hLik = obj.hyp.lik;
+            
+            % We set things up for the gradient ascent algorithm.
+            numSteps = 100;
+            stepSizeLik = hLik/10 ;
+            
+            stepSizeFactor = 2; 
+            maxReductions = 100; 
+            
+            newHypLikDeriv = zeros(length(hLik),1);
+                      
+            % Now we can start iterating
+            for i = 1:numSteps
+                % We try to improve the parameters, all the while checking the step size.
+                for j = 1:maxReductions
+                    % We check if we haven't accidentally been decreasing the step size too much.
+                    if j == maxReductions
+                        disp('Error: something is wrong with the step size in the hyperparameter optimization scheme.');
+                    end
+                    % We calculate new hyperparameters. Or at least, candidates. We still check them.
+                    if ~exist('logp','var') % If no logp is defined, this is the first time we are looping. In this case, with no derivative data known yet either, we keep the hyperparameters the same.
+                        newHypLik = obj.hyp.lik';                       
+                    else
+                        % We apply a normal ass gradient descent.
+                        newHypLik = hLik+stepSizeLik.*newHypLikDeriv;
+                    end
+                    
+                    % Now we check the new hyperparameters. If they are good, we will implement them.
+                    if min(newHypLik) > 0 % The parameters have to remain positive. 
+                        %If they are not, something is wrong. To be precise, the step size is too big.
+                        % We partly implement the new hyperparameters and check the new value of logp.
+
+                        Sfm = newHypLik^2*eye(nm); % This is the noise covariance matrix.       
+                        Kmm = obj.cov.k(Phi_m, hCov);
+
+                        P = Kmm + Sfm;
+                        
+                        % optimize mean
+                        mm = obj.mean.m(Phi_m, hMean);
+                        
+                        newLogp = -nm/2*log(2*pi) - 1/2*tools.logdet(P) - 1/2*(fm - mm)'/P*(fm - mm);
+                        % If this is the first time we are in this loop, 
+                        % or if the new logp is better than the old one, 
+                        % we fully implement the new hyperparameters and recalculate the derivative.
+                        if ~exist('logp','var') || newLogp >= logp
+                            % We calculate the new hyperparameter derivative.
+                            
+                            alpha = P\(fm - mm);
+                            R = alpha*alpha' - inv(P);
+                            
+                            newHypLikDeriv = newHypLik*trace(R);
+                            
+                            % If this is not the first time we run this, we also update the step size, based on how much the (normalized) derivative direction has changed. If the derivative is still in the
+                            % same direction as earlier, we take a bigger step size. If the derivative is in the opposite direction, we take a smaller step size. And if the derivative is perpendicular to
+                            % what is used to be, then the step size was perfect and we keep it. For this scheme, we use the dot product.
+                            if exist('logp','var')
+                                                                
+                                directionConsistencyLik = ((hypLikDeriv.*newHypLik)'*...
+                                    (newHypLikDeriv.*newHypLik))/norm(hypLikDeriv.*newHypLik)/...
+                                    norm(newHypLikDeriv.*newHypLik);
+                                stepSizeLik = stepSizeLik*stepSizeFactor^directionConsistencyLik;       
+                            end
+                            break; % We exit the step-size-reduction loop.
+                        end
+                    end
+                    % If we reach this, it means the hyperparameters we tried were not suitable. In this case, we should reduce the step size and try again. If the step size is small enough, there will
+                    % always be an improvement of the hyperparameters. (Unless they are fully perfect, which never really occurs.)
+                    stepSizeLik = stepSizeLik/stepSizeFactor;
+                end
+                % We update the important parameters.
+                logp = newLogp;
+
+                hLik = newHypLik;   
+                hypLikDeriv = newHypLikDeriv;
+                
+            end
+            
+            obj.hyp.lik =hLik;   
+            
         end
         
         function logp = minimize_hypers(obj, hyp0)

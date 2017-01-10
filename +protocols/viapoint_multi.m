@@ -49,7 +49,7 @@ env_par.acquisition = 'epd_multi';
 env_par.expert = 'vp_multi_segment_expert';
 env_par.expert_std = 1;
 % env_par.expert_std = 0;
-env_par.tol = 0.1;
+env_par.tol = 0.3;
 
 reward_model.type = 'viapoint_multi_gp';
 reward_model.n_segments = 4;
@@ -59,6 +59,7 @@ reward_model.n_segments = 4;
 % hyp.lik = 1e-3;
 
 hyp(1).cov = ones(6,1);
+%hyp(1).cov = [-0.0917;0.2220;-0.0239;0.1034;0.1241;-0.0757];
 hyp(1).mean = [];
 hyp(1).lik = 0.01;
 
