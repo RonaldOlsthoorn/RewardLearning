@@ -22,7 +22,7 @@ reference_par.viapoint_t = [300];
 reference_par.viapoint = [-0.3;-0.08;0.3623;1.2088;-1.2107;-1.2104];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [0.1;0.1;0.1;0.1;0.1;0];
+agent_par.noise_std = [10;10;10];
 agent_par.annealer = 0.95;
 %agent_par.annealer = 6/100;
 agent_par.reps = 10;
