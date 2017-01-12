@@ -57,22 +57,24 @@ classdef UR5_DMP_policy < policy.Policy
                 policy.dof(i) = dof;
             end
             
-            r = zeros(n_system_dof, n_time);
-            rd = zeros(n_system_dof, n_time);
-            rdd = zeros(n_system_dof, n_time);
+            x = zeros(n_system_dof, n_time);
+            xd = zeros(n_system_dof, n_time);
+            xdd = zeros(n_system_dof, n_time);
      
             for i=1:3
                 
-                r(i,:) = policy.dof(i).xd(1,:);
-                rd(i,:) = policy.dof(i).xd(2,:);
-                rdd(i,:) = policy.dof(i).xd(3,:);
+                x(i,:) = policy.dof(i).xd(1,:);
+                xd(i,:) = policy.dof(i).xd(2,:);
+                xdd(i,:) = policy.dof(i).xd(3,:);
             end
             
             for i = 4:6
                 
-                r(i,:) = ones(1, length(r(i,:)))*obj.orientation(i-3);
+                x(i,:) = ones(1, length(x(i,:)))*obj.orientation(i-3);
             end
             
+            [r, rd, rdd] = ik.map_ref(x(1:3,:), obj.init_state, obj.reference.Ts, ik.create_model_UR5());
+                       
             policy.r = r;
             policy.rd = rd;
             policy.rdd = rdd;
