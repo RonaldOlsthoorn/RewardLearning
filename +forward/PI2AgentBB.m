@@ -1,5 +1,5 @@
 classdef PI2AgentBB < forward.Agent
-    %PI2Agent defines a PI2 reinforcement learning agent.
+    %PI2Agent defines a Black box PI2 reinforcement learning agent.
 
     properties
                 
@@ -33,7 +33,7 @@ classdef PI2AgentBB < forward.Agent
         % run.
         function batch_trajectories = get_batch_trajectories(obj)
             
-            if isempty(obj.previous_batch), % first batch
+            if isempty(obj.previous_batch) % first batch
                 batch_size = obj.reps;
                 batch_trajectories = obj.create_batch_trajectories(batch_size);
                 return;
@@ -52,7 +52,7 @@ classdef PI2AgentBB < forward.Agent
             for i = 1:batch_size
                 
                 eps = obj.gen_epsilon();
-                ro = obj.policy.create_trajectory(eps); % push back storage policy to policy
+                ro = obj.policy.create_trajectory(eps); 
                 
                 batch_trajectories.append_rollout(ro);
             end
@@ -104,8 +104,8 @@ classdef PI2AgentBB < forward.Agent
             % operation into inner product terms.
             Peps = zeros(n_dof, n_reps, n_rbfs);
             
-            for j=1:n_dof,
-                for k=1:n_reps,
+            for j=1:n_dof
+                for k=1:n_reps
                     Peps(j,k,:) = P(k,:).*(batch_rollouts.get_rollout(k).policy.dof(j).theta_eps(end,:)-obj.policy.DoFs(j).w');
                 end
             end
@@ -150,7 +150,7 @@ classdef PI2AgentBB < forward.Agent
             [~, inds]=sort(R);              
             batch_tmp = db.RolloutBatch();
             
-            for j=length(R):-1:(length(R) - obj.n_reuse + 1),
+            for j=length(R):-1:(length(R) - obj.n_reuse + 1)
                 
                 batch_tmp.append_rollout(batch_rollouts.get_rollout(inds(j)));
             end
@@ -158,7 +158,7 @@ classdef PI2AgentBB < forward.Agent
             obj.previous_batch = batch_tmp;
         end
         
-        % Update the exploration noise linearly.
+        % Update the exploration noise exponentially.
         function update_exploration_noise(obj)
             
             obj.noise_mult = max([0.1, obj.noise_mult*obj.annealer]);             
@@ -169,7 +169,7 @@ classdef PI2AgentBB < forward.Agent
             
             eps = zeros(obj.policy.n_rfs, obj.policy.n_dof);
             
-            for j=1:obj.policy.n_dof,
+            for j=1:obj.policy.n_dof
                 std_eps = obj.noise_std(j) * obj.noise_mult;
                 eps(:,j) = std_eps*randn(obj.policy.n_rfs, 1);
             end

@@ -1,5 +1,6 @@
 classdef PlantUR5 < plant.Plant
-    
+% UR5 wrapper+ external controller
+
     properties(Constant)
         
         handle_batch_figure = 4;
@@ -28,10 +29,12 @@ classdef PlantUR5 < plant.Plant
             obj.system.set_init_state(is)
         end
         
+        % Runs a prescribed trajectory on the UR5 and returns the rollout.
         function rollout = run(obj, trajectory)
             
             n_end = length(trajectory.policy.dof(1).xd(1,:));
             
+            % memmory allocate
             control_input = zeros(obj.system.dof, n_end);
             joint_positions = zeros(obj.system.dof, n_end);
             joint_speeds = zeros(obj.system.dof, n_end);
@@ -39,6 +42,7 @@ classdef PlantUR5 < plant.Plant
             tool_speeds = zeros(3, n_end);
             time = zeros(1, n_end);
             
+            % construct inputs for each dof
             r = zeros(obj.system.dof, n_end);
             rd = zeros(obj.system.dof, n_end);
             
@@ -48,6 +52,7 @@ classdef PlantUR5 < plant.Plant
                 rd(i,:) = trajectory.policy.dof(i).xd(2,:);
             end
             
+            % set to default position.
             output = obj.system.reset();
             
             joint_position = output.joint_position;
@@ -57,6 +62,7 @@ classdef PlantUR5 < plant.Plant
             
             t0 = tic;
             
+            % go into the action, ur5 running.
             for i = 1:length(trajectory.policy.dof(1).xd(1,:))
                 
                 control_input = obj.controller.control_law(r(:,i), rd(:,i),...
@@ -73,10 +79,11 @@ classdef PlantUR5 < plant.Plant
                 
                 time(1,i) = toc(t0);
             end
-            
+            % end speed may be non-zero. break gently
             obj.system.gently_break();
             obj.system.reset();
             
+            % data processing...
             trajectory.control_input = control_input;
             trajectory.joint_positions = joint_positions;
             trajectory.joint_speeds = joint_speeds;
@@ -87,6 +94,7 @@ classdef PlantUR5 < plant.Plant
             rollout = trajectory;
         end   
         
+        % prints the 3d trajectory of the rollout
         function print_rollout(obj, rollout)
             
             figure(obj.handle_batch_figure)
@@ -100,7 +108,6 @@ classdef PlantUR5 < plant.Plant
             hold on
             plot(rollout.time, rollout.tool_positions(3,:));
         end   
-        
     end
 end
 

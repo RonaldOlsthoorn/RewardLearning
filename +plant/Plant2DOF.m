@@ -1,4 +1,5 @@
 classdef Plant2DOF < plant.Plant
+    % 2DoF robotic arm simulator+controller
     
     properties(Constant)
         
@@ -6,7 +7,6 @@ classdef Plant2DOF < plant.Plant
     end
     
     properties
-
     end
     
     methods
@@ -17,26 +17,21 @@ classdef Plant2DOF < plant.Plant
             obj@plant.Plant(system, controller);
         end
         
+        % run rollout with prescribed trajectory.
         function rollout = run(obj, trajectory)
             
             n_end = length(trajectory.policy.dof(1).xd(1,:));
             
+            % pre allocate memmory
             control_input = zeros(obj.system.dof, n_end);
             joint_positions = zeros(obj.system.dof, n_end);
             joint_speeds = zeros(obj.system.dof, n_end);
             tool_positions = zeros(obj.system.dof, n_end);
             tool_speeds = zeros(obj.system.dof, n_end);
             
-            r = zeros(obj.system.dof, n_end);
-            rd = zeros(obj.system.dof, n_end);
-            rdd = zeros(obj.system.dof, n_end);
-            
-            for i=1:obj.system.dof
-                
-                r(i,:) = trajectory.policy.dof(i).xd(1,:);
-                rd(i,:) = trajectory.policy.dof(i).xd(2,:);
-                rdd(i,:) = trajectory.policy.dof(i).xd(3,:);
-            end
+            r = trajectory.policy.r;
+            rd = trajectory.policy.rd;
+            rdd = trajectory.policy.rdd;
             
             output = obj.system.reset();
             obj.controller.reset();
@@ -51,13 +46,12 @@ classdef Plant2DOF < plant.Plant
                 
                 [joint_position, joint_speed,...
                     tool_position, tool_speed] = obj.system.run_increment(u);
-                
+            
                 control_input(:,i) = u;
                 joint_positions(:,i) = joint_position;
                 joint_speeds(:,i) = joint_speed;
                 tool_positions(:,i) = tool_position;
-                tool_speeds(:,i) = tool_speed;
-                                
+                tool_speeds(:,i) = tool_speed;                    
             end
                         
             trajectory.control_input = control_input;
@@ -65,7 +59,7 @@ classdef Plant2DOF < plant.Plant
             trajectory.joint_speeds = joint_speeds;
             trajectory.tool_positions = tool_positions;
             trajectory.tool_speeds = tool_speeds;
-            
+            % swap rollout/trajectory
             rollout = trajectory;
         end 
         
@@ -74,6 +68,7 @@ classdef Plant2DOF < plant.Plant
             obj.system.set_init_state(s);
         end
         
+        % print the rollout in the manner that best fits this system.
         function print_rollout(obj, rollout)
             
             figure(obj.handle_batch_figure)
@@ -96,4 +91,3 @@ classdef Plant2DOF < plant.Plant
         end        
     end
 end
-

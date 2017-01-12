@@ -1,5 +1,6 @@
 classdef Policy < handle
-    
+% Base class for policies.
+
     properties
     end
     

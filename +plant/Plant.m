@@ -1,4 +1,6 @@
 classdef Plant < handle
+% Plant includes the system and the controller in closed loop (todo: change
+% this namespace).
     
     properties(Constant)
         
@@ -25,6 +27,8 @@ classdef Plant < handle
             obj.controller = c;
         end    
         
+        % Runs a batch of rollouts with the trajectories in container
+        % batch_trajectories.
         function batch_rollouts = batch_run(obj, batch_trajectories)
             
             if obj.print_batch
@@ -52,9 +56,7 @@ classdef Plant < handle
             set(double(obj.handle_batch_figure),...
                 'units','normalized','outerposition',[0 0 1 1]);
             clf;
-
         end
-        
     end
 end
 

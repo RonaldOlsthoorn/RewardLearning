@@ -1,4 +1,6 @@
 classdef RolloutBatch < handle
+    % Container class, handling groups of rollouts. Used for imitating
+    % set-like behaviour.
     
     properties
         
@@ -20,7 +22,10 @@ classdef RolloutBatch < handle
             obj.size = length(obj.batch);
         end
         
+        % Returns rollout equal to r, if present in the set.
         function rollout = get_equal_rollout(obj, r)
+                        
+            rollout = [];
             
             for i= 1:obj.size
                 if r.equals(obj.batch(i))
@@ -29,6 +34,7 @@ classdef RolloutBatch < handle
             end
         end
         
+        % Overwrite rollout with new update r, if equal r is present.
         function update_rollout(obj, r)
             
             for i= 1:obj.size
@@ -38,11 +44,14 @@ classdef RolloutBatch < handle
             end
         end
         
-        function rollout = get_rollout(obj, index)
+        % Returns rollout based on the order (note different index than
+        % Rollout.index!).
+        function rollout = get_rollout(obj, i)
             
-            rollout = obj.batch(index);
+            rollout = obj.batch(i);
         end
         
+        % Returns true if rollout is present, otherwise false.
         function res = contains(obj, rollout)
             
             res = false;
@@ -62,6 +71,7 @@ classdef RolloutBatch < handle
             end
         end
         
+        % Remove rollout object if present in the set.
         function delete(obj, rollout)
             
             for i= 1:obj.size
@@ -91,6 +101,7 @@ classdef RolloutBatch < handle
             end
         end
         
+        % Write as an array.
         function arr = to_str_array(obj)
             
            for i = 1:obj.size

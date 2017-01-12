@@ -1,10 +1,9 @@
 classdef HardCodedExpert < expert.Expert
-    %UNTITLED5 Summary of this class goes here
-    %   Detailed explanation goes here
+    % Implements a hard coded expert. Simple square error function is used.
     
     properties
         
-        std;
+        std; % rating error 
     end
     
     methods
@@ -16,7 +15,7 @@ classdef HardCodedExpert < expert.Expert
         
         function rating = query_expert(obj, rollout)
             
-            rating = obj.std*randn()+rollout.sum_out;
+            rating = obj.std*randn()+sum(rollout.outcomes);
         end
     end
 end

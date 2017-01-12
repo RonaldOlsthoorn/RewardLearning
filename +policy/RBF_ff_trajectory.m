@@ -1,5 +1,6 @@
 classdef RBF_ff_trajectory < handle
-    
+% class describing a feed-forward signal using radial basis functions.
+
     properties(Constant)
         
         bw_scale = 0.55;
@@ -44,6 +45,7 @@ classdef RBF_ff_trajectory < handle
             obj.initialize_bases();
         end
         
+        % initializes basic parameters of the trajectory.
         function initialize_parameters(obj, policy_par)
             
             obj.Ts = policy_par.Ts;
@@ -51,10 +53,10 @@ classdef RBF_ff_trajectory < handle
             obj.t = (0:obj.Ts:(obj.duration - obj.Ts))';
             
             obj.n_rfs = policy_par.n_rbfs;
-            obj.w = zeros(policy_par.n_rbfs, 1);
-            
+            obj.w = zeros(policy_par.n_rbfs, 1);    
         end
         
+        % determine the centers of the basis functions (time-space).
         function initialize_centers(obj, n_rbfs)
             
             obj.n_rfs = n_rbfs;
@@ -63,6 +65,7 @@ classdef RBF_ff_trajectory < handle
             obj.c = centers_time;
         end
         
+        % amplitude of the basis functions.
         function initialize_amplitudes(obj)
             
             obj.D = 3*ones(length(obj.c),1);
@@ -71,6 +74,7 @@ classdef RBF_ff_trajectory < handle
             %             obj.D = 1./[obj.D; obj.D(end)];
         end
         
+        % pre compute basis functions.
         function initialize_psi(obj)
             
             for i = 1:obj.n_rfs
@@ -79,6 +83,7 @@ classdef RBF_ff_trajectory < handle
             end
         end
         
+        % pre compute the weighted basis functions.
         function initialize_weighted_psi(obj)
             
             % average updates over time
@@ -94,6 +99,7 @@ classdef RBF_ff_trajectory < handle
             obj.time_normalized_psi = W./(ones(length(obj.t), 1)*sum(W, 1));
         end
         
+        % pre compute normalized basis functions.
         function initialize_bases(obj)
             
             for i = 1:length(obj.t)
@@ -102,6 +108,7 @@ classdef RBF_ff_trajectory < handle
             end
         end
         
+        % returns resulting trajectory given exploration noise.
         function [y, yd, ydd] = create_trajectory(obj, eps)
             
             y = (obj.bases*(obj.w+eps))';

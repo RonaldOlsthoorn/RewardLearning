@@ -13,6 +13,7 @@ classdef MovementLearner < handle
         
         W; % policy weight trace
         R; % Reward trace
+        R_true;
         
         plant;
         
@@ -34,6 +35,8 @@ classdef MovementLearner < handle
             
             obj.W = [];
             obj.R = [];
+            obj.R_true = [];
+            
             
             protocol_handle = str2func(strcat('protocols.', obj.protocol_s));
             protocol = protocol_handle();
@@ -51,7 +54,7 @@ classdef MovementLearner < handle
             
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
-            obj.plant.set_init_state(obj.reference.r_joints(:,1));
+            obj.plant.set_init_state(obj.reference.init_state);
             
             policy = init.init_policy(p.policy_par, obj.reference);
             obj.agent = init.init_agent(p.agent_par, policy);
@@ -60,9 +63,7 @@ classdef MovementLearner < handle
                 obj.reference);
             
             obj.environment = init.init_environment(p.env_par, ...
-                obj.plant, obj.reward_model, obj.agent);
-            
-            %obj.reset_figure();
+                obj.plant, obj.reward_model, obj.agent, obj.reference);
         end
         
         function [Weights, Returns] = run_movement_learning(obj)
@@ -71,7 +72,7 @@ classdef MovementLearner < handle
             
             obj.environment.prepare();
             
-            while iteration<50 % for now. Replace with EPD
+            while iteration < 50 % for now. Replace with EPD
                 
                 obj.print_progress();
                 
@@ -97,10 +98,12 @@ classdef MovementLearner < handle
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            rating = obj.environment.expert.query_expert(noiseless_rollout);
             
             obj.print_noiseless_rollout(noiseless_rollout);
             
             obj.R = [obj.R noiseless_rollout.R];
+            obj.R_true = [obj.R_true sum(rating)];
         end
         
         function print_result(obj)
@@ -111,7 +114,9 @@ classdef MovementLearner < handle
             obj.print_noiseless_rollout(noiseless_rollout);
             
             figure;
+            hold on;
             plot(obj.R);
+            plot(obj.R_true);
             title(obj.protocol_s);
             xlabel('iteration');
             ylabel('Return');

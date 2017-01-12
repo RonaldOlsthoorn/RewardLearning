@@ -27,16 +27,14 @@ classdef ControllerImperfect < handle
         
         function update_int(obj, r, x)
             
-           obj.int = obj.int+(r-x); 
-            
+           obj.int = obj.int+(r-x);           
         end
         
         function reset(obj)
-            
+        % reset integral term    
             obj.int = 0;
         end
-        
-        
+               
         function control_input = saturation(obj, control_input)
            
             for i = 1:length(control_input)

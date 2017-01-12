@@ -11,7 +11,7 @@ t = 0:Ts/2:Ts;
 y = ode4_ti('eompend',t, x, r, control_method, par);
 y = y(end,:);           % we are only interested in the last value
 
-if wrapflag,
+if wrapflag
     if y(1) > pi,  y(1) = y(1) - 2*pi; end; % wrapping
     if y(1) < -pi, y(1) = y(1) + 2*pi; end; % wrapping
 end;

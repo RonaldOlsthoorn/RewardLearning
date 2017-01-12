@@ -1,8 +1,29 @@
-function [env] = init_environment(env_par, plant, reward_model, agent)
+function [env] = init_environment(env_par, plant, reward_model, agent, ref)
 
 if env_par.dyn
-    expert = expert.HardCodedExpert(env_par.expert_std);
-    env = environment.DynamicEnvironment(plant, reward_model, expert, agent, env_par.tol);
+    switch env_par.expert
+        case 'hard_coded_expert'
+            ex = expert.HardCodedExpert(env_par.expert_std);
+        case 'multi_segment_expert'
+            ex = expert.MultiSegmentExpert(env_par.expert_std, reward_model.n_segments);
+        case 'vp_multi_segment_expert'
+            ex = expert.VPMultiSegmentExpert(env_par.expert_std, ref, reward_model.n_segments);
+        case 'vp_single_segment_expert'
+            ex = expert.VPSingleSegmentExpert(env_par.expert_std, ref);
+        otherwise
+            ex = [];
+    end
+        
+    switch env_par.acquisition
+        case 'epd_single'
+            env = environment.SingleSegmentEnvironment(plant, reward_model, ex, agent);
+        case 'epd_multi'
+            env = environment.MultiSegmentEnvironment(plant, reward_model, ex, agent);
+        otherwise
+            env = [];
+    end
+    
+    env.tol = env_par.tol;
 else   
     env = environment.StaticEnvironment(plant, reward_model);
 end

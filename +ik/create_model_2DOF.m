@@ -1,6 +1,5 @@
 function [ par ] = create_model_2DOF()
-%CREATE_MODEL_2DOF Summary of this function goes here
-%   Detailed explanation goes here
+%Returns parameters for 2 DoF robotic arm, used for kin and ik equations.
 
 par.l1  = 0.5;          % Length link 1
 par.l2  = 0.5;          % Length link 2

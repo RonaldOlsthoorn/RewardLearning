@@ -1,6 +1,5 @@
 classdef Expert < handle
-    %UNTITLED4 Summary of this class goes here
-    %   Detailed explanation goes here
+    % Base class for experts
     
     properties
     end
@@ -11,4 +10,3 @@ classdef Expert < handle
     end
     
 end
-

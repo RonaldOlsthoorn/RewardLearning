@@ -1,5 +1,6 @@
 classdef SystemUR5 < plant.System
-    
+% Wrapper class for ur5 robotic commands.
+
     properties(Constant)
         
         ip = '192.168.1.50';
@@ -23,6 +24,7 @@ classdef SystemUR5 < plant.System
 %             obj.init();
         end
         
+        % sets initial state for rollouts (joint positions).
         function set_init_state(obj, is)
             
             obj.init_state = is;
@@ -43,6 +45,7 @@ classdef SystemUR5 < plant.System
             obj.arm.fopen(obj.ip);
         end
         
+        % Runs a time step on the robotic arm of Ts seconds. 
         function [joint_position, joint_speed,...
                 tool_position, tool_speed] = run_increment(obj, control_input)
             
@@ -63,6 +66,7 @@ classdef SystemUR5 < plant.System
             tool_speed = ts(1:3)';
         end
         
+        % Place the robot arm in its initial position.
         function [output] = reset(obj)
             
             tolerance = 0.001;
@@ -93,6 +97,7 @@ classdef SystemUR5 < plant.System
             output.joint_speed = vel;
         end
         
+        % Make all the joints stop its movements easily.
         function gently_break(obj)
             
             obj.arm.update();
