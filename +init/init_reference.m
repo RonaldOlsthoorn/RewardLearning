@@ -46,6 +46,12 @@ switch reference_par.trajectory
 %         
 %         [j] = ik.map_ref2(reference.r_tool, reference_par, ik.create_model_2DOF());
 %         reference.r_joints = j;
+
+    case 'robot-via'
+        
+        reference = refs.VPReference(reference_par);
+        reference.init_state = reference_par.start_joint;
+        
     otherwise
         reference = [];
 end

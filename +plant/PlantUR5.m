@@ -42,16 +42,21 @@ classdef PlantUR5 < plant.Plant
             tool_speeds = zeros(3, n_end);
             time = zeros(1, n_end);
             
-            % construct inputs for each dof
-            r = zeros(obj.system.dof, n_end);
-            rd = zeros(obj.system.dof, n_end);
+%             
+%             
+%             % construct inputs for each dof
+%             r = zeros(obj.system.dof, n_end);
+%             rd = zeros(obj.system.dof, n_end);
+%             
+%             for i=1:obj.system.dof
+%                 
+%                 r(i,:) = trajectory.policy.dof(i).xd(1,:);
+%                 rd(i,:) = trajectory.policy.dof(i).xd(2,:);
+%             end
             
-            for i=1:obj.system.dof
-                
-                r(i,:) = trajectory.policy.dof(i).xd(1,:);
-                rd(i,:) = trajectory.policy.dof(i).xd(2,:);
-            end
-            
+            r = trajectory.policy.r;
+            rd = trajectory.policy.rd;
+
             % set to default position.
             output = obj.system.reset();
             

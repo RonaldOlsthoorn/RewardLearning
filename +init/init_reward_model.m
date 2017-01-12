@@ -10,6 +10,8 @@ switch reward_model_par.type
         reward_model = reward.StaticLinearRewardModel(reference);
     case 'reward_model_static_vp'
         reward_model = reward.StaticVPRewardModel(reference);
+    case 'reward_model_UR5_static_vp'
+        reward_model = reward.UR5StaticVPRewardModel(reference);
     case 'reward_model_gp'
         gp = gp.init_GP(reward_model_par.gp_par);
         reward_model = reward.init_DynamicRewardModel(reference, gp);
