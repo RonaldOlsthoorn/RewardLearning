@@ -22,16 +22,16 @@ controller_par.type = 'controllerInvKin';
 
 reference_par.trajectory = '2dof-via'; 
 reference_par.start_tool = [0;0.5];
-reference_par.goal_tool = [0.8;0.5];
+reference_par.goal_tool = [0.5;0.3];
 reference_par.start_joint = [pi/6;(2*pi/3)];
 reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
 reference_par.viapoint_t = [300];
-reference_par.viapoint = [0.3; 0.5];
+reference_par.viapoint = [0.3; 0.6];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [100; 10];
+agent_par.noise_std = [100; 100];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
