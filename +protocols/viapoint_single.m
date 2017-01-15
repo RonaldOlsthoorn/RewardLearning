@@ -21,17 +21,17 @@ plant_par.par = par;
 controller_par.type = 'controllerInvKin';
 
 reference_par.trajectory = '2dof-via'; 
-reference_par.start_tool=[0;0.5];
-reference_par.goal_tool=[0.8;0.5];
-reference_par.start_joint=[pi/6;(2*pi/3)];
-reference_par.goal_joint=[0.2203;0.6767];
+reference_par.start_tool = [0;0.5];
+reference_par.goal_tool = [0.5;0.3];
+reference_par.start_joint = [pi/6;(2*pi/3)];
+reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
-reference_par.viapoint_t = 300;
-reference_par.viapoint = [0.3; 0.5];
+reference_par.viapoint_t = [300];
+reference_par.viapoint = [0.3; 0.6];
 
 agent_par.type = 'agent_PI2BB';
-agent_par.noise_std = [100; 10];
+agent_par.noise_std = [100; 100];
 agent_par.annealer = 0.95;
 agent_par.reps = 10;
 agent_par.n_reuse = 5;
@@ -47,15 +47,21 @@ policy_par.goal = reference_par.goal_tool;
 env_par.dyn = true;
 env_par.acquisition = 'epd_single';
 env_par.expert = 'vp_single_segment_expert';
-env_par.expert_std = 1e-4;
-env_par.tol = 1;
+%env_par.expert_std = 0.002;
+env_par.expert_std = 0.004;
+env_par.tol = 1e-3;
 
 reward_model.type = 'viapoint_single_gp';
 reward_model.n_segments = 4;
 
-hyp.cov = ones(45,1);
+% hyp.cov = ones(45,1);
+% hyp.mean = [];
+% hyp.lik = 0.01;
+
+hyp.cov = ones(9,1);
 hyp.mean = [];
 hyp.lik = 0.01;
+
 
 gp_par.hyp = hyp;
 gp_par.mean = 'zero';

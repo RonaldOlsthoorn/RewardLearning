@@ -14,6 +14,7 @@ classdef MovementLearner < handle
         W; % policy weight trace
         R; % Reward trace
         R_true;
+        R_expert;
         
         plant;
         
@@ -35,8 +36,8 @@ classdef MovementLearner < handle
             
             obj.W = [];
             obj.R = [];
+            obj.R_expert = [];
             obj.R_true = [];
-            
             
             protocol_handle = str2func(strcat('protocols.', obj.protocol_s));
             protocol = protocol_handle();
@@ -100,15 +101,17 @@ classdef MovementLearner < handle
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             if isa(obj.environment,'environment.DynamicEnvironment')
-                rating = obj.environment.expert.query_expert(noiseless_rollout);
+                rating_expert = obj.environment.expert.query_expert(noiseless_rollout);
+                rating_true = obj.environment.expert.true_reward(noiseless_rollout);
             else
-                rating = noiseless_rollout.R;
+                rating_true = noiseless_rollout.R;
             end
             
             obj.print_noiseless_rollout(noiseless_rollout);
             
             obj.R = [obj.R noiseless_rollout.R];
-            obj.R_true = [obj.R_true sum(rating)];
+            obj.R_expert = [obj.R_expert sum(rating_expert)];
+            obj.R_true = [obj.R_true sum(rating_true)];
         end
         
         function print_result(obj)
@@ -120,8 +123,15 @@ classdef MovementLearner < handle
             
             figure;
             hold on;
-            plot(obj.R);
-            plot(obj.R_true);
+            
+            if isa(obj.environment,'environment.DynamicEnvironment')
+                plot(obj.R);
+                plot(obj.R_expert);
+                plot(obj.R_true);
+            else
+                plot(obj.R);
+            end
+            
             title(obj.protocol_s);
             xlabel('iteration');
             ylabel('Return');

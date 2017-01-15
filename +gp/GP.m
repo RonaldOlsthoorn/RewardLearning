@@ -113,8 +113,20 @@ classdef GP < handle
         
         function logp = minimize_gpml(obj)
             
+            [h, logp] = minimize(obj.hyp, ...
+                @gp, -100, @infExact, @meanZero, @covSEard, @likGauss,...
+                obj.x_measured, obj.y_measured);
             
-            [h, logp] = minimize(@gp);
+            if h.lik<-10
+                h.lik = -10;
+            end
+            
+            for i = 1:length(h.cov)
+                if h.cov(i)< -10
+                    h.cov(i) = -10;
+                end
+            end
+            
             obj.hyp = h;
         end
         

@@ -29,7 +29,7 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.index = 1;
             
-            n_samples = 4;
+            n_samples = 8;
             
             % create the controls for the first batch of rollouts
             batch_trajectory = obj.agent.create_batch_trajectories(n_samples);

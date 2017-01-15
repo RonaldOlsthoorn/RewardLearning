@@ -102,22 +102,15 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
         
         function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
             
-            max_rollout = batch_rollouts.get_rollout(1);
-            max_epd = obj.epd(max_rollout);
+            epd = zeros(1,batch_rollouts.size);
             
-            if batch_rollouts.size ==1
-                return;
+            for i = 1:batch_rollouts.size
+                epd(i) = obj.epd(batch_rollouts.get_rollout(i));
             end
             
-            for i = 2:batch_rollouts.size
-                
-                epd_candidate = obj.epd(batch_rollouts.get_rollout(i));
-                
-                if epd_candidate > max_epd
-                    max_rollout = batch_rollouts.get_rollout(i);
-                    max_epd = epd_candidate;
-                end
-            end
+            [max_epd, j] = max(epd);
+            max_rollout = batch_rollouts.get_rollout(j);
+                        
         end
         
         function rollout = demonstrate_and_query_expert(obj, sample)
