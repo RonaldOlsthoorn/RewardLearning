@@ -58,20 +58,35 @@ reward_model.n_segments = 4;
 % hyp.mean = [0.005];
 % hyp.lik = 1e-3;
 
-hyp(1).cov = ones(6,1);
-%hyp(1).cov = [-0.0917;0.2220;-0.0239;0.1034;0.1241;-0.0757];
+% hyp(1).cov = ones(6,1);
+% hyp(1).mean = [];
+% hyp(1).lik = 0.01;
+% 
+% hyp(2).cov = ones(6,1);
+% hyp(2).mean = [];
+% hyp(2).lik = 0.01;
+% 
+% hyp(3).cov = ones(6,1);
+% hyp(3).mean = [];
+% hyp(3).lik = 0.01;
+% 
+% hyp(4).cov = ones(6,1);
+% hyp(4).mean = [];
+% hyp(4).lik = 0.01;
+
+hyp(1).cov = [1;1;1];
 hyp(1).mean = [];
 hyp(1).lik = 0.01;
 
-hyp(2).cov = ones(6,1);
+hyp(2).cov = [1;1;1];
 hyp(2).mean = [];
 hyp(2).lik = 0.01;
 
-hyp(3).cov = ones(6,1);
+hyp(3).cov = [1;1;1];
 hyp(3).mean = [];
 hyp(3).lik = 0.01;
 
-hyp(4).cov = ones(6,1);
+hyp(4).cov = [1;1;1];
 hyp(4).mean = [];
 hyp(4).lik = 0.01;
 

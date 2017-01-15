@@ -20,10 +20,13 @@ classdef GP < handle
     
     methods
         
-        function [reward, s2] = assess(obj, x_infer)
+        function [reward, sPost] = assess(obj, x_infer)
             
+            [reward, SPost] = gp(obj.hyp, ...
+            @infExact, @meanZero, @covSEard, @likGauss, ...
+            obj.x_measured, obj.y_measured, x_infer);
             
-            
+            sPost = sqrt(SPost);
             
 %             sfm = obj.hyp.lik(1);
 %             
@@ -104,15 +107,14 @@ classdef GP < handle
         function logp = minimize(obj)
             
             %logp = obj.minimize_hypers(obj.hyp);
-            %logp = obj.minimize_sigma();
-            
+            %logp = obj.minimize_sigma();     
             logp = obj.minimize_gpml();
         end
         
         function logp = minimize_gpml(obj)
             
             
-            [h, logp] = minimize();
+            [h, logp] = minimize(@gp);
             obj.hyp = h;
         end
         

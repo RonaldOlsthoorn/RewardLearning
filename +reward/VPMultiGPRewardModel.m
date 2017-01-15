@@ -78,7 +78,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                 
                 obj.gps(i).x_measured = x_meas;
                 obj.gps(i).y_measured = y_meas;
-                obj.gps(i).compute_features_measurements();
+                %obj.gps(i).compute_features_measurements();
             end
         end
         
