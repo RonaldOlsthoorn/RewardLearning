@@ -22,51 +22,54 @@ classdef GP < handle
         
         function [reward, s2] = assess(obj, x_infer)
             
-            sfm = obj.hyp.lik(1);
             
-            Xm = obj.x_measured';
-            fmh = obj.y_measured;
             
-            Xs = x_infer';
-            Phi_s = obj.gp_features(Xs);
-            Phi_m = obj.phi_measured;
             
-            % We now set up the (squared exponential) covariance matrix and related terms.
-            nm = size(Xm,2); % This is the number of measurement points.
-            X = [Xm,Xs]; % We merge the measurement and trial points.
-            
-            Phi = [Phi_m, Phi_s];
-            
-            K = obj.cov.k(Phi, obj.hyp.cov);
-            
-            % n = size(X,2); % This is the number of points.
-            % diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
-            % K = lf^2*exp(-1/2*diff.^2/lx^2); % This is the covariance matrix. It contains the covariances of each combination of points.
-            
-            Kmm = K(1:nm,1:nm);
-            Kms = K(1:nm,nm+1:end);
-            Ksm = Kms';
-            Kss = K(nm+1:end,nm+1:end);
-            Sfm = sfm^2*eye(nm); % This is the noise covariance matrix.
-            
-            mm = obj.mean.m(Xm, obj.hyp.mean);
-            ms = obj.mean.m(Xs, obj.hyp.mean);
-            
-            % mm = zeros(nm,1); % This is the mean vector m(Xm). We assume a zero mean function.
-            % ms = zeros(ns,1); % This is the mean vector m(Xs). We assume a zero mean function.
-            
-            mPost = ms + Ksm/(Kmm + Sfm)*(fmh - mm); % This is the posterior mean vector.
-            SPost = Kss - Ksm/(Kmm + Sfm)*Kms; % This is the posterior covariance matrix.
-            sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
-            
-            Kw = diag(obj.hyp.cov);
-            
-            % We calculate the posterior distribution of w.
-            muw = (Phi_m/Sfm*Phi_m' + inv(Kw))\Phi_m/Sfm*fmh;
-            Sw = inv(Phi_m/Sfm*Phi_m' + inv(Kw));
-            
-            reward = mPost;
-            s2 = real(sPost);
+%             sfm = obj.hyp.lik(1);
+%             
+%             Xm = obj.x_measured';
+%             fmh = obj.y_measured;
+%             
+%             Xs = x_infer';
+%             Phi_s = obj.gp_features(Xs);
+%             Phi_m = obj.phi_measured;
+%             
+%             % We now set up the (squared exponential) covariance matrix and related terms.
+%             nm = size(Xm,2); % This is the number of measurement points.
+%             X = [Xm,Xs]; % We merge the measurement and trial points.
+%             
+%             Phi = [Phi_m, Phi_s];
+%             
+%             K = obj.cov.k(Phi, obj.hyp.cov);
+%             
+%             % n = size(X,2); % This is the number of points.
+%             % diff = repmat(X,n,1) - repmat(X',1,n); % This is matrix containing differences between input points.
+%             % K = lf^2*exp(-1/2*diff.^2/lx^2); % This is the covariance matrix. It contains the covariances of each combination of points.
+%             
+%             Kmm = K(1:nm,1:nm);
+%             Kms = K(1:nm,nm+1:end);
+%             Ksm = Kms';
+%             Kss = K(nm+1:end,nm+1:end);
+%             Sfm = sfm^2*eye(nm); % This is the noise covariance matrix.
+%             
+%             mm = obj.mean.m(Xm, obj.hyp.mean);
+%             ms = obj.mean.m(Xs, obj.hyp.mean);
+%             
+%             % mm = zeros(nm,1); % This is the mean vector m(Xm). We assume a zero mean function.
+%             % ms = zeros(ns,1); % This is the mean vector m(Xs). We assume a zero mean function.
+%             
+%             mPost = ms + Ksm/(Kmm + Sfm)*(fmh - mm); % This is the posterior mean vector.
+%             SPost = Kss - Ksm/(Kmm + Sfm)*Kms; % This is the posterior covariance matrix.
+%             sPost = sqrt(diag(SPost)); % These are the posterior standard deviations.
+%             
+%             Kw = diag(obj.hyp.cov);
+%             
+%             % We calculate the posterior distribution of w.
+%             muw = (Phi_m/Sfm*Phi_m' + inv(Kw))\Phi_m/Sfm*fmh;
+%             Sw = inv(Phi_m/Sfm*Phi_m' + inv(Kw));
+%             
+%             reward = mPost;
+%             s2 = real(sPost);
         end
         
         function compute_features_measurements(obj)
@@ -96,13 +99,21 @@ classdef GP < handle
             end
             
             Phi(end,:) = ones(1,nm);
-                    
         end
         
         function logp = minimize(obj)
             
             %logp = obj.minimize_hypers(obj.hyp);
-            logp = obj.minimize_sigma();
+            %logp = obj.minimize_sigma();
+            
+            logp = obj.minimize_gpml();
+        end
+        
+        function logp = minimize_gpml(obj)
+            
+            
+            [h, logp] = minimize();
+            obj.hyp = h;
         end
         
         function logp = minimize_sigma(obj)

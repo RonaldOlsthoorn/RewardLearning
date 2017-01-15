@@ -82,6 +82,27 @@ classdef VPMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        function init_hypers(obj)
+            
+            d = length(obj.gps(1).x_measured(1,:));
+            
+            for i = 1:obj.n_segments
+                
+                lambda_x = std(obj.gps(i).x_measured);
+                lambda_y = std(obj.gps(i).y_measured);
+                
+                if lambda_y == 0
+                    lambda_y = mean(lambda_x);
+                end
+                
+                sigma = lambda_y/10;
+                
+                obj.gps(i).hyp.cov(1:d, 1) = log(lambda_x);
+                obj.gps(i).hyp.cov(d+1, 1) = log(lambda_y);
+                obj.gps(i).hyp.lik = log(sigma);
+            end
+        end
+        
         function minimize(obj)
             
            for i = 1:obj.n_segments
