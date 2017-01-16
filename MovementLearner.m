@@ -135,6 +135,8 @@ classdef MovementLearner < handle
             title(obj.protocol_s);
             xlabel('iteration');
             ylabel('Return');
+            
+            disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
         end
         
         function print_noiseless_rollout(obj, rollout)
@@ -151,15 +153,15 @@ classdef MovementLearner < handle
                 'units','normalized','outerposition',[0 0 1 1]);
             clf;
             
-            subplot(1,3,1)
+            subplot(1,3,1);
             xlabel('t [s]');
             ylabel('x_{ef} [m]');
             
-            subplot(1,3,2)
+            subplot(1,3,2);
             xlabel('t [s]');
             ylabel('y_{ef} [m]');
             
-            subplot(1,3,3)
+            subplot(1,3,3);
             xlabel('x_{ef} [m]');
             ylabel('y_{ef} [m]');
             

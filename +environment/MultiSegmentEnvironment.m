@@ -3,6 +3,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
     
     properties
         
+        n_queries = 0;
         original_batch;
         tol;
         
@@ -40,8 +41,11 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     batch_rollouts.update_rollout(rollout);
                     obj.reward_model.add_demonstration(rollout);
+                    obj.reward_model.minimize();
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
+                    
+                    obj.n_queries = obj.n_queries + 1;
                     
                     unqueried_batch = obj.reward_model.add_reward_batch(unqueried_batch);
                     obj.original_batch = obj.reward_model.add_reward_batch(obj.original_batch);

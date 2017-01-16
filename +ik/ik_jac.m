@@ -38,8 +38,7 @@ while(norm(xgoal-x,2)>epsilon && i< max_iterations)
     theta = delta_theta+theta;
     
     [x_end] = ik.forward_kinematics([theta(1);0;theta(2);0], par);
-    x = [x_end(1);x_end(3)];
-    
+    x = [x_end(1);x_end(3)];    
 end
 
 if(i==max_iterations)
@@ -47,6 +46,4 @@ if(i==max_iterations)
 end
 
 theta_end = theta;
-
 end
-
