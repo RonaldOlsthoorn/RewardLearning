@@ -153,7 +153,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                 elseif strcmp(p{i}, 'db_demo') 
                     db_cache = this.db_demo;
                     for j = 1:length(db_cache)
-                        db_cp(j) = db_cache.copy();
+                        db_cp(j) = db_cache(j).copy();
                     end
                     new.(p{i}) = db_cp;
                 elseif strcmp(p{i}, 'figID')
