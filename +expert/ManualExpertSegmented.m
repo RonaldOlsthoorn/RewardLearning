@@ -71,6 +71,38 @@ classdef ManualExpertSegmented < expert.Expert
             close(f);
         end
         
+        function rating = query_expert_segment(obj, rollout, seg)
+            
+            rating = zeros(obj.n_segments, 1);
+            
+            f = figure('Visible','on',...
+                'units','normalized','outerposition',[0 0 1 1]);
+            
+            uicontrol('Style', 'pushbutton', 'String', 'rate',...
+                'Position',[1800,500,100,25],...
+                'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
+            
+            obj.hinput = uicontrol('Style', 'edit',...
+                'Position',[1800,450,100,25]);
+            
+            f.Visible = 'on';
+            
+            obj.plot_rollout(rollout);                   
+            obj.plot_overlay(rollout, seg);      
+            obj.lock = true;
+            
+            while (obj.lock)
+                
+                pause(0.1);
+            end
+            
+            rating(seg) = str2double(obj.hinput.String);        
+            
+            close(f);
+        end
+        
+        
+        
         function rating = true_reward(obj, rollout)
             
             rating = zeros(1, obj.n_segments);
