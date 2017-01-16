@@ -13,6 +13,8 @@ classdef ManualExpertSegmented < expert.Expert
         
         segment_start;
         segment_end;
+        
+        manual = true;
     end
     
     methods
@@ -39,24 +41,20 @@ classdef ManualExpertSegmented < expert.Expert
         function rating = query_expert(obj, rollout)
             
             rating = zeros(obj.n_segments, 1);
-            
-            f = figure('Visible','on',...
-                'units','normalized','outerposition',[0 0 1 1]);
-            
-            uicontrol('Style', 'pushbutton', 'String', 'rate',...
-                'Position',[1800,500,100,25],...
-                'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
-            
-            obj.hinput = uicontrol('Style', 'edit',...
-                'Position',[1800,450,100,25]);
-            
-            f.Visible = 'on';
-            
             obj.plot_rollout(rollout);
             
+            hx = uicontrol('Style', 'text', 'Position',[600, 900, 100, 25]);
+            hy = uicontrol('Style', 'text', 'Position',[1200, 900, 100, 25]);
+            
             for seg = 1:obj.n_segments
-                obj.plot_overlay(rollout, seg);
                 
+                set(hx, 'String', ...
+                    strcat('mean x in this segment: ', num2str(rollout.outcomes(seg,1))));
+                
+                set(hy, 'String', ... 
+                    strcat('mean y in this segment: ', num2str(rollout.outcomes(seg,2))));
+                
+                obj.plot_overlay(rollout, seg);
                 obj.lock = true;
                 
                 while (obj.lock)
@@ -65,10 +63,67 @@ classdef ManualExpertSegmented < expert.Expert
                 end
                 
                 rating(seg) = str2double(obj.hinput.String);   
-                
             end
             
             close(f);
+        end
+        
+        function background(obj, batch)
+            
+            f = figure('Visible','on',...
+                'units','normalized','outerposition',[0 0 1 1]);
+            
+            uicontrol('Style', 'pushbutton', 'String', 'rate',...
+                'Position',[1800, 600,100,25],...
+                'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
+            
+            obj.hinput = uicontrol('Style', 'edit',...
+                'Position',[1800,550,100,25]);
+            
+            f.Visible = 'on';
+            
+            c = 1-1/20;
+            co = [c, c, c];
+            
+            for i = 1:batch.size
+                
+                rollout = batch.get_rollout(i);
+                
+                subplot(1,3,1);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(1,:),...
+                    'b-', 'LineWidth', 1, 'Color', co);
+
+                subplot(1,3,2);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', co);
+
+                subplot(1,3,3);
+                hold on;
+                plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', co);
+            end
+            
+            subplot(1,3,1);
+            hold on;
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1));
+            xlabel('tool position t [s]');
+            ylabel('tool position x [m]');
+            
+            subplot(1,3,2);
+            hold on;
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2));
+            xlabel('tool position t [s]');
+            ylabel('tool position y [m]');
+            
+            subplot(1,3,3);
+            hold on;
+            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2));
+            xlabel('tool position x [m]');
+            ylabel('tool position y [m]');
+
+            f.Visible = 'on';
         end
         
         function rating = query_expert_segment(obj, rollout, seg)
@@ -79,11 +134,11 @@ classdef ManualExpertSegmented < expert.Expert
                 'units','normalized','outerposition',[0 0 1 1]);
             
             uicontrol('Style', 'pushbutton', 'String', 'rate',...
-                'Position',[1800,500,100,25],...
+                'Position',[1800,900,100,25],...
                 'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
             
             obj.hinput = uicontrol('Style', 'edit',...
-                'Position',[1800,450,100,25]);
+                'Position',[1800,150,100,25]);
             
             f.Visible = 'on';
             
@@ -100,7 +155,6 @@ classdef ManualExpertSegmented < expert.Expert
             
             close(f);
         end
-        
         
         
         function rating = true_reward(obj, rollout)
@@ -130,24 +184,21 @@ classdef ManualExpertSegmented < expert.Expert
             end
         end
         
-        function plot_rollout(obj, rollout)
+        function plot_rollout(~, rollout)
             
             subplot(1,3,1);
             hold on;
-            plot(rollout.time, rollout.tool_positions(1,:));
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1));
+            plot(rollout.time, rollout.tool_positions(1,:), 'k');
             xlabel('tool position t [s]');
             ylabel('tool position x [m]');
             subplot(1,3,2);
             hold on;
-            plot(rollout.time, rollout.tool_positions(2,:));
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2));
+            plot(rollout.time, rollout.tool_positions(2,:), 'k');
             xlabel('tool position t [s]');
             ylabel('tool position y [m]');
             subplot(1,3,3);
             hold on;
-            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:));
-            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2));
+            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'k');
             xlabel('tool position x [m]');
             ylabel('tool position y [m]');
         end
@@ -155,16 +206,28 @@ classdef ManualExpertSegmented < expert.Expert
         function plot_overlay(obj, rollout, seg)
             
             subplot(1,3,1);
+            items = get(gca, 'Children');
+            if length(items)>2
+                delete(items(end));
+            end
             hold on;
             plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
                 'LineWidth', 2);
+            
             subplot(1,3,2);
+            if length(items)>2
+                delete(items(end));
+            end
             hold on;
             plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
                 'LineWidth', 2);
+            
             subplot(1,3,3);
+            if length(items)>2
+                delete(items(end));
+            end
             hold on;
             plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
