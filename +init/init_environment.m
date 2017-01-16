@@ -10,6 +10,10 @@ if env_par.dyn
             ex = expert.VPMultiSegmentExpert(env_par.expert_std, ref, reward_model.n_segments);
         case 'vp_single_segment_expert'
             ex = expert.VPSingleSegmentExpert(env_par.expert_std, ref);
+        case 'manual_expert'
+            ex = expert.ManualExpert(ref, reward_model.n_segments);
+        case 'manual_expert_segmented'
+            ex = expert.ManualExpertSegmented(ref, reward_model.n_segments);
         otherwise
             ex = [];
     end
