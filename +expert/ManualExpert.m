@@ -10,6 +10,8 @@ classdef ManualExpert < expert.Expert
         n_segments;
         reference;
         hinput;
+        
+        manual = true;
     end
     
     methods

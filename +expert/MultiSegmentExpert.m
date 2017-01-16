@@ -6,6 +6,7 @@ classdef MultiSegmentExpert < expert.Expert
         std; % rating error 
         n_segments;
         weights  = [1 1 1 1];
+        manual = false;
     end
     
     methods

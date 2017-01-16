@@ -9,6 +9,8 @@ classdef VPMultiSegmentExpert < expert.Expert
         
         segment_start;
         segment_end;
+        
+        manual = false;
     end
     
     methods
