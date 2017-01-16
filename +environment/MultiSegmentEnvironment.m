@@ -101,7 +101,9 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                 end
             end
             
-            [res, seg] = max(mean(epd,2));
+            [res, seg] = max(mean(epd,2));         
+            
+            mean(epd, 2)
         end
         
         function [max_rollout, max_epd, max_seg] = find_max_acquisition(obj, batch_rollouts)
