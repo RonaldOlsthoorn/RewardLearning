@@ -2,7 +2,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
     
     properties
         
-        batch_demonstrations;
+        db_demo;
         gps;
         n_segments;
         n; % number of time steps. rename.
@@ -47,30 +47,56 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         
         function add_demonstration(obj, demonstration)
             
-            obj.batch_demonstrations.append_rollout(demonstration);
+            for i = 1:obj.n_segments
+                obj.db_demo(i).append_rollout(demonstration);
+            end
+            obj.update_gps();
+        end 
+        
+        function add_demonstration_segment(obj, demonstration, seg)
+            
+            obj.db_demo(seg).append_rollout(demonstration);
             obj.update_gps();
         end
         
         function remove_demonstration(obj, demonstration)
             
-            obj.batch_demonstrations.delete(demonstration);
+            for s = 1:obj.n_segments
+                obj.db_demo(s).delete(demonstration);
+            end
+            
             obj.update_gps();
         end
         
         function add_batch_demonstrations(obj, batch_demonstrations)
             
-            obj.batch_demonstrations.append_batch(batch_demonstrations)
+            for i = 1:obj.n_segments
+                obj.db_demo(i).append_batch(batch_demonstrations)
+            end
+            
             obj.update_gps();
+        end
+        
+        function res = db_contains(obj, rollout)
+            
+            res = false;
+            
+            for i = 1:obj.n_segments
+                if obj.db_demo(i).contains(rollout)
+                    res = true;
+                    return
+                end
+            end
         end
         
         function update_gps(obj)
             
             for i = 1:obj.n_segments
-                x_meas = zeros(obj.batch_demonstrations.size, 2);
-                y_meas = zeros(obj.batch_demonstrations.size, 1);
+                x_meas = zeros(obj.db_demo(i).size, 2);
+                y_meas = zeros(obj.db_demo(i).size, 1);
                 
-                for j = 1:obj.batch_demonstrations.size
-                    demo = obj.batch_demonstrations.get_rollout(j);
+                for j = 1:obj.db_demo(i).size
+                    demo = obj.db_demo(i).get_rollout(j);
                     
                     x_meas(j,:) = demo.outcomes(i,:);
                     y_meas(j,1) = demo.R_expert(i);
@@ -124,8 +150,12 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                         new_gps(j) = this.gps(j).copy();
                     end
                     new.(p{i}) = new_gps;
-                elseif strcmp(p{i}, 'batch_demonstrations') 
-                    new.(p{i}) = this.(p{i}).copy();
+                elseif strcmp(p{i}, 'db_demo') 
+                    db_cache = this.db_demo;
+                    for j = 1:length(db_cache)
+                        db_cp(j) = db_cache(j).copy();
+                    end
+                    new.(p{i}) = db_cp;
                 elseif strcmp(p{i}, 'figID')
                     % Nothing, ow sweet nothing
                 else

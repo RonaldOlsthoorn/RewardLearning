@@ -30,17 +30,17 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             
             while true == find_nominee
                 
-                [max_rollout, max_epd] = obj.find_max_acquisition(unqueried_batch);
+                [max_rollout, max_epd, segment] = obj.find_max_acquisition(unqueried_batch);
                 
                 %disp(strcat('max epd: ', num2str(max_epd)));
                 
                 % rollouts are reused! therefore always check if rollout
                 % already queried.
-                if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
+                if(~obj.reward_model.db_contains(max_rollout) && max_epd > obj.tol)
                     
-                    rollout = obj.demonstrate_and_query_expert(max_rollout);
+                    rollout = obj.demonstrate_and_query_expert(max_rollout, segment);
                     batch_rollouts.update_rollout(rollout);
-                    obj.reward_model.add_demonstration(rollout);
+                    obj.reward_model.add_demonstration_segment(rollout, segment);
                     obj.reward_model.minimize();
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
@@ -60,7 +60,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
         end
         
         
-        function res = epd(obj, rollout)
+        function [res, seg] = epd(obj, rollout)
             
             epd = zeros(obj.reward_model.n_segments, 2);
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
@@ -101,26 +101,30 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                 end
             end
             
-            res = mean(mean(epd));
+            [res, seg] = max(mean(epd,2));         
+            
+            %mean(epd, 2)
         end
         
-        function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
+        function [max_rollout, max_epd, max_seg] = find_max_acquisition(obj, batch_rollouts)
             
             epd = zeros(1,batch_rollouts.size);
+            seg = zeros(1,batch_rollouts.size);
             
             for i = 1:batch_rollouts.size
-                epd(i) = obj.epd(batch_rollouts.get_rollout(i));
+                [epd(i), seg(i)] = obj.epd(batch_rollouts.get_rollout(i));
+                  
             end
             
             [max_epd, j] = max(epd);
             max_rollout = batch_rollouts.get_rollout(j);
-                        
+            max_seg = seg(j);
         end
         
-        function rollout = demonstrate_and_query_expert(obj, sample)
+        function rollout = demonstrate_and_query_expert(obj, sample, segment)
             
             rollout = obj.demonstrate_rollout(sample);
-            rollout.R_expert = obj.expert.query_expert(rollout);
+            rollout.R_expert = obj.expert.query_expert_segment(rollout, segment);
         end
         
         function print_reward_kl(~, batch_tilda, batch_star)
@@ -171,4 +175,3 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
     end
     
 end
-
