@@ -3,6 +3,7 @@ classdef VPSingleSegmentExpert < expert.Expert
     
     properties
         
+        manual = false;
         std; % rating error 
         ref;
     end
