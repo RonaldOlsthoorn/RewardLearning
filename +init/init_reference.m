@@ -52,6 +52,11 @@ switch reference_par.trajectory
         reference = refs.VPReference(reference_par);
         reference.init_state = reference_par.start_joint;
         
+    case '2dof_advanced'
+        
+        reference = refs.VPAdvancedReference(reference_par);
+        reference.init_state = reference_par.start_joint;
+
     otherwise
         reference = [];
 end

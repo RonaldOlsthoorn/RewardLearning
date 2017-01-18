@@ -21,6 +21,8 @@ switch reward_model_par.type
         reward_model = reward.init_VPSingleGPRewardModel(reference, reward_model_par);
     case 'viapoint_multi_gp'
         reward_model = reward.init_VPMultiGPRewardModel(reference, reward_model_par);
+    case 'viapoint_advanced_static'
+        reward_model = reward.StaticVPAdvancedRewardModel(reference);
     otherwise
         reward_model = [];
         
