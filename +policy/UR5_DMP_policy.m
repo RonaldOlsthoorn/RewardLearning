@@ -1,4 +1,4 @@
-classdef DMP_policy < policy.Policy
+classdef UR5_DMP_policy < policy.Policy
 % implements the policy as a trajectory generator.
 
     properties
@@ -9,17 +9,21 @@ classdef DMP_policy < policy.Policy
         reference;
         
         init_state;
+        
+        orientation
     end
     
     methods
         
-        function obj = DMP_policy(policy_par, ref)
+        function obj = UR5_DMP_policy(policy_par, ref)
             
             obj.reference = ref;
             obj.n_dof = policy_par.dof;
             obj.n_rfs = policy_par.n_rbfs;
             
-            obj.init_state = ref.init_state; % TODO: remove. need for ik.
+            obj.init_state = ref.init_state; % TODO: Remove. Need for ik.
+            
+            obj.orientation = policy_par.orientation;
             
             for i = 1:policy_par.dof
                 
@@ -38,7 +42,7 @@ classdef DMP_policy < policy.Policy
             
             trajectory = rollout.Rollout();
             
-            n_system_dof = 2;
+            n_system_dof = 6;
             n_time = length(obj.reference.t);
             
             for i = 1:obj.n_dof
@@ -53,17 +57,24 @@ classdef DMP_policy < policy.Policy
                 policy.dof(i) = dof;
             end
             
-            r = zeros(n_system_dof, n_time);
-            rd = zeros(n_system_dof, n_time);
-            rdd = zeros(n_system_dof, n_time);
+            x = zeros(n_system_dof, n_time);
+            xd = zeros(n_system_dof, n_time);
+            xdd = zeros(n_system_dof, n_time);
      
-            for i=1:n_system_dof
+            for i=1:3
                 
-                r(i,:) = policy.dof(i).xd(1,:);
-                rd(i,:) = policy.dof(i).xd(2,:);
-                rdd(i,:) = policy.dof(i).xd(3,:);
+                x(i,:) = policy.dof(i).xd(1,:);
+                xd(i,:) = policy.dof(i).xd(2,:);
+                xdd(i,:) = policy.dof(i).xd(3,:);
             end
             
+            for i = 4:6
+                
+                x(i,:) = ones(1, length(x(i,:)))*obj.orientation(i-3);
+            end
+            
+            [r, rd, rdd] = ik.map_ref(x(1:3,:), obj.init_state, obj.reference.Ts, ik.create_model_UR5());
+                       
             policy.r = r;
             policy.rd = rd;
             policy.rdd = rdd;

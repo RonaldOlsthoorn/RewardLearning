@@ -3,6 +3,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
     
     properties
         
+        n_queries = 0;
         original_batch;
         tol;
         
@@ -29,19 +30,29 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             
             while true == find_nominee
                 
-                [max_rollout, max_epd] = obj.find_max_acquisition(unqueried_batch);
+                [max_rollout, max_epd, segment] = obj.find_max_acquisition(unqueried_batch);
                 
                 %disp(strcat('max epd: ', num2str(max_epd)));
                 
                 % rollouts are reused! therefore always check if rollout
                 % already queried.
-                if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
+                if(~obj.reward_model.db_contains(max_rollout) && max_epd > obj.tol)
                     
-                    rollout = obj.demonstrate_and_query_expert(max_rollout);
+                    if obj.expert.manual == true
+                        obj.expert.background(batch_rollouts);
+                    end
+                    rollout = obj.demonstrate_and_query_expert(max_rollout, segment);
                     batch_rollouts.update_rollout(rollout);
-                    obj.reward_model.add_demonstration(rollout);
+                    
+                    obj.reward_model.add_demonstration_segment(rollout, segment);
+                    obj.reward_model.minimize();
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
+                    
+                    obj.n_queries = obj.n_queries + 1;
+                    
+                    unqueried_batch = obj.reward_model.add_reward_batch(unqueried_batch);
+                    obj.original_batch = obj.reward_model.add_reward_batch(obj.original_batch);
                     
                     if unqueried_batch.is_empty()
                         find_nominee = false;
@@ -53,7 +64,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
         end
         
         
-        function res = epd(obj, rollout)
+        function [res, seg] = epd(obj, rollout)
             
             epd = zeros(obj.reward_model.n_segments, 2);
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
@@ -94,81 +105,83 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                 end
             end
             
-            res = mean(mean(epd));
+            [res, seg] = max(mean(epd,2));         
+            
+            %mean(epd, 2)
         end
         
-        function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
+        function [max_rollout, max_epd, max_seg] = find_max_acquisition(obj, batch_rollouts)
             
-            max_rollout = batch_rollouts.get_rollout(1);
-            max_epd = obj.epd(max_rollout);
+            epd = zeros(1,batch_rollouts.size);
+            seg = zeros(1,batch_rollouts.size);
             
-            if batch_rollouts.size ==1
-                return;
+            for i = 1:batch_rollouts.size
+                [epd(i), seg(i)] = obj.epd(batch_rollouts.get_rollout(i));
+                  
             end
             
-            for i = 2:batch_rollouts.size
-                
-                epd_candidate = obj.epd(batch_rollouts.get_rollout(i));
-                
-                if epd_candidate > max_epd
-                    max_rollout = batch_rollouts.get_rollout(i);
-                    max_epd = epd_candidate;
-                end
-            end
+            [max_epd, j] = max(epd);
+            max_rollout = batch_rollouts.get_rollout(j);
+            max_seg = seg(j);
         end
         
-        function rollout = demonstrate_and_query_expert(obj, sample)
+        function rollout = demonstrate_and_query_expert(obj, sample, segment)
             
             rollout = obj.demonstrate_rollout(sample);
-            rollout.R_expert = obj.expert.query_expert(rollout);
+            
+            rollout.R_expert = obj.expert.query_expert_segment(rollout, segment);
         end
         
-        function print_reward_kl(~, batch_tilda, batch_star)
+        function print_reward_kl(obj, rm_ext)
             
-            R_tilda = zeros(batch_tilda.size, 1);
-            R_star = zeros(batch_star.size, 1);
+            figure(11);
+            clf;              
             
-            for i = 1:batch_tilda.size
+            for i = 1:obj.reward_model.n_segments
                 
-                R_tilda(i,1) = batch_tilda.get_rollout(i).R;
-                R_star(i,1) = batch_star.get_rollout(i).R;
+                minx = min(obj.reward_model.gps(i).x_measured(:,1));
+                miny = min(obj.reward_model.gps(i).x_measured(:,2));
+                maxx = max(obj.reward_model.gps(i).x_measured(:,1));
+                maxy = max(obj.reward_model.gps(i).x_measured(:,2));
+                
+                dx = (maxx-minx);
+                dy = (maxy-miny);
+                
+                [x_grid, y_grid] = meshgrid(((minx-dx):(dx/10):(maxx+dx))',...
+                                        ((miny-dy):(dy/10):(maxy+dy))');
+                
+                mPostOrig = zeros(size(x_grid));
+                mPostNew = zeros(size(x_grid));
+                
+                for j = 1:length(x_grid)
+                    
+                    tuples = [x_grid(:,j), y_grid(:,j)];
+                    m_orig = obj.reward_model.gps(i).assess(tuples);
+                    mPostOrig(:,j) = m_orig;
+                    m_new = rm_ext.gps(i).assess(tuples);
+                    mPostNew(:,j) = m_new;
+                end
+                
+                subplot(2,2,i);
+                hold on;
+                grid on;
+                
+%                 patch([x_grid; flip(x_grid)], [mPost-2*sPost; flipud(mPost+2*sPost)], 1, 'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+%                 set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
+                
+                surface(x_grid, y_grid, mPostOrig); % We plot the mean line.
+
+                scatter3(rm_ext.gps(i).x_measured(:,1), rm_ext.gps(i).x_measured(:,2) , rm_ext.gps(i).y_measured, 'ro'); % We plot the measurement points.
+                xlabel('mean x');
+                ylabel('mean y');
+                zlabel('Return');
+                
+                surface(x_grid, y_grid, mPostNew); % We plot the mean line.
             end
-            
-            figure
-            hold on;
-            scatter(R_tilda, zeros(batch_tilda.size, 1));
-            scatter(R_star, zeros(batch_star.size, 1));
+
         end
-        
-        function print_kl(~, theta_tilda, theta_star)
-            
-            figure
-            hold on;
-            scatter(theta_tilda, zeros(length(theta_tilda), 1));
-            scatter(theta_star, zeros(length(theta_star), 1));
-        end
-        
-        function print_r_in_rm(~, batch_tilda, batch_star)
-            
-            R_tilda = zeros(batch_tilda.size, 1);
-            O_tilda = zeros(batch_tilda.size, 1);
-            R_star = zeros(batch_star.size, 1);
-            O_star = zeros(batch_star.size, 1);
-            
-            for i = 1:batch_tilda.size
                 
-                R_tilda(i,1) = batch_tilda.get_rollout(i).R;
-                O_tilda(i,1) = batch_tilda.get_rollout(i).sum_out;
-                
-                R_star(i,1) = batch_star.get_rollout(i).R;
-                O_star(i,1) = batch_star.get_rollout(i).sum_out;
-            end
-            
-            scatter(O_tilda, R_tilda, '+', 'g');
-            scatter(O_star, R_star, '+', 'p');
-        end
-        
     end
     
 end
-

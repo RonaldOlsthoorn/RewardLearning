@@ -16,7 +16,7 @@ reference_par.goal_joint=[-0.2672;-1.6281;1.7727;-0.1439;1.3053;0];
 reference_par.use_ik=true;
 reference_par.duration=8;
 reference_par.Ts=0.01;
-reference_par.trajectory='trajectory_robot';    
+reference_par.trajectory='trajectory_robot';
 
 agent_par.type = 'agent_PI2DRLegacy';
 agent_par.noise_std = [0.1;0.1;0.1;0.1;0.1;0];
@@ -40,4 +40,3 @@ protocol.agent_par = agent_par;
 protocol.policy_par = policy_par;
 protocol.reward_model_par = reward_model_par;
 end
-

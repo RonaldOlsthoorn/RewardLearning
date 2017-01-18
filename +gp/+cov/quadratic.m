@@ -8,15 +8,9 @@ classdef quadratic
     methods
         function res = k(~, X, hyp)
             
-            Kw = hyp(1);
+            Kw = diag(hyp);
             
-            [d, n] = size(X);
-            
-            res = zeros(n);
-            
-            for i = 1:n
-                res(((i-1)*d+1):i*d,:) = X(:,i)'*Kw*X;
-            end
+            res = X'*Kw*X;
         end
         
         function res = dkdlf(X, hyp)

@@ -91,6 +91,25 @@ classdef VPSingleGPRewardModel < reward.RewardModel
             
             obj.gp.x_measured = x_meas;
             obj.gp.y_measured = y_meas;
+            %obj.gp.compute_features_measurements();
+        end
+        
+        function init_hypers(obj)
+            
+            d = length(obj.gp.x_measured(1,:));
+
+            lambda_x = std(obj.gp.x_measured);
+            lambda_y = std(obj.gp.y_measured);
+            
+            if lambda_y == 0
+                lambda_y = mean(lambda_x);
+            end
+            
+            sigma = lambda_y/10;
+            
+            obj.gp.hyp.cov(1:d, 1) = log(lambda_x);
+            obj.gp.hyp.cov(d+1, 1) = log(lambda_y);
+            obj.gp.hyp.lik = log(sigma);
         end
         
         function minimize(obj)

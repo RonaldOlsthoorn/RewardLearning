@@ -1,4 +1,4 @@
-classdef PlantUR5 < plant.Plant
+classdef PlantUR5_cart < plant.Plant
 % UR5 wrapper+ external controller
 
     properties(Constant)
@@ -12,7 +12,7 @@ classdef PlantUR5 < plant.Plant
     
     methods
         
-        function obj = PlantUR5(plant_par, external_controller)
+        function obj = PlantUR5_cart(plant_par, external_controller)
             
             if ~plant_par.sim
                 system = plant.SystemUR5(plant_par);

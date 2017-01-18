@@ -3,6 +3,7 @@ classdef VPSingleSegmentExpert < expert.Expert
     
     properties
         
+        manual = false;
         std; % rating error 
         ref;
     end
@@ -24,6 +25,20 @@ classdef VPSingleSegmentExpert < expert.Expert
             end
             
             rating = sum(res);
+            
+            rating = rating + obj.std*rand;
+        end
+        
+        function rating = true_reward(obj, rollout)
+   
+            res = zeros(1, length(obj.ref.viapoints(1,:)));
+            for i = 1:length(obj.ref.viapoints(1,:))
+                res(i)  = -sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
+                                    -obj.ref.viapoints(:,i)').^2, 2);           
+            end
+            
+            rating = sum(res);
+            
         end
     end
 end

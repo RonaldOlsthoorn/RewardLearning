@@ -9,6 +9,13 @@ switch policy_par.type
         p = policy.RBF_ref_policy(policy_par, ref);
     case 'dmp_ref'
         p = policy.DMP_policy(policy_par, ref);
+    case 'dmp_ref_ik'
+        p = policy.DMP_policy_ik(policy_par, ref);
+    case 'UR5_dmp_ref'
+        p = policy.UR5_DMP_policy(policy_par, ref);
+    case 'UR5_dmp_ref_ik'
+        p = policy.UR5_DMP_policy_ik(policy_par, ref);
+        
     otherwise
         p = [];
 end

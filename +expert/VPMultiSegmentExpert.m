@@ -9,6 +9,8 @@ classdef VPMultiSegmentExpert < expert.Expert
         
         segment_start;
         segment_end;
+        
+        manual = false;
     end
     
     methods
@@ -44,12 +46,44 @@ classdef VPMultiSegmentExpert < expert.Expert
                     if obj.ref.viapoints_t(j)>= obj.segment_start(i) && ...
                             obj.ref.viapoints_t(j)<= obj.segment_end(i)
                         rating(i) = rating(i) - sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
+                                    -obj.ref.viapoints(:,j)').^2, 2) + ...
+                                    obj.std*randn();  
+                    end
+                    
+                end
+            end            
+        end
+        
+        function rating = query_expert_segment(obj, rollout, seg)
+            
+            rating = zeros(1, obj.n_segments);
+            
+            for j = 1:length(obj.ref.viapoints(1,:))
+                
+                if obj.ref.viapoints_t(j)>= obj.segment_start(seg) && ...
+                        obj.ref.viapoints_t(j)<= obj.segment_end(seg)
+                    rating(seg) = rating(seg) - sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
+                        -obj.ref.viapoints(:,j)').^2, 2) + ...
+                        obj.std*randn();
+                end
+            end
+        end
+        
+        function rating = true_reward(obj, rollout)
+            
+            rating = zeros(1, obj.n_segments);
+            
+            for i = 1:obj.n_segments
+                
+                for j = 1:length(obj.ref.viapoints(1,:))
+                    
+                    if obj.ref.viapoints_t(j)>= obj.segment_start(i) && ...
+                            obj.ref.viapoints_t(j)<= obj.segment_end(i)
+                        rating(i) = rating(i) - sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
                                     -obj.ref.viapoints(:,j)').^2, 2);  
                     end
                 end
-            end
-            
-            %rating = rating + obj.std*randn(1,obj.n_segments);
+            end 
         end
     end
 end

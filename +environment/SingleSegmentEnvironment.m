@@ -3,6 +3,8 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
     
     properties
         
+        n_queries = 0;
+        
         original_batch;
         tol;
     end
@@ -13,7 +15,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                 expert, agent)
             
             obj = obj@environment.DynamicEnvironment(plant, reward_model,...
-                expert, agent);        
+                expert, agent);
         end
         
         % Updates the reward if needed by demonstrating rollouts of the
@@ -36,11 +38,22 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                 % already queried.
                 if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     
+                    if obj.expert.manual == true
+                        obj.expert.background(batch_rollouts);
+                    end
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     batch_rollouts.update_rollout(rollout);
                     obj.reward_model.add_demonstration(rollout);
-                    obj.reward_model.print();
+                    obj.reward_model.minimize();
+                    
                     unqueried_batch.delete(max_rollout);
+                    
+                    unqueried_batch = obj.reward_model.add_reward_batch(unqueried_batch);
+                    obj.original_batch = obj.reward_model.add_reward_batch(obj.original_batch);
+                    
+                    obj.n_queries = obj.n_queries + 1;
+                    
+                    obj.reward_model.print();
                     
                     if unqueried_batch.is_empty()
                         find_nominee = false;

@@ -41,11 +41,17 @@ switch reference_par.trajectory
         reference = refs.VPReference(reference_par);
         reference.init_state = reference_par.start_joint;
         
-        [t] = refs.ref_2doflin(reference_par);
-        reference.r_tool = t;
+%         [t] = refs.ref_2doflin(reference_par);
+%         reference.r_tool = t;
+%         
+%         [j] = ik.map_ref2(reference.r_tool, reference_par, ik.create_model_2DOF());
+%         reference.r_joints = j;
+
+    case 'robot-via'
         
-        [j] = ik.map_ref2(reference.r_tool, reference_par, ik.create_model_2DOF());
-        reference.r_joints = j;
+        reference = refs.VPReference(reference_par);
+        reference.init_state = reference_par.start_joint;
+        
     otherwise
         reference = [];
 end

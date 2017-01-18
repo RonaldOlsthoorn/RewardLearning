@@ -1,4 +1,4 @@
-function [ protocol ] = viapoint_single_static()
+function [ protocol ] = viapoint_single_manual()
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
@@ -44,13 +44,29 @@ policy_par.Ts =  plant_par.Ts;
 policy_par.start = reference_par.start_tool;
 policy_par.goal = reference_par.goal_tool;
 
-env_par.dyn = false;
-env_par.acquisition = 'epd';
-env_par.expert = 'hard_coded_expert';
-env_par.expert_std = 1e-3;
-env_par.tol = 0.1;
+env_par.dyn = true;
+env_par.acquisition = 'epd_single';
+env_par.expert = 'manual_expert';
+env_par.expert_std = 0.004;
+% env_par.expert_std = 0;
+env_par.tol = 5e-1;
 
-reward_model.type = 'reward_model_static_vp';
+reward_model.type = 'viapoint_single_gp';
+reward_model.n_segments = 4;
+
+% hyp.cov = ones(45,1);
+% hyp.mean = [];
+% hyp.lik = 0.01;
+
+hyp.cov = ones(9,1);
+hyp.mean = [];
+hyp.lik = 0.01;
+
+gp_par.hyp = hyp;
+gp_par.mean = 'zero';
+gp_par.cov = 'quadratic';
+
+reward_model.gp_par = gp_par;
 
 protocol.plant_par = plant_par;
 protocol.controller_par = controller_par;

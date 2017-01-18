@@ -29,7 +29,7 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.index = 1;
             
-            n_samples = 4;
+            n_samples = 8;
             
             % create the controls for the first batch of rollouts
             batch_trajectory = obj.agent.create_batch_trajectories(n_samples);
@@ -46,15 +46,29 @@ classdef DynamicEnvironment < environment.Environment
                 obj.index = obj.index + 1;
                 
                 rollout = obj.reward_model.add_outcomes(rollout);
-                
-                rollout.R_expert = obj.expert.query_expert(rollout);
+
                 batch_rollouts.append_rollout(rollout);
+            end
+            
+            for i = 1:batch_rollouts.size
+                
+                rollout = batch_rollouts.get_rollout(i);
+                
+                if obj.expert.manual == true
+                    obj.expert.background(batch_rollouts);
+                    rollout.R_expert = obj.expert.query_expert(rollout);
+                else
+                    rollout.R_expert = obj.expert.query_expert(rollout);
+                end
+                
+                batch_rollouts.update_rollout(rollout);
             end
             
             obj.iteration = obj.iteration + 1;
             
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
-%            obj.reward_model.minimize();
+            obj.reward_model.init_hypers();
+            obj.reward_model.minimize();
             obj.reward_model.print();
         end
       
