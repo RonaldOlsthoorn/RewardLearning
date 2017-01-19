@@ -22,6 +22,10 @@ classdef VPReference < handle
         t;      
     end
     
+    methods(Abstract)
+        print_reference_overlay(obj, figure_handle)
+    end
+    
     methods
         
         function obj = VPReference(ref_par)

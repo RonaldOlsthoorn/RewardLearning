@@ -132,9 +132,11 @@ classdef MovementLearner < handle
             hold on;
             
             if isa(obj.environment,'environment.DynamicEnvironment')
+                
                 plot(obj.R);
                 plot(obj.R_expert);
                 plot(obj.R_true);
+                
             else
                 plot(obj.R);
             end
@@ -151,24 +153,25 @@ classdef MovementLearner < handle
             
             disp(strcat('Return: ', num2str(rollout.R)));
             obj.plant.print_rollout(rollout);
+            obj.reference.print_reference_overlay(obj.plant.handle_batch_figure);
         end
         
         function reset_figure(obj)
             
             figure(obj.handle_noiseless_figure);
             set(double(obj.handle_noiseless_figure),...
-                'units','normalized','outerposition',[0 0 1 1]);
+                'units', 'normalized', 'outerposition', [0 0 1 1]);
             clf;
             
-            subplot(1,3,1);
+            subplot(1, 3, 1);
             xlabel('t [s]');
             ylabel('x_{ef} [m]');
             
-            subplot(1,3,2);
+            subplot(1, 3, 2);
             xlabel('t [s]');
             ylabel('y_{ef} [m]');
             
-            subplot(1,3,3);
+            subplot(1, 3, 3);
             xlabel('x_{ef} [m]');
             ylabel('y_{ef} [m]');
             
