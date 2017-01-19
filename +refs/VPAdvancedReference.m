@@ -7,8 +7,7 @@ classdef VPAdvancedReference < handle
         viapoints; % viapoints in 2d column vectors
         viapoints_t;
         
-        viaplane;
-        viaplane_t;
+        plane;
         
         r_joints;
         r_joints_d;
@@ -33,12 +32,11 @@ classdef VPAdvancedReference < handle
             obj.viapoints = ref_par.viapoint;
             obj.viapoints_t = ref_par.viapoint_t;
             
-            obj.viaplane = ref_par.viaplane;
-            obj.viaplane_t = ref_par.viaplane_t;
-            
+            obj.plane = refs.plane(ref_par);
+                   
             obj.duration = ref_par.duration;
             obj.Ts = ref_par.Ts;      
-            obj.t = 0:obj.Ts:(obj.duration-obj.Ts);            
+            obj.t = 0:obj.Ts:(obj.duration-obj.Ts); 
         end     
         
         function print_reference_overlay(obj, figure_handle)
@@ -57,8 +55,7 @@ classdef VPAdvancedReference < handle
                     scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j));
                 end
                 
-                t_plane = (obj.viaplane_t(1):obj.viaplane_t(2))*obj.Ts;
-                plot(t_plane, ones(1,length(t_plane))*obj.viaplane(i), ...
+                plot(obj.plane.t, ones(1,length(obj.plane.t))*obj.plane.tool(i), ...
                     'LineWidth', 2);
             end
             

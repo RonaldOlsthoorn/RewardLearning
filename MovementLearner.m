@@ -137,6 +137,7 @@ classdef MovementLearner < handle
                 plot(obj.R_expert);
                 plot(obj.R_true);
                 
+                disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
             else
                 plot(obj.R);
             end
@@ -144,8 +145,6 @@ classdef MovementLearner < handle
             title(obj.protocol_s);
             xlabel('iteration');
             ylabel('Return');
-            
-            disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
         end
         
         function print_noiseless_rollout(obj, rollout)
