@@ -10,7 +10,9 @@ classdef UR5_DMP_policy < policy.Policy
         
         init_state;
         
-        orientation
+        orientation;
+        
+        z;
     end
     
     methods
@@ -24,6 +26,8 @@ classdef UR5_DMP_policy < policy.Policy
             obj.init_state = ref.init_state; % TODO: Remove. Need for ik.
             
             obj.orientation = policy_par.orientation;
+            
+            obj.z = policy_par.start(3);
             
             for i = 1:policy_par.dof
                 
@@ -61,13 +65,15 @@ classdef UR5_DMP_policy < policy.Policy
             xd = zeros(n_system_dof, n_time);
             xdd = zeros(n_system_dof, n_time);
      
-            for i=1:3
+            for i=1:2
                 
                 x(i,:) = policy.dof(i).xd(1,:);
                 xd(i,:) = policy.dof(i).xd(2,:);
                 xdd(i,:) = policy.dof(i).xd(3,:);
             end
-            
+                   
+            x(3,:) = ones(1,length(obj.reference.t))*obj.z;
+                               
             for i = 4:6
                 
                 x(i,:) = ones(1, length(x(i,:)))*obj.orientation(i-3);

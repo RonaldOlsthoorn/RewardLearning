@@ -27,10 +27,12 @@ reference_par.start_joint = [pi/6;(2*pi/3)];
 reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
-reference_par.viapoint_t = [300];
+
+reference_par.viapoint_t = 300;
 reference_par.viapoint = [0.3; 0.6];
 reference_par.viaplane_t = [601, 800];
-reference_par.viaplane = [0.5;0.3];
+reference_par.dim = 'xy';
+reference_par.level = [0.5;0.3];
 
 agent_par.type = 'agent_PI2BB';
 agent_par.noise_std = [100; 100];

@@ -16,6 +16,11 @@ classdef Reference < handle
         t;      
     end
     
+    methods(Abstract)
+       
+        plot_reference_overlay(obj, figure_handle);
+    end
+    
     methods
         
         function obj = Reference(ref_par)
