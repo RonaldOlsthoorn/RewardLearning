@@ -6,6 +6,12 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
         manual = false;
         std; % rating error 
         ref;
+        
+        threshold = 0.9;
+        penalty = 10;
+        
+        w_plane = 1;
+        w_point = 1;
     end
     
     methods
@@ -18,32 +24,50 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
         
         function rating = query_expert(obj, rollout)
    
-            res = zeros(1, length(obj.ref.viapoints(1,:)));
+            res = 0;
             
-            sq_error = (rollout.tool_positions(:, obj.ref.plane.t)...
-                -obj.ref.viaplane').^2;
+            [m_sing] = max(sqrt(sum(rollout.tool_positions.^2)));
+            
+            if m_sing > obj.threshold
+                 res = res - obj.penalty;
+            end
+            
+            sq_error = (rollout.tool_positions(:, obj.ref.plane.t/obj.ref.Ts)...
+                -obj.ref.plane.tool).^2;
             sq_error(isnan(sq_error)) = 0;
             
-            res = res - mean(sq_error, 2) + obj.std*randn();
+            res = res - obj.w_plane*sum(sum(sq_error,2));
                 
             for i = 1:length(obj.ref.viapoints(1,:))
-                res(i)  = -sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
+                res  = res -obj.w_point*sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
                                     -obj.ref.viapoints(:,i)').^2, 2);           
             end
             
-            rating = sum(res);
-            rating = rating + obj.std*rand;
+            rating = res + obj.std*rand;
         end
         
         function rating = true_reward(obj, rollout)
    
-            res = zeros(1, length(obj.ref.viapoints(1,:)));
+            res = 0;
+            
+            [m_sing] = max(sqrt(sum(rollout.tool_positions.^2)));
+            
+            if m_sing > obj.threshold
+                 res = res - obj.penalty;
+            end
+            
+            sq_error = (rollout.tool_positions(:, obj.ref.plane.t/obj.ref.Ts)...
+                -obj.ref.plane.tool).^2;
+            sq_error(isnan(sq_error)) = 0;
+            
+            res = res - obj.w_plane*sum(sum(sq_error,2));
+                
             for i = 1:length(obj.ref.viapoints(1,:))
-                res(i)  = -sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
+                res  = res -obj.w_point*sum((rollout.tool_positions(:, obj.ref.viapoints_t(i))'...
                                     -obj.ref.viapoints(:,i)').^2, 2);           
             end
             
-            rating = sum(res);
+            rating = res;
         end
     end
 end

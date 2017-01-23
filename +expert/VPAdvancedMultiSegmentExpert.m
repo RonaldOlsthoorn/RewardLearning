@@ -14,6 +14,9 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
         
         threshold = 0.9;
         penalty = 10;
+        
+        w_plane = 3;
+        w_point = 1;
     end
     
     methods
@@ -57,14 +60,14 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
                         -obj.ref.plane.tool).^2;
                     sq_error(isnan(sq_error)) = 0;
                     
-                    rating(i) = rating(i) - 3*sum(sum(sq_error,2)) + obj.std*randn();
+                    rating(i) = rating(i) - obj.w_plane*sum(sum(sq_error,2)) + obj.std*randn();
                 end
                 
                 for j = 1:length(obj.ref.viapoints(1,:))
                     
                     if obj.ref.viapoints_t(j)>= obj.segment_start(i) && ...
                             obj.ref.viapoints_t(j)<= obj.segment_end(i)
-                        rating(i) = rating(i) - 1*sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
+                        rating(i) = rating(i) - obj.w_point*sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
                             -obj.ref.viapoints(:,j)').^2, 2) + ...
                             obj.std*randn();
                     end
@@ -90,14 +93,14 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
                     -obj.ref.plane.tool).^2;
                 sq_error(isnan(sq_error)) = 0;
                 
-                rating(seg) = rating(seg) - 3*sum(sum(sq_error,2)) + obj.std*randn();
+                rating(seg) = rating(seg) - obj.w_plane*sum(sum(sq_error,2)) + obj.std*randn();
             end
             
             for j = 1:length(obj.ref.viapoints(1,:))
                 
                 if obj.ref.viapoints_t(j)>= obj.segment_start(seg) && ...
                         obj.ref.viapoints_t(j)<= obj.segment_end(seg)
-                    rating(seg) = rating(seg) - 1*sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
+                    rating(seg) = rating(seg) - obj.w_point*sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
                         -obj.ref.viapoints(:,j)').^2, 2) + ...
                         obj.std*randn();
                 end
@@ -123,14 +126,14 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
                         -obj.ref.plane.tool).^2;
                     sq_error(isnan(sq_error)) = 0;
                     
-                    rating(seg) = rating(seg) - 3*sum(sum(sq_error,2));
+                    rating(seg) = rating(seg) - obj.w_plane*sum(sum(sq_error,2));
                 end
                 
                 for j = 1:length(obj.ref.viapoints(1,:))
                     
                     if obj.ref.viapoints_t(j)>= obj.segment_start(seg) && ...
                             obj.ref.viapoints_t(j)<= obj.segment_end(seg)
-                        rating(seg) = rating(seg) - sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
+                        rating(seg) = rating(seg) - obj.w_point*sum((rollout.tool_positions(:, obj.ref.viapoints_t(j))'...
                             -obj.ref.viapoints(:,j)').^2, 2) ;
                     end
                 end

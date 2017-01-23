@@ -27,10 +27,12 @@ reference_par.start_joint = [pi/6;(2*pi/3)];
 reference_par.goal_joint = [0.2203;0.6767];
 reference_par.duration = 8;
 reference_par.Ts = plant_par.Ts;
-reference_par.viapoint_t = [300];
+
+reference_par.viapoint_t = 300;
 reference_par.viapoint = [0.3; 0.6];
 reference_par.viaplane_t = [601, 800];
-reference_par.viaplane = [0.5;0.3];
+reference_par.plane_dim = 'xy';
+reference_par.plane_level = [0.5;0.3];
 
 agent_par.type = 'agent_PI2BB';
 agent_par.noise_std = [100; 100];
@@ -48,9 +50,9 @@ policy_par.goal = reference_par.goal_tool;
 
 env_par.dyn = true;
 env_par.acquisition = 'epd_single';
-env_par.expert = 'vp_single_segment_expert';
+env_par.expert = 'vp_advanced_single_segment_expert';
 %env_par.expert_std = 0.002;
-env_par.expert_std = 0.004;
+env_par.expert_std = 0.032;
 env_par.tol = 1e-1;
 
 reward_model.type = 'viapoint_single_gp';
