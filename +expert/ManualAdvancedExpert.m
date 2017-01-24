@@ -4,7 +4,7 @@ classdef ManualAdvancedExpert < expert.Expert
     
     properties
         
-        figure_handle; 
+        figure_handle;
         
         handle_input_figure = 10;
         lock = false;
@@ -17,6 +17,8 @@ classdef ManualAdvancedExpert < expert.Expert
         
         segment_start;
         segment_end;
+        
+        bg_color = (1-5/20)*ones(1,3);
     end
     
     methods
@@ -54,78 +56,6 @@ classdef ManualAdvancedExpert < expert.Expert
             close(obj.figure_handle);
         end
         
-        
-        
-        function background(obj, batch)
-            
-            obj.figure_handle = figure('Visible','on',...
-                'units','normalized','outerposition',[0 0 1 1]);
-            
-            uicontrol('Style', 'pushbutton', 'String', 'rate',...
-                'Position',[1800, 600,100,25],...
-                'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
-            
-            obj.hinput = uicontrol('Style', 'edit',...
-                'Position',[1800,550,100,25]);
-            
-            obj.figure_handle.Visible = 'on';
-            
-            c = 1-5/20;
-            co = [c, c, c];
-            
-            for i = 1:batch.size
-                
-                rollout = batch.get_rollout(i);
-                
-                subplot(1,3,1);
-                hold on;
-                plot(rollout.time, rollout.tool_positions(1,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
-                
-                subplot(1,3,2);
-                hold on;
-                plot(rollout.time, rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
-                
-                subplot(1,3,3);
-                hold on;
-                p = plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
-                
-                if ~isempty(rollout.R_expert)
-                    
-                    x = ones(1,2)*rollout.tool_positions(1,500);
-                    y = [rollout.tool_positions(2,500), rollout.tool_positions(2,500)];
-                    
-                    annotation('textarrow', x, y,...
-                        'String','hello');
-                end
-            end
-            
-            subplot(1,3,1);
-            hold on;
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1));
-            xlabel('tool position t [s]');
-            ylabel('tool position x [m]');
-            
-            subplot(1,3,2);
-            hold on;
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2));
-            xlabel('tool position t [s]');
-            ylabel('tool position y [m]');
-            
-            subplot(1,3,3);
-            hold on;
-            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2));
-            xlabel('tool position x [m]');
-            ylabel('tool position y [m]');
-            
-            subplot(1,3,3);
-            hold on;
-            
-            obj.figure_handle.Visible = 'on';
-        end
-        
         function rating = true_reward(obj, rollout)
             
             res = zeros(1, length(obj.reference.viapoints(1,:)));
@@ -146,12 +76,99 @@ classdef ManualAdvancedExpert < expert.Expert
             end
         end
         
+        function background(obj, batch)
+            
+            obj.init_figure();
+            obj.plot_background_batch(batch);
+            obj.plot_reference();
+            
+            obj.plot_annotations(batch);
+            
+            obj.figure_handle.Visible = 'on';
+        end
+        
+        function init_figure(obj)
+            
+            obj.figure_handle = figure('Visible','on',...
+                'units','normalized','outerposition',[0 0 1 1]);
+            
+            uicontrol('Style', 'pushbutton', 'String', 'rate',...
+                'Position',[1800, 600,100,25],...
+                'Callback', {@(source, eventdata)rating_callback(obj, source, eventdata)});
+            
+            obj.hinput = uicontrol('Style', 'edit',...
+                'Position',[1800,550,100,25]);
+            
+            subplot(1,3,1)
+            xlabel('tool position t [s]');
+            ylabel('tool position x [m]');
+            
+            subplot(1,3,2);
+            xlabel('tool position t [s]');
+            ylabel('tool position y [m]');
+            
+            subplot(1,3,3);
+            xlabel('tool position x [m]');
+            ylabel('tool position y [m]');
+            
+            obj.figure_handle.Visible = 'on';
+        end
+        
+        function plot_background_batch(obj, batch)
+            
+            for i = 1:batch.size
+                
+                rollout = batch.get_rollout(i);
+                
+                subplot(1,3,1);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(1,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+                
+                subplot(1,3,2);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+                
+                subplot(1,3,3);
+                hold on;
+                plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+            end
+        end
+        
+        function plot_reference(obj)
+            
+            subplot(1,3,1);
+            hold on;
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1),...
+                40, 'Marker', '+', 'LineWidth', 2, ...
+                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
+            plot(obj.reference.plane.t, obj.reference.plane.tool(1,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
+            
+            subplot(1,3,2);
+            hold on;
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2),...
+                40, 'Marker', '+', 'LineWidth', 2, ...
+                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
+            plot(obj.reference.plane.t, obj.reference.plane.tool(2,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
+            
+            subplot(1,3,3);
+            hold on;
+            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2),...
+                40, 'Marker', '+', 'LineWidth', 2, ...
+                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
+            plot(obj.reference.plane.tool(1,:), obj.reference.plane.tool(2,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
+        end
+        
         function plot_rollout(obj, rollout)
             
             subplot(1,3,1);
             hold on;
             plot(rollout.time, rollout.tool_positions(1,:), 'LineWidth', 2, 'Color', 'red');
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1));
             
             for i = 1:obj.n_segments
                 
@@ -166,7 +183,6 @@ classdef ManualAdvancedExpert < expert.Expert
             subplot(1,3,2);
             hold on;
             plot(rollout.time, rollout.tool_positions(2,:), 'LineWidth', 2, 'Color', 'red');
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2));
             
             for i = 1:obj.n_segments
                 
@@ -177,14 +193,56 @@ classdef ManualAdvancedExpert < expert.Expert
                 scatter(t_position, m_segment(1),...
                     40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             end
-           
+            
             subplot(1,3,3);
             hold on;
-            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:));
-            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2));
+            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'LineWidth', 2, 'Color', 'red');
+        end
+        
+        function plot_annotations(obj, batch)
             
+            subplot(1,3,1);
+            hold on;
+            
+            for i = 1:batch.size
+                rollout = batch.get_rollout(i);
+                
+                if ~isempty(rollout.R_expert)
+                    
+                    text(rollout.time(500), rollout.tool_positions(1,500), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert)),...
+                        'FontSize', 8, 'Color', obj.bg_color);
+                end
+            end
+            
+            subplot(1,3,2);
+            hold on;
+            
+            for i = 1:batch.size
+                rollout = batch.get_rollout(i);
+                
+                if ~isempty(rollout.R_expert)
+                    
+                    text(rollout.time(500), rollout.tool_positions(2,500), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert)),...
+                        'FontSize', 8, 'Color', obj.bg_color);
+                end
+            end
+            
+            subplot(1,3,3);
+            hold on;
+            
+            for i = 1:batch.size
+                rollout = batch.get_rollout(i);
+                
+                if ~isempty(rollout.R_expert)
+                    
+                    text(rollout.tool_positions(1,500), rollout.tool_positions(2,500), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert)),...
+                        'FontSize', 8, 'Color', obj.bg_color);
+                end
+            end
         end
     end
-    
 end
 

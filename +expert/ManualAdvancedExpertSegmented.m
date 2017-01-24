@@ -17,6 +17,8 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
         manual = true;
         
         line_handles;
+        
+        bg_color = (1-5/20)*ones(1,3);
     end
     
     methods
@@ -58,6 +60,14 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             end
         end
         
+        function rating_callback(obj, ~, ~)
+            
+            [~, status] = str2num(obj.hinput.String);
+            
+            if (status)
+                obj.lock = false;
+            end
+        end
         
         function rating = query_expert(obj, rollout)
             
@@ -66,16 +76,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             rating = zeros(obj.n_segments, 1);
             obj.plot_rollout(rollout);
             
-            hx = uicontrol('Style', 'text', 'Position',[600, 900, 100, 25]);
-            hy = uicontrol('Style', 'text', 'Position',[1200, 900, 100, 25]);
-            
             for seg = 1:obj.n_segments
-                
-                set(hx, 'String', ...
-                    strcat('mean x in this segment: ', num2str(rollout.outcomes(seg,1))));
-                
-                set(hy, 'String', ...
-                    strcat('mean y in this segment: ', num2str(rollout.outcomes(seg,2))));
                 
                 obj.plot_overlay(rollout, seg);
                 obj.lock = true;
@@ -88,9 +89,10 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 
                 figure(obj.figure_handle);
                 
-                delete(obj.line_handles(1));
-                delete(obj.line_handles(2));
-                delete(obj.line_handles(3));
+                for i = 1:length(obj.line_handles)
+                    
+                    delete(obj.line_handles(i));
+                end
             end
             
             close(obj.figure_handle);
@@ -100,17 +102,6 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             
             figure(obj.figure_handle);
             
-            rating = zeros(obj.n_segments, 1);
-            
-            hx = uicontrol('Style', 'text', 'Position',[600, 900, 100, 25]);
-            hy = uicontrol('Style', 'text', 'Position',[1200, 900, 100, 25]);
-            
-            set(hx, 'String', ...
-                strcat('mean x in this segment: ', num2str(rollout.outcomes(seg,1))));
-            
-            set(hy, 'String', ...
-                strcat('mean y in this segment: ', num2str(rollout.outcomes(seg,2))));
-            
             obj.plot_rollout(rollout);
             obj.plot_overlay(rollout, seg);
             obj.lock = true;
@@ -119,17 +110,25 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 pause(0.1);
             end
             
-            delete(obj.line_handles(1));
-            delete(obj.line_handles(2));
-            delete(obj.line_handles(3));
+            for i = 1:length(obj.line_handles)
+                
+                delete(obj.line_handles(i));
+            end
             
             rating(seg) = str2double(obj.hinput.String);
             
             close(obj.figure_handle);
         end
         
-        
         function background(obj, batch)
+            
+            obj.init_figure();
+            obj.plot_background_batch(batch);
+            obj.plot_reference();
+            obj.plot_annotations(batch);
+        end
+        
+        function init_figure(obj)
             
             obj.figure_handle = figure('Visible','on',...
                 'units','normalized','outerposition',[0 0 1 1]);
@@ -141,10 +140,22 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.hinput = uicontrol('Style', 'edit',...
                 'Position',[1800,550,100,25]);
             
-            obj.figure_handle.Visible = 'on';
+            subplot(1,3,1);
+            xlabel('tool position t [s]');
+            ylabel('tool position x [m]');
             
-            c = 1-5/20;
-            co = [c, c, c];
+            subplot(1,3,2);
+            xlabel('tool position t [s]');
+            ylabel('tool position y [m]');
+            
+            subplot(1,3,3);
+            xlabel('tool position x [m]');
+            ylabel('tool position y [m]');
+            
+            obj.figure_handle.Visible = 'on';
+        end
+        
+        function plot_background_batch(obj, batch)
             
             for i = 1:batch.size
                 
@@ -153,38 +164,42 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 subplot(1,3,1);
                 hold on;
                 plot(rollout.time, rollout.tool_positions(1,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
                 
                 subplot(1,3,2);
                 hold on;
                 plot(rollout.time, rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
                 
                 subplot(1,3,3);
                 hold on;
                 plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', co);
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
             end
+        end
+        
+        function plot_reference(obj)
             
             subplot(1,3,1);
             hold on;
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1));
-            xlabel('tool position t [s]');
-            ylabel('tool position x [m]');
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(1), ...
+                40, 'Marker', '+', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            plot(obj.reference.plane.t, obj.reference.plane.tool(1,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
             
             subplot(1,3,2);
             hold on;
-            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2));
-            xlabel('tool position t [s]');
-            ylabel('tool position y [m]');
+            scatter(obj.reference.viapoints_t*obj.reference.Ts, obj.reference.viapoints(2), ...
+                40, 'Marker', '+', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            plot(obj.reference.plane.t, obj.reference.plane.tool(1,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
             
             subplot(1,3,3);
             hold on;
-            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2));
-            xlabel('tool position x [m]');
-            ylabel('tool position y [m]');
-            
-            obj.figure_handle.Visible = 'on';
+            scatter(obj.reference.viapoints(1), obj.reference.viapoints(2), ...
+                40, 'Marker', '+', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            plot(obj.reference.plane.tool(1,:), obj.reference.plane.tool(2,:), ...
+                'Color', 'cyan', 'LineWidth', 2);
         end
         
         function plot_rollout(obj, rollout)
@@ -194,54 +209,79 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             subplot(1,3,1);
             hold on;
             plot(rollout.time, rollout.tool_positions(1,:), 'k');
-            xlabel('tool position t [s]');
-            ylabel('tool position x [m]');
+            
             subplot(1,3,2);
             hold on;
             plot(rollout.time, rollout.tool_positions(2,:), 'k');
-            xlabel('tool position t [s]');
-            ylabel('tool position y [m]');
+            
             subplot(1,3,3);
             hold on;
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'k');
-            xlabel('tool position x [m]');
-            ylabel('tool position y [m]');
+            
         end
         
         function plot_overlay(obj, rollout, seg)
             
             figure(obj.figure_handle);
             
+            t_position = (obj.segment_start(seg)+(obj.segment_end(seg)-obj.segment_start(seg))/2)*obj.reference.Ts;
+            t_segment = obj.reference.t(obj.segment_start(seg):obj.segment_end(seg));
+            
+            m_segment = ones(1, length(t_segment))*mean(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)));
+            
             subplot(1,3,1);
             hold on;
             obj.line_handles(1) = plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
-                'LineWidth', 2);
+                'LineWidth', 2, 'Color', 'red');
+            
+            obj.line_handles(end+1) = plot(t_segment, m_segment, 'Color', 'b');
+            obj.line_handles(end+1) = scatter(t_position, m_segment(1),...
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            
+            m_segment = ones(1, length(t_segment))*mean(rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)));
             
             subplot(1,3,2);
             hold on;
-            obj.line_handles(2) = plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
+            obj.line_handles(end+1) = plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
-                'LineWidth', 2);
+                'LineWidth', 2, 'Color', 'red');
+            
+            obj.line_handles(end+1) = plot(t_segment, m_segment, 'Color', 'b');
+            obj.line_handles(end+1) = scatter(t_position, m_segment(1),...
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            
+            m_segment_x = ones(1, length(t_segment))*mean(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)));
+            m_segment_y = ones(1, length(t_segment))*mean(rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)));
             
             subplot(1,3,3);
             hold on;
-            obj.line_handles(3) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
+            obj.line_handles(end+1) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
-                'LineWidth', 2);
+                'LineWidth', 2, 'Color', 'red');
+            obj.line_handles(end+1) = scatter(m_segment_x(1), m_segment_y(1),...
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
+            obj.line_handles(end+1) = plot(m_segment_x, rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), 'Color', 'b');
+            obj.line_handles(end+1) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
         end
         
-        function rating_callback(obj, ~, ~)
+        function plot_annotations(obj, batch, seg)
             
-            [~, status] = str2num(obj.hinput.String);
+            subplot(1,3,3);
+            hold on;
             
-            if (status)
-                obj.lock = false;
+            t_segment = obj.segment_start(seg) + (obj.segment_end(seg) - obj.segment_start(seg))/2;
+            
+            for i = 1:batch.size
+                rollout = batch.get_rollout(i);
+                
+                if ~isempty(rollout.R_expert)
+                    
+                    text(rollout.tool_positions(1,t_segment), rollout.tool_positions(2,500), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert)));
+                end
+                
             end
-            
-            
         end
-        
     end
-    
 end
