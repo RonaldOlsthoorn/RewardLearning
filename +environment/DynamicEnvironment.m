@@ -77,7 +77,5 @@ classdef DynamicEnvironment < environment.Environment
             disp('demonstrate rollout');
             rollout = obj.plant.run(sample);
         end
-        
-    
     end
 end

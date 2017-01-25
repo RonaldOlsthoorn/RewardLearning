@@ -51,9 +51,6 @@ classdef VPReference < handle
                     scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j));
                 end
                 
-                t_plane = (obj.viaplane_t(1):obj.viaplane_t(2))*obj.Ts;
-                plot(t_plane, ones(1,length(t_plane))*obj.viaplane(i), ...
-                    'LineWidth', 2);
             end
             
             subplot(1,d+1,d+1)

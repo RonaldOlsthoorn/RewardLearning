@@ -125,7 +125,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.init_figure();
             obj.plot_background_batch(batch);
             obj.plot_reference();
-            obj.plot_annotations(batch);
+            % obj.plot_annotations(batch);
         end
         
         function init_figure(obj)
@@ -235,20 +235,20 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
                 'LineWidth', 2, 'Color', 'red');
             
-            obj.line_handles(end+1) = plot(t_segment, m_segment, 'Color', 'b');
-            obj.line_handles(end+1) = scatter(t_position, m_segment(1),...
+            obj.line_handles(2) = plot(t_segment, m_segment, 'Color', 'b');
+            obj.line_handles(3) = scatter(t_position, m_segment(1),...
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             
             m_segment = ones(1, length(t_segment))*mean(rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)));
             
             subplot(1,3,2);
             hold on;
-            obj.line_handles(end+1) = plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
+            obj.line_handles(4) = plot(rollout.time(obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
                 'LineWidth', 2, 'Color', 'red');
             
-            obj.line_handles(end+1) = plot(t_segment, m_segment, 'Color', 'b');
-            obj.line_handles(end+1) = scatter(t_position, m_segment(1),...
+            obj.line_handles(5) = plot(t_segment, m_segment, 'Color', 'b');
+            obj.line_handles(6) = scatter(t_position, m_segment(1),...
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             
             m_segment_x = ones(1, length(t_segment))*mean(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)));
@@ -256,13 +256,13 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             
             subplot(1,3,3);
             hold on;
-            obj.line_handles(end+1) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
+            obj.line_handles(7) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), ...
                 rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), ...
                 'LineWidth', 2, 'Color', 'red');
-            obj.line_handles(end+1) = scatter(m_segment_x(1), m_segment_y(1),...
+            obj.line_handles(8) = scatter(m_segment_x(1), m_segment_y(1),...
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
-            obj.line_handles(end+1) = plot(m_segment_x, rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), 'Color', 'b');
-            obj.line_handles(end+1) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
+            obj.line_handles(9) = plot(m_segment_x, rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), 'Color', 'b');
+            obj.line_handles(10) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
         end
         
         function plot_annotations(obj, batch, seg)
