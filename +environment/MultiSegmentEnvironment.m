@@ -39,7 +39,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                 if(~obj.reward_model.db_contains(max_rollout) && max_epd > obj.tol)
                     
                     if obj.expert.manual == true
-                        obj.expert.background(batch_rollouts);
+                        obj.expert.background(obj.reward_model.db_demo(segment));
                     end
                     rollout = obj.demonstrate_and_query_expert(max_rollout, segment);
                     batch_rollouts.update_rollout(rollout);

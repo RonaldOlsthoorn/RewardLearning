@@ -1,4 +1,4 @@
-function [ protocol ] = viapoint_advanced_single()
+function [ protocol ] = viapoint_advanced_single_manual()
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
