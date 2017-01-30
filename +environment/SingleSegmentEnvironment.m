@@ -39,7 +39,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                 if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     
                     if obj.expert.manual == true
-                        obj.expert.background(batch_rollouts);
+                        obj.expert.background(obj.reward_model.batch_demonstrations);
                     end
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     batch_rollouts.update_rollout(rollout);

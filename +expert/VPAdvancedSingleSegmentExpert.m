@@ -10,7 +10,7 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
         threshold = 0.9;
         penalty = 10;
         
-        w_plane = 1;
+        w_plane = 2;
         w_point = 1;
     end
     
@@ -43,7 +43,7 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
                                     -obj.ref.viapoints(:,i)').^2, 2);           
             end
             
-            rating = res + obj.std*rand;
+            rating = res + obj.std*randn;
         end
         
         function rating = true_reward(obj, rollout)
