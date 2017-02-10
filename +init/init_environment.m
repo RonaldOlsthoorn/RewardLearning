@@ -20,12 +20,16 @@ if env_par.dyn
             ex = expert.ManualAdvancedExpertSegmented(ref, reward_model.n_segments);
         case 'vp_advanced_multi_segment_expert'
             ex = expert.VPAdvancedMultiSegmentExpert(env_par.expert_std, ref, reward_model.n_segments);
+        case 'vp_advanced_x_multi_segment_expert'
+            ex = expert.VPAdvancedXMultiSegmentExpert(env_par.expert_std, ref, reward_model.n_segments);
         case 'vp_advanced_single_segment_expert'
-            ex = expert.VPAdvancedSingleSegmentExpert(env_par.expert_std, ref);        
+            ex = expert.VPAdvancedSingleSegmentExpert(env_par.expert_std, ref);
+        case 'vp_advanced_x_single_segment_expert'
+            ex = expert.VPAdvancedXSingleSegmentExpert(env_par.expert_std, ref);
         otherwise
             ex = [];
     end
-        
+    
     switch env_par.acquisition
         case 'epd_single'
             env = environment.SingleSegmentEnvironment(plant, reward_model, ex, agent);
@@ -36,7 +40,7 @@ if env_par.dyn
     end
     
     env.tol = env_par.tol;
-else   
+else
     env = environment.StaticEnvironment(plant, reward_model);
 end
 

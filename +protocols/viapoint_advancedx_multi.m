@@ -50,7 +50,7 @@ policy_par.goal = reference_par.goal_tool;
 
 env_par.dyn = true;
 env_par.acquisition = 'epd_multi';
-env_par.expert = 'vp_advanced_multi_segment_expert';
+env_par.expert = 'vp_advanced_x_multi_segment_expert';
 env_par.expert_std = 0.0032;
 % env_par.expert_std = 0;
 env_par.tol = 1e-2;
