@@ -1,4 +1,4 @@
-classdef VPMultiGPRewardModel < reward.RewardModel
+classdef VPVarMultiGPRewardModel < reward.RewardModel
     
     properties
         
@@ -92,7 +92,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         function update_gps(obj)
             
             for i = 1:obj.n_segments
-                x_meas = zeros(obj.db_demo(i).size, obj.feature_block.n_features);
+                x_meas = zeros(obj.db_demo(i).size, 2);
                 y_meas = zeros(obj.db_demo(i).size, 1);
                 
                 for j = 1:obj.db_demo(i).size
@@ -187,7 +187,7 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                 
                 for j = 1:length(x_grid)
                     
-                    tuples = [x_grid(:,j), y_grid(:,j), zeros(length(x_grid(:,j)),2)];
+                    tuples = [x_grid(:,j), y_grid(:,j)];
                     [m, s] = obj.gps(i).assess(tuples);
                     mPost(:,j) = m;
                     sPost(:,j) = s;

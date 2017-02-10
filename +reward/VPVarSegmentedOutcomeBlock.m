@@ -1,9 +1,9 @@
-classdef VPSegmentedOutcomeBlock < reward.OutcomeBlock
+classdef VPVarSegmentedOutcomeBlock < reward.OutcomeBlock
     % VPOUTCOMEBLOCK feature block containing only squared error.
     
     properties
         
-        n_features = 2;
+        n_features = 4;
         segment_start;
         segment_end;
         n_segments;
@@ -12,14 +12,17 @@ classdef VPSegmentedOutcomeBlock < reward.OutcomeBlock
     
     methods
         
-        function obj = VPSegmentedOutcomeBlock(ref, n_segments)
+        function obj = VPVarSegmentedOutcomeBlock(ref, n_segments)
             
            obj.n = length(ref.t); 
            obj.n_segments = n_segments;
            obj.init_segments();
                
            obj.reward_primitives = {reward.outcome.OutcomeVPX(obj.segment_start, obj.segment_end), ...
-                reward.outcome.OutcomeVPY(obj.segment_start, obj.segment_end)};
+                reward.outcome.OutcomeVPY(obj.segment_start, obj.segment_end), ...
+                reward.outcome.OutcomeVPVarX(obj.segment_start, obj.segment_end), ...
+                reward.outcome.OutcomeVPVarY(obj.segment_start, obj.segment_end)
+                };
         end
         
         function init_segments(obj)
