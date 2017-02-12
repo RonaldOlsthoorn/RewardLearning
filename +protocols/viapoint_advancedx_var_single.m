@@ -53,7 +53,7 @@ env_par.acquisition = 'epd_single';
 env_par.expert = 'vp_advanced_x_single_segment_expert';
 %env_par.expert_std = 0.002;
 env_par.expert_std = 0.004;
-env_par.tol = 8e-3;
+env_par.tol = 1e-2;
 
 reward_model.type = 'viapoint_var_single_gp';
 reward_model.n_segments = 4;
