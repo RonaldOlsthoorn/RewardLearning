@@ -184,13 +184,13 @@ classdef MovementLearner < handle
                 plot(obj.n_rollouts, obj.R);
             end
             
-            title(obj.protocol_s);
+            title(strrep(obj.protocol_s, '_', ' '));
             xlabel('rollouts');
             ylabel('Return');
             
             figure;
             plot(obj.n_rollouts, obj.D);
-            title(obj.protocol_s);
+            title(strrep(obj.protocol_s, '_', ' '));
             xlabel('rollouts');
             ylabel('expert queries');
         end
