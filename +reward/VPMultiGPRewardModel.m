@@ -187,7 +187,12 @@ classdef VPMultiGPRewardModel < reward.RewardModel
                 
                 for j = 1:length(x_grid)
                     
-                    tuples = [x_grid(:,j), y_grid(:,j)];
+                    if length(obj.gps(i).x_measured(1,:)) == 2
+                        tuples = [x_grid(:,j), y_grid(:,j)]; 
+                    elseif length(obj.gps(i).x_measured(1,:)) == 4
+                        tuples = [x_grid(:,j), y_grid(:,j), zeros(length(x_grid(:,j)), 2)]; 
+                    end
+                    
                     [m, s] = obj.gps(i).assess(tuples);
                     mPost(:,j) = m;
                     sPost(:,j) = s;

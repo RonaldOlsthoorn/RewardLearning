@@ -45,7 +45,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                     batch_rollouts.update_rollout(rollout);
                     
                     obj.reward_model.add_demonstration_segment(rollout, segment);
-%                    obj.reward_model.init_hypers();
+                    obj.reward_model.init_hypers();
                     obj.reward_model.minimize();
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
@@ -156,7 +156,12 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                 
                 for j = 1:length(x_grid)
                     
-                    tuples = [x_grid(:,j), y_grid(:,j)];
+                    if obj.reward_model.gps(i).x_measured(1,:) == 2
+                        tuples = [x_grid(:,j), y_grid(:,j)]; 
+                    elseif obj.reward_model.gps(i).x_measured(1,:) == 4
+                        tuples = [x_grid(:,j), y_grid(:,j), zeros(length(x_grid(:,j)), 2)]; 
+                    end
+                    
                     m_orig = obj.reward_model.gps(i).assess(tuples);
                     mPostOrig(:,j) = m_orig;
                     m_new = rm_ext.gps(i).assess(tuples);
