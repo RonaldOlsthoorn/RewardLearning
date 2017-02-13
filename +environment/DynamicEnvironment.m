@@ -5,6 +5,8 @@ classdef DynamicEnvironment < environment.Environment
         
         expert;
         agent;
+        n_init_samples;
+        
     end
     
     methods(Abstract)
@@ -28,10 +30,10 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.index = 1;
             
-            n_samples = 8;
+            obj.n_init_samples = 8;
             
             % create the controls for the first batch of rollouts
-            batch_trajectory = obj.agent.create_batch_trajectories(n_samples);
+            batch_trajectory = obj.agent.create_batch_trajectories(obj.n_init_samples);
             % run em
             batch_trajectory = obj.plant.batch_run(batch_trajectory);
             % allocate new batch (batch_trajectory is index-less)

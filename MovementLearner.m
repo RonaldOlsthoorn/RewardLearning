@@ -9,12 +9,16 @@ classdef MovementLearner < handle
     
     properties
         
+        iteration;
+        totalIt = 50;
         protocol_s;
         
         W; % policy weight trace
         R; % Reward trace
+        D;
         R_true;
         R_expert;
+        n_rollouts;
         
         plant;
         
@@ -69,11 +73,11 @@ classdef MovementLearner < handle
         
         function [Weights, Returns] = run_movement_learning(obj)
             
-            iteration = 1;
+            obj.iteration = 1;
             
             obj.environment.prepare();
             
-            while iteration < 50 % for now. Replace with EPD
+            while obj.iteration < obj.totalIt % for now. Replace with EPD
                 
                 obj.print_progress();
                 
@@ -86,7 +90,7 @@ classdef MovementLearner < handle
                 
                 obj.agent.update(batch_rollouts);
                 
-                iteration = iteration + 1;
+                obj.iteration = obj.iteration + 1;
             end
             
             Weights = obj.W;
@@ -100,7 +104,40 @@ classdef MovementLearner < handle
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
+            trace_rollouts(obj);
+            
             if isa(obj.environment,'environment.DynamicEnvironment')
+   
+                if isa(obj.reward_model, 'reward.VPSingleGPRewardModel') ||...
+                        isa(obj.reward_model, 'reward.VPVarSingleGPRewardModel')
+                       
+                    if obj.iteration == 1
+                        obj.D(1,1) = obj.reward_model.batch_demonstrations.size;
+                    else
+                        obj.D(end + 1, 1) = obj.reward_model.batch_demonstrations.size;
+                    end
+                    
+                elseif isa(obj.reward_model, 'reward.VPMultiGPRewardModel') ||...
+                        isa(obj.reward_model, 'reward.VPVarMultiGPRewardModel')
+                    
+                    if obj.iteration == 1
+                        
+                        d = 0;
+                        for i = 1:length(obj.reward_model.db_demo)
+                            d = d + obj.reward_model.db_demo(i).size;
+                        end
+
+                        obj.D(1,1) = d; 
+                    else
+                        d = 0;
+                        for i = 1:length(obj.reward_model.db_demo)
+                            d = d + obj.reward_model.db_demo(i).size;
+                        end
+                            
+                        obj.D(end + 1,1) = d;
+                    end
+                end
+                
                 if obj.environment.expert.manual == false
                     rating_expert = obj.environment.expert.query_expert(noiseless_rollout);
                 end
@@ -133,26 +170,51 @@ classdef MovementLearner < handle
             
             if isa(obj.environment,'environment.DynamicEnvironment')
                 
-                plot(obj.R);
-                plot(obj.R_expert);
-                plot(obj.R_true);
+                plot(obj.n_rollouts, obj.R);
+                plot(obj.n_rollouts, obj.R_expert);
+                %plot(obj.n_rollouts, obj.R_true);
                 
+                dataY = [1 diff(obj.D)'];
+                dataY(dataY ~= 0) = 1;
+                dataY = dataY.*obj.R_expert;
+                data = [obj.n_rollouts'; dataY];
+                data( :, ~any(data(2,:),1) ) = [];
+                
+                scatter(data(1,:), data(2,:));
+
                 disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
             else
-                plot(obj.R);
+                plot(obj.n_rollouts, obj.R);
             end
             
-            title(obj.protocol_s);
-            xlabel('iteration');
+            title(strrep(obj.protocol_s, '_', ' '));
+            xlabel('rollouts');
             ylabel('Return');
+            
+            figure;
+            plot(obj.n_rollouts, obj.D);
+            title(strrep(obj.protocol_s, '_', ' '));
+            xlabel('rollouts');
+            ylabel('expert queries');
         end
         
         function print_noiseless_rollout(obj, rollout)
             % print the noiseless rollout in a single figure.
             
             disp(strcat('Return: ', num2str(rollout.R)));
-            obj.plant.print_rollout(rollout);
-            obj.reference.print_reference_overlay(obj.plant.handle_batch_figure);
+            obj.plant.print_rollout(rollout, obj.reference, obj.totalIt, obj.iteration);
+        end
+        
+        function trace_rollouts(obj)
+            if obj.iteration == 1
+                obj.n_rollouts(1,1) = obj.environment.n_init_samples;
+            elseif obj.iteration == 2
+                obj.n_rollouts(2,1) = obj.n_rollouts(1,1) + obj.agent.reps;
+            else
+                n_start = length(obj.n_rollouts(:,1));
+                
+                obj.n_rollouts(n_start + 1, 1) = obj.n_rollouts(n_start) + (obj.agent.reps - obj.agent.n_reuse);
+            end
         end
         
         function reset_figure(obj)
