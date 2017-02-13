@@ -10,6 +10,7 @@ classdef MovementLearner < handle
     properties
         
         iteration;
+        totalIt = 50;
         protocol_s;
         
         W; % policy weight trace
@@ -76,7 +77,7 @@ classdef MovementLearner < handle
             
             obj.environment.prepare();
             
-            while obj.iteration < 50 % for now. Replace with EPD
+            while obj.iteration < obj.totalIt % for now. Replace with EPD
                 
                 obj.print_progress();
                 
@@ -173,7 +174,9 @@ classdef MovementLearner < handle
                 plot(obj.n_rollouts, obj.R_expert);
                 %plot(obj.n_rollouts, obj.R_true);
                 
-                dataY = [1 diff(obj.D)'].*obj.R_expert;
+                dataY = [1 diff(obj.D)'];
+                dataY(dataY ~= 0) = 1;
+                dataY = dataY.*obj.R_expert;
                 data = [obj.n_rollouts'; dataY];
                 data( :, ~any(data(2,:),1) ) = [];
                 
@@ -199,8 +202,7 @@ classdef MovementLearner < handle
             % print the noiseless rollout in a single figure.
             
             disp(strcat('Return: ', num2str(rollout.R)));
-            obj.plant.print_rollout(rollout);
-            obj.reference.print_reference_overlay(obj.plant.handle_batch_figure);
+            obj.plant.print_rollout(rollout, obj.reference, obj.totalIt, obj.iteration);
         end
         
         function trace_rollouts(obj)

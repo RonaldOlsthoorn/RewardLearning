@@ -69,24 +69,44 @@ classdef Plant2DOF < plant.Plant
         end
         
         % print the rollout in the manner that best fits this system.
-        function print_rollout(obj, rollout)
+        function print_rollout(obj, rollout, ref, totalIterations, iteration)
+                        
+            if iteration == 1
+                color = [0.5, 0.5, 0.5];
+                
+            else
+                color =  [  1-(iteration/totalIterations)^2, ...
+                            1-(iteration/totalIterations)^2, ...
+                            1  ];
+            end
             
             figure(obj.handle_batch_figure)
             subplot(1,3,1)            
             hold on
-            plot(rollout.time, rollout.tool_positions(1,:));
+            plot(rollout.time, rollout.tool_positions(1,:), ...
+                'Color', color);
             xlabel('t [s]');
             ylabel('x_{ef} [m]');
             subplot(1,3,2)
             hold on
-            plot(rollout.time, rollout.tool_positions(2,:));
+            plot(rollout.time, rollout.tool_positions(2,:), ...
+                'Color', color);
             xlabel('t [s]');
             ylabel('y_{ef} [m]');
             subplot(1,3,3)
             hold on
-            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:));
+            plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), ...
+                'Color', color);
             xlabel('x_{ef} [m]');
             ylabel('y_{ef} [m]');
+            
+            if totalIterations == iteration
+                scatter(rollout.tool_positions(1, ref.viapoints_t), ...
+                    rollout.tool_positions(2, ref.viapoints_t));
+            end
+            
+            ref.print_reference_overlay(obj.handle_batch_figure);
+            
             drawnow;
         end        
     end

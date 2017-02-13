@@ -20,6 +20,8 @@ classdef VPReference < handle
         duration;
         Ts;
         t;      
+        
+        handles;
     end
     
     
@@ -37,6 +39,13 @@ classdef VPReference < handle
         
         function print_reference_overlay(obj, figure_handle)
             
+            if ~isempty(obj.handles)
+                for i = 1:length(obj.handles)
+                    uistack(obj.handles(i), 'top');
+                end
+                return;
+            end
+            
             figure(figure_handle);
             % assume that dimension of viapoint equals.
             d = length(obj.viapoints(:,1));
@@ -48,7 +57,9 @@ classdef VPReference < handle
                 
                 for j = 1:length(obj.viapoints(1,:))
                     
-                    scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j));
+                    obj.handles(end + 1) = scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
                 
             end
@@ -58,11 +69,15 @@ classdef VPReference < handle
             
             if d==2
                 for j = 1:length(obj.viapoints(1,:))
-                    scatter(obj.viapoints(1, j), obj.viapoints(2, j));
+                    obj.handles(end + 1) = scatter(obj.viapoints(1, j), obj.viapoints(2, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
             elseif d==3
                 for j = 1:length(obj.viapoints(1,:))
-                    scatter3(obj.viapoints(1, j), obj.viapoints(2, j), obj.viapoints(3, j));
+                    obj.handles(end + 1) = scatter3(obj.viapoints(1, j), obj.viapoints(2, j), obj.viapoints(3, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
             end
         end

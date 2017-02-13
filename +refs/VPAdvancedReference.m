@@ -23,6 +23,7 @@ classdef VPAdvancedReference < handle
         Ts;
         t;      
 
+        handles;
     end
     
     methods
@@ -42,6 +43,13 @@ classdef VPAdvancedReference < handle
         function print_reference_overlay(obj, figure_handle)
             
             figure(figure_handle);
+            
+            if ~isempty(obj.handles)
+                for i = 1:length(obj.handles)
+                    uistack(obj.handles(i), 'top');
+                end
+                return;
+            end
             % assume that dimension of viapoint equals.
             d = length(obj.viapoints(:,1));
             
@@ -52,11 +60,13 @@ classdef VPAdvancedReference < handle
                 
                 for j = 1:length(obj.viapoints(1,:))
                     
-                    scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j));
+                    obj.handles(end+1) = scatter(obj.viapoints_t(j)*obj.Ts, obj.viapoints(i, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
                 
-                plot(obj.plane.t, ones(1,length(obj.plane.t))*obj.plane.tool(i), ...
-                    'LineWidth', 2);
+                obj.handles(end+1) = plot(obj.plane.t, ones(1,length(obj.plane.t))*obj.plane.tool(i), ...
+                    'LineWidth', 2, 'Color', 'black');
             end
             
             subplot(1,d+1,d+1)
@@ -64,11 +74,15 @@ classdef VPAdvancedReference < handle
             
             if d==2
                 for j = 1:length(obj.viapoints(1,:)) 
-                    scatter(obj.viapoints(1, j), obj.viapoints(2, j));
+                    obj.handles(end+1) = scatter(obj.viapoints(1, j), obj.viapoints(2, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
             elseif d==3
                 for j = 1:length(obj.viapoints(1,:)) 
-                    scatter3(obj.viapoints(1, j), obj.viapoints(2, j), obj.viapoints(3, j));
+                    obj.handles(end+1) = scatter3(obj.viapoints(1, j), obj.viapoints(2, j), obj.viapoints(3, j),...
+                        40, 'Marker', '+', 'LineWidth', 2, ...
+                        'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'b');
                 end
             end
         end
