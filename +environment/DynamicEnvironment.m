@@ -5,7 +5,6 @@ classdef DynamicEnvironment < environment.Environment
         
         expert;
         agent;
-
     end
     
     methods(Abstract)

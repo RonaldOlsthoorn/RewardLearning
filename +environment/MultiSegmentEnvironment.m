@@ -45,6 +45,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                     batch_rollouts.update_rollout(rollout);
                     
                     obj.reward_model.add_demonstration_segment(rollout, segment);
+%                    obj.reward_model.init_hypers();
                     obj.reward_model.minimize();
                     obj.reward_model.print();
                     unqueried_batch.delete(max_rollout);
