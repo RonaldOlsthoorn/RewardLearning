@@ -17,6 +17,7 @@ classdef MovementLearner < handle
         D;
         R_true;
         R_expert;
+        n_rollouts;
         
         plant;
         
@@ -102,22 +103,17 @@ classdef MovementLearner < handle
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
+            trace_rollouts(obj);
+            
             if isa(obj.environment,'environment.DynamicEnvironment')
-                
+   
                 if isa(obj.reward_model, 'reward.VPSingleGPRewardModel') ||...
                         isa(obj.reward_model, 'reward.VPVarSingleGPRewardModel')
                        
                     if obj.iteration == 1
                         obj.D(1,1) = obj.reward_model.batch_demonstrations.size;
-                        obj.D(1,2) = obj.reward_model.batch_demonstrations.size;
-                    elseif obj.iteration == 2
-                        obj.D(2,1) = obj.D(1,1) + obj.agent.reps;
-                        obj.D(2,2) = obj.reward_model.batch_demonstrations.size;
                     else
-                        n_start = length(obj.D(:,1));
-                        
-                        obj.D(n_start + 1, 1) = obj.D(n_start) + (obj.agent.reps - obj.agent.n_reuse); 
-                        obj.D(n_start + 1, 2) = obj.reward_model.batch_demonstrations.size;
+                        obj.D(end + 1, 1) = obj.reward_model.batch_demonstrations.size;
                     end
                     
                 elseif isa(obj.reward_model, 'reward.VPMultiGPRewardModel') ||...
@@ -129,31 +125,15 @@ classdef MovementLearner < handle
                         for i = 1:length(obj.reward_model.db_demo)
                             d = d + obj.reward_model.db_demo(i).size;
                         end
-                           
-                        obj.D(1,1) = d;
-                        obj.D(1,2) = d; 
-                    elseif obj.iteration == 2
-                        
-                        obj.D(2,1) = obj.agent.reps;
-                        
-                        d = 0;
-                        for i = 1:length(obj.reward_model.db_demo)
-                            d = d + obj.reward_model.db_demo(i).size;
-                        end
-                        
-                        obj.D(2,1) = obj.D(1,1) + obj.agent.reps;
-                        obj.D(2,2) = d;
-                        
+
+                        obj.D(1,1) = d; 
                     else
-                        n_start = length(obj.D(:,1));
-                        obj.D(n_start + 1, 1) = obj.D(n_start) + (obj.agent.reps - obj.agent.n_reuse); 
-                        
                         d = 0;
                         for i = 1:length(obj.reward_model.db_demo)
                             d = d + obj.reward_model.db_demo(i).size;
                         end
                             
-                        obj.D(n_start + 1,2) = d;
+                        obj.D(end + 1,1) = d;
                     end
                 end
                 
@@ -189,21 +169,27 @@ classdef MovementLearner < handle
             
             if isa(obj.environment,'environment.DynamicEnvironment')
                 
-                plot(obj.R);
-                plot(obj.R_expert);
-                plot(obj.R_true);
+                plot(obj.n_rollouts, obj.R);
+                plot(obj.n_rollouts, obj.R_expert);
+                %plot(obj.n_rollouts, obj.R_true);
                 
+                dataY = [1 diff(obj.D)'].*obj.R_expert;
+                data = [obj.n_rollouts'; dataY];
+                data( :, ~any(data(2,:),1) ) = [];
+                
+                scatter(data(1,:), data(2,:));
+
                 disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
             else
-                plot(obj.R);
+                plot(obj.n_rollouts, obj.R);
             end
             
             title(obj.protocol_s);
-            xlabel('iteration');
+            xlabel('rollouts');
             ylabel('Return');
             
             figure;
-            plot(obj.D(:,1), obj.D(:,2));
+            plot(obj.n_rollouts, obj.D);
             title(obj.protocol_s);
             xlabel('rollouts');
             ylabel('expert queries');
@@ -215,6 +201,18 @@ classdef MovementLearner < handle
             disp(strcat('Return: ', num2str(rollout.R)));
             obj.plant.print_rollout(rollout);
             obj.reference.print_reference_overlay(obj.plant.handle_batch_figure);
+        end
+        
+        function trace_rollouts(obj)
+            if obj.iteration == 1
+                obj.n_rollouts(1,1) = obj.environment.n_init_samples;
+            elseif obj.iteration == 2
+                obj.n_rollouts(2,1) = obj.n_rollouts(1,1) + obj.agent.reps;
+            else
+                n_start = length(obj.n_rollouts(:,1));
+                
+                obj.n_rollouts(n_start + 1, 1) = obj.n_rollouts(n_start) + (obj.agent.reps - obj.agent.n_reuse);
+            end
         end
         
         function reset_figure(obj)
