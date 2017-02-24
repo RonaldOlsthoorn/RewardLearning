@@ -1,5 +1,6 @@
 classdef MultiSegmentEnvironment < environment.DynamicEnvironment
-    %
+    % Dynamic environment running a multi segment reward model with an
+    % accompanying multi segment multi reward learning algorithm.
     
     properties
         

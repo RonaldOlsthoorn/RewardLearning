@@ -1,6 +1,6 @@
 classdef ManualAdvancedExpert < expert.Expert
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Manual expert class for multi-objective task. Basically performs ui
+    % functionality for human expert.
     
     properties
         
@@ -23,6 +23,12 @@ classdef ManualAdvancedExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % reference: contains viapoint / viaplane information, which will
+        % be displayed for the user.
+        % n_seg: number of considered segments. Note that although a single
+        % trajectory rating (instead of segment trajectory rating) is used,
+        % segments are displayed for the expert guide.
         function obj = ManualAdvancedExpert(reference, n_seg)
             
             obj.n_segments = n_seg;
@@ -31,6 +37,8 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indexes according to the number of
+        % segments chosen.
         function init_segments(obj)
             
             n = length(obj.reference.t);
@@ -42,6 +50,8 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Returns the rating according to the manual expert input.
+        % rollout: demonstrated rollout (result will be plotted).
         function rating = query_expert(obj, rollout)
             
             obj.plot_rollout(rollout);
@@ -56,6 +66,7 @@ classdef ManualAdvancedExpert < expert.Expert
             close(obj.figure_handle);
         end
         
+        % Don't think I use this. For manual expert
         function rating = true_reward(obj, rollout)
             
             res = zeros(1, length(obj.reference.viapoints(1,:)));
@@ -67,6 +78,8 @@ classdef ManualAdvancedExpert < expert.Expert
             rating = sum(res);
         end
         
+        % Callback from when the 'rate' button is clicked. We should then
+        % unlock the waiting loop and move on with processing the rating.
         function rating_callback(obj, ~, ~)
             
             [~, status] = str2num(obj.hinput.String);
@@ -75,6 +88,7 @@ classdef ManualAdvancedExpert < expert.Expert
                 obj.lock = false;
             end
         end
+        
         
         function background(obj, batch)
             

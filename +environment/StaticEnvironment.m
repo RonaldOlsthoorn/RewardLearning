@@ -19,4 +19,3 @@ classdef StaticEnvironment < environment.Environment
     end
     
 end
-

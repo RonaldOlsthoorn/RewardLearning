@@ -1,6 +1,6 @@
 classdef ManualExpert < expert.Expert
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Manual expert class for simple single viapoint task. Basically
+    % performs ui support for human expert.
     
     properties
         
@@ -23,6 +23,13 @@ classdef ManualExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % Constructor.
+        % reference: contains viapoint / viaplane information, which will
+        % be displayed for the user.
+        % n_seg: number of considered segments. Note that although a single
+        % trajectory rating (instead of segment trajectory rating) is used,
+        % segments are displayed for the expert guide.
         function obj = ManualExpert(reference, n_seg)
             
             obj.n_segments = n_seg;
@@ -30,6 +37,8 @@ classdef ManualExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indexes according to the number of
+        % segments chosen.
         function init_segments(obj)
             
             n = length(obj.reference.t);
@@ -41,6 +50,8 @@ classdef ManualExpert < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Returns the rating according to the manual expert input.
+        % rollout: demonstrated rollout (result will be plotted).
         function rating = true_reward(obj, rollout)
             
             res = zeros(1, length(obj.reference.viapoints(1,:)));

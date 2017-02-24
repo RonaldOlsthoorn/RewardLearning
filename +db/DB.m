@@ -9,6 +9,7 @@ classdef DB < handle
     
     methods
         
+        % add new row of rollouts to the database
         function append_row(obj, batch_rollouts)
             
             obj.table = [obj.table; batch_rollouts];

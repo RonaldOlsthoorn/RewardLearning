@@ -10,12 +10,14 @@ classdef RolloutBatch < handle
     
     methods
         
+        % Add a new rollout to the end of the batch
         function append_rollout(obj, rollout)
             
             obj.batch = [obj.batch rollout];
             obj.size = obj.size+1;
         end
         
+        % Add a batch or rollouts to the end of the batch
         function append_batch(obj, batch)
             
             obj.batch = [obj.batch batch.batch];
@@ -62,6 +64,7 @@ classdef RolloutBatch < handle
             end
         end
         
+        % Returns true if there are no rollouts in the batch.
         function res = is_empty(obj)
             
             if obj.size==0

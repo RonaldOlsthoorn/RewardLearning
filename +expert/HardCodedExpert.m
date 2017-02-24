@@ -8,9 +8,11 @@ classdef HardCodedExpert < expert.Expert
     
     methods
         
-        function obj = HardCodedExpert(s)
+        % Constructor.
+        % standard_deviation: represents expert rating error std.
+        function obj = HardCodedExpert(standard_deviation)
             
-            obj.std = s;
+            obj.std = standard_deviation;
         end
         
         function rating = query_expert(obj, rollout)

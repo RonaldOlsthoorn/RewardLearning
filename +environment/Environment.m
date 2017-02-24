@@ -1,7 +1,9 @@
 classdef Environment < handle    
     % Environment base class for reinforcement learning environments.
-    % Environment designed to return in an episodic
-    % fashion due to the nature of the application.
+    % Environment designed to return in an episodic fashion due to the 
+    % nature of the application.
+    % Currently, reward learning also incorporated in subclasses. Maybe 
+    % remove from this class.
     
     properties
         
@@ -19,6 +21,8 @@ classdef Environment < handle
     
     methods
         
+        % Constructor. Two basic ingredients for the environment are a
+        % reward model and a plant (system + low level controller).
         function obj = Environment(p, r)
             
             obj.plant = p;

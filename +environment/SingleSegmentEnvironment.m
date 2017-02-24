@@ -1,5 +1,6 @@
 classdef SingleSegmentEnvironment < environment.DynamicEnvironment
-    %
+    % Represents a dynamic environment with a single single GP reward
+    % funciton (with multi segment inputs).
     
     properties
         
@@ -38,19 +39,21 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                 % already queried.
                 if(~obj.reward_model.batch_demonstrations.contains(max_rollout) && max_epd > obj.tol)
                     
-                    if obj.expert.manual == true
-                        
+                    % For manual experts, background ui inits are needed.
+                    if obj.expert.manual == true     
                         obj.expert.background(obj.reward_model.batch_demonstrations);
                     end
                     
+                    % 
                     rollout = obj.demonstrate_and_query_expert(max_rollout);
                     batch_rollouts.update_rollout(rollout);
                     obj.reward_model.add_demonstration(rollout);
                     
+                    % do not use previous hypers as init point for hyper
+                    % minimization. We are very prone to local minima!
                     obj.reward_model.init_hypers();
                     obj.reward_model.minimize();
-                    
-                    
+                            
                     unqueried_batch.delete(max_rollout);
                     
                     unqueried_batch = obj.reward_model.add_reward_batch(unqueried_batch);
@@ -69,13 +72,15 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             end
         end
         
-        
+        % Returns expected policy divergence value for a specific rollout.
         function res = epd(obj, rollout)
             
             [m, s2] = obj.reward_model.assess(rollout);
             sigma_points = m(end) + [1 -1]*s2(end);
             
             epd = zeros(1, 2);
+            
+            % Rollout weight for unaltered policy update.
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
             for sigma = 1:length(sigma_points)
@@ -94,6 +99,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                     batch.update_rollout(ro);
                 end
                 
+                % Rollout weight for reward model altered policy update.
                 theta_star = obj.agent.get_probability_trajectories(batch);
                 epd(sigma) = sum(theta_star.*log(theta_star./theta_tilda));
             end
@@ -101,6 +107,9 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             res = mean(epd);
         end
         
+        
+        % Returns the maximum acquisition function evaluation result and 
+        % its argument rollout for a batch of rollouts.
         function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
             
             max_rollout = batch_rollouts.get_rollout(1);
@@ -121,12 +130,19 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             end
         end
         
+        % Demonstrate a rollout and query the expert.
+        % sample: rollout sample to be queried.
+        % @ return: new rollout with the same policy as input but possibly 
+        % different result (when applied on stochastic systems). Expert 
+        % rating included.
         function rollout = demonstrate_and_query_expert(obj, sample)
             
             rollout = obj.demonstrate_rollout(sample);
             rollout.R_expert = obj.expert.query_expert(rollout);
         end
         
+        % Print difference in return with original and extended reward
+        % function (tool for debugging and visualization of epd).
         function print_reward_kl(~, batch_tilda, batch_star)
             
             R_tilda = zeros(batch_tilda.size, 1);
@@ -144,6 +160,8 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             scatter(R_star, zeros(batch_star.size, 1));
         end
         
+        % Print difference in return with original and extended reward
+        % function (tool for debugging and visualization of epd).
         function print_kl(~, theta_tilda, theta_star)
             
             figure
@@ -152,6 +170,8 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             scatter(theta_star, zeros(length(theta_star), 1));
         end
         
+        % Print difference in return with original and extended reward
+        % function (tool for debugging and visualization of epd).
         function print_r_in_rm(~, batch_tilda, batch_star)
             
             R_tilda = zeros(batch_tilda.size, 1);

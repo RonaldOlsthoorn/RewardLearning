@@ -34,11 +34,13 @@ classdef DynamicEnvironment < environment.Environment
             
             % create the controls for the first batch of rollouts
             batch_trajectory = obj.agent.create_batch_trajectories(obj.n_init_samples);
-            % run em
+            % run 'em
             batch_trajectory = obj.plant.batch_run(batch_trajectory);
             % allocate new batch (batch_trajectory is index-less)
             batch_rollouts = db.RolloutBatch();
             
+            % rollouts are index-less at first. add index and outcomes.
+            % bit devious, maybe refactor.
             for i = 1:batch_trajectory.size
                 
                 rollout = batch_trajectory.get_rollout(i);
@@ -51,10 +53,12 @@ classdef DynamicEnvironment < environment.Environment
                 batch_rollouts.append_rollout(rollout);
             end
             
+            
             for i = 1:batch_rollouts.size
                 
                 rollout = batch_rollouts.get_rollout(i);
                 
+                % background preparation only needed in manual expert
                 if obj.expert.manual == true
                     obj.expert.background(batch_rollouts);
                     rollout.R_expert = obj.expert.query_expert(rollout);
@@ -72,7 +76,9 @@ classdef DynamicEnvironment < environment.Environment
             obj.reward_model.minimize();
             obj.reward_model.print();
         end
-      
+        
+        % Re-run a rollout for demonstration. Same policy input, maybe
+        % different result (depending on deterministic/stochastic system).
         function [rollout] = demonstrate_rollout(obj, sample)
             
             disp('demonstrate rollout');
