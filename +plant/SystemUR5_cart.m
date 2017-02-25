@@ -1,4 +1,4 @@
-classdef SystemUR5 < plant.System
+classdef SystemUR5_cart < plant.System
 % Wrapper class for ur5 robotic commands.
 
     properties(Constant)
@@ -16,7 +16,7 @@ classdef SystemUR5 < plant.System
     
     methods
         
-        function obj = SystemUR5(system_par)
+        function obj = SystemUR5_cart(system_par)
             
             obj.Ts = system_par.Ts;
             

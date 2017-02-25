@@ -1,6 +1,6 @@
 classdef Exact_Timed_DMP < handle
     
-    %  
+    %deprecated  
     properties(Constant)
         
         alpha_z = 25;

@@ -20,11 +20,6 @@ classdef GP < handle
     
     methods
         
-        % infer method.
-        % x_infer: inference input points
-        % @reward: output mean
-        % @sPost: output variance
-        % TODO refactor to infer
         function [reward, sPost] = assess(obj, x_infer)
             
             [reward, SPost] = gp(obj.hyp, ...
@@ -80,8 +75,6 @@ classdef GP < handle
 %             s2 = real(sPost);
         end
         
-        % Deprecated. Do not use feature based linear approximation
-        % anymore.
         function compute_features_measurements(obj)
             
             Xm = obj.x_measured';
@@ -89,8 +82,6 @@ classdef GP < handle
             obj.phi_measured = Phi_m;
         end
         
-        % Deprecated. Do not use feature based linear approximation
-        % anymore.
         function Phi = gp_features(~, X)
            
             [d, nm]  = size(X);
@@ -113,7 +104,6 @@ classdef GP < handle
             Phi(end,:) = ones(1,nm);
         end
         
-        % Wrapper for different hyper parameter minimization methods.
         function logp = minimize(obj)
             
             %logp = obj.minimize_hypers(obj.hyp);
@@ -121,9 +111,6 @@ classdef GP < handle
             logp = obj.minimize_gpml();
         end
         
-        % Uses gpml library to calculate optimal hyper parameters. 
-        % @return logp: log likelihood of the hyper parameters (final cost
-        % function evaluation).
         function logp = minimize_gpml(obj)
             
             [h, logp] = minimize(obj.hyp, ...
@@ -143,9 +130,6 @@ classdef GP < handle
             obj.hyp = h;
         end
         
-        % Deprecated
-        % minimize the observation noise hyper parameter only.
-        % TODO: check derivative.
         function logp = minimize_sigma(obj)
             
             nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
@@ -239,10 +223,6 @@ classdef GP < handle
             
         end
         
-        % minimize the hyper parameters Hildo's way
-        % hyp0: starting point
-        % @ return: final cost function evaluation (log likelihood
-        % optimization).
         function logp = minimize_hypers(obj, hyp0)
             
             nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
@@ -349,12 +329,9 @@ classdef GP < handle
             
             obj.hyp.cov = hCov;
             obj.hyp.mean = hMean;
-            obj.hyp.lik =hLik;   
+            obj.hyp.lik = hLik;   
         end
-        
-        % update the hyper parameters, taking the current hypers as initial
-        % parameters for optimization.
-        % TODO: change init. unsafe.
+          
         function update_hyper_parameters(obj)
             
             obj.minimize(obj.hyp);
@@ -383,7 +360,6 @@ classdef GP < handle
             plot(obj.x_measured, obj.y_measured, 'ro'); % We plot the measurement points.
         end
         
-        % Clear reward model figure.
         function reset_figure(obj)
             figure(obj.figID);
             set(double(obj.figID),...

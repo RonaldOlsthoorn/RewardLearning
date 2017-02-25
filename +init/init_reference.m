@@ -10,6 +10,7 @@ switch reference_par.trajectory
         reference.r_tool = t;
         reference.r_tool_d = t_d;
         
+        % inverse kinematics used for initializing the policy.
         if reference_par.use_ik
             
             [j, j_d] = ik.map_ref(reference.r_tool, reference_par, ik.create_model_UR5());
@@ -27,6 +28,7 @@ switch reference_par.trajectory
         reference.r_tool_d = t_d;
         reference.r_tool_dd = t_dd;
         
+        % inverse kinematics used for initializing the policy.
         if reference_par.use_ik
             
             [j, j_d] = ik.map_ref2(reference.r_tool, reference_par, ik.create_model_2DOF());

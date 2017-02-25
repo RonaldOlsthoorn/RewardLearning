@@ -1,5 +1,10 @@
 function dx = eompend(x, r, control_method, par)
 % Equations of motion for a double pendulum. Derivations based on Lagrangian.
+% Closed loop system is simulated.
+% x: state of the system
+% r: reference state
+% control_method: pointer to control method function
+% par: parameters of the pendulum.
 % Source: http://divf.eng.cam.ac.uk/birl/pub/Main/Publications/LataniotisC.pdf
 
 alpha = par.Iz1+par.Iz2+par.m1*par.r1^2 + par.m2*(par.l1^2 + par.r2^2);

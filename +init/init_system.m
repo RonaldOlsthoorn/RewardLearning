@@ -1,5 +1,5 @@
 function [ system ] = init_system(system_par)
-% 
+% deprecated. system and controller are initialized together as plant.
 
     if strcmp(system_par.system, 'UR5')
        system = plant.SystemUR5(system_par); 

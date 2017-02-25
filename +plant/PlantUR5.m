@@ -1,5 +1,5 @@
 classdef PlantUR5 < plant.Plant
-% UR5 wrapper+ external controller
+% UR5 wrapper+external controller
 
     properties(Constant)
         
@@ -41,9 +41,7 @@ classdef PlantUR5 < plant.Plant
             tool_positions = zeros(3, n_end);
             tool_speeds = zeros(3, n_end);
             time = zeros(1, n_end);
-            
-%             
-%             
+                       
 %             % construct inputs for each dof
 %             r = zeros(obj.system.dof, n_end);
 %             rd = zeros(obj.system.dof, n_end);

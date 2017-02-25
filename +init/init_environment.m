@@ -1,5 +1,6 @@
 function [env] = init_environment(env_par, plant, reward_model, agent, ref)
 
+% many choices of dynamic environment
 if env_par.dyn
     switch env_par.expert
         case 'hard_coded_expert'

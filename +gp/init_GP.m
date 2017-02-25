@@ -1,5 +1,6 @@
 function obj = init_GP(gp_par)
 % Factory function for gp objects
+% TODO: REMOVE CASES. WE DO NOT USE THEM!!
 
 obj = gp.GP();
 obj.hyp = gp_par.hyp;

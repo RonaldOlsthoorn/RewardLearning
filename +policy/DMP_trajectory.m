@@ -44,12 +44,15 @@ classdef DMP_trajectory < handle
     
     methods
         
+        % Constructor.
+        % creates dmp with parameters in dmp_par
         function obj = DMP_trajectory(index, dmp_par)
             
             obj.index = index;
             obj.initialize(dmp_par);
         end
         
+        % initialize different aspects of the dmp
         function initialize(obj, dmp_par)
             
             obj.initialize_parameters(dmp_par)
@@ -61,6 +64,7 @@ classdef DMP_trajectory < handle
             obj.initialize_bases();
         end
         
+        % set base parameters of dmp as attributes.
         function initialize_parameters(obj, dmp_par)
             
             obj.Ts = dmp_par.Ts;
@@ -75,6 +79,7 @@ classdef DMP_trajectory < handle
             obj.w = zeros(obj.n_rfs,1);
         end
         
+        % determine the centers of the rbfs in time.
         function initialize_centers(obj)
                         
             centers_time = (0:1/(obj.n_rfs-1):1)'*0.5;
@@ -82,12 +87,16 @@ classdef DMP_trajectory < handle
             obj.cd = obj.c*(-obj.alpha_x);
         end
         
+        % calculate the bandwidth of the rbfs and account for quadratic
+        % scaling of rbfs to equalize region of influence for each rbf.
         function initialize_amplitudes(obj)
             
             obj.D = (diff(obj.c)*0.55).^2;
             obj.D = 1./[obj.D; obj.D(end)];
         end
         
+        % initialize first order system (exponential decay). Used as a
+        % damping factor for rbf generated force. 
         function initialize_x(obj)
             
             obj.x = zeros(length(obj.t), 1);
@@ -100,6 +109,7 @@ classdef DMP_trajectory < handle
             % obj.x = exp(-obj.alpha_x.*obj.tau.*obj.t);
         end
         
+        % pre-compute rbf basis functions
         function initialize_psi(obj)
             
             for i = 1:obj.n_rfs
@@ -123,6 +133,7 @@ classdef DMP_trajectory < handle
             obj.time_normalized_psi = W./(ones(length(obj.t), 1)*sum(W, 1));
         end
         
+        % pre-compute normalized rbf basis functions
         function initialize_bases(obj)
             
             for i = 1:length(obj.t)
@@ -132,6 +143,11 @@ classdef DMP_trajectory < handle
             
         end
         
+        % returns trajectory and first and second order derivative.
+        % eps: exploration noise
+        % y: trajectory position
+        % yd: trajectory velocity
+        % ydd: trajectory acceleration
         function [y, yd, ydd] = create_trajectory(obj, eps)
             
             import rollout.Rollout;
@@ -164,7 +180,11 @@ classdef DMP_trajectory < handle
             ydd = ydd';
         end
         
-        
+        % determines weights to fit a specified trajectory. Straight
+        % forward linear least squares method is used.
+        % T: trajectory position
+        % Td: optionally, trajectory velocity
+        % Tdd: optionally, trajectory acceleration
         function batch_fit(obj, T, Td, Tdd)
             
             if (nargin < 3)

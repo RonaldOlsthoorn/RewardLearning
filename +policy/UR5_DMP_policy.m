@@ -1,5 +1,8 @@
 classdef UR5_DMP_policy < policy.Policy
 % implements the policy as a trajectory generator.
+% Bote, uses DMP trajectory classes as implementation of DMP itself. Policy
+% is merely an application that wraps around dmp classes to provide policy
+% functionality: trajectory generation (multi DoF), policy update.
 
     properties
         
@@ -31,7 +34,7 @@ classdef UR5_DMP_policy < policy.Policy
             
             for i = 1:policy_par.dof
                 
-                if i ==1 % Annoying MATLAB pre-allocation thingy
+                if i == 1 % Annoying MATLAB pre-allocation thingy
                     obj.DoFs = policy.DMP_trajectory(i, policy_par);
                 else
                     obj.DoFs(i) = policy.DMP_trajectory(i, policy_par);
@@ -41,7 +44,12 @@ classdef UR5_DMP_policy < policy.Policy
             end
         end
         
-        % Return the prescribed trajectory in joint-space.        
+        % creates a trajectory in both end-effector space and joint space.
+        % End effector space is what the policy parameters are mapped in.
+        % Joint space needed to actually simulate/run the plant.
+        % epsilon: parameter based exploration noise.
+        % Return the prescribed trajectory. Basically a bare-bone rollout 
+        % without any results.
         function [trajectory] = create_trajectory(obj, eps)
             
             trajectory = rollout.Rollout();
@@ -89,7 +97,7 @@ classdef UR5_DMP_policy < policy.Policy
             trajectory.time = obj.reference.t;
         end
         
-        % Return a noiseless trajectory in joint-space.
+        % Return a noiseless trajectory.
         function [trajectory] = create_noiseless_trajectory(obj)
             
             eps = zeros(obj.n_rfs, obj.n_dof);
