@@ -1,5 +1,5 @@
 classdef ManualAdvancedExpert < expert.Expert
-    % Manual expert class for multi-objective task. Basically performs ui
+    % Manual expert class for multi-objective task. Basically performs UI
     % functionality for human expert.
     
     properties
@@ -66,7 +66,8 @@ classdef ManualAdvancedExpert < expert.Expert
             close(obj.figure_handle);
         end
         
-        % Don't think I use this. For manual expert
+        % Don't think I use this. For manual expert 'true reward' does not
+        % mean anything.
         function rating = true_reward(obj, rollout)
             
             res = zeros(1, length(obj.reference.viapoints(1,:)));
@@ -89,18 +90,18 @@ classdef ManualAdvancedExpert < expert.Expert
             end
         end
         
-        
+        % Set up UI environment for expert. Anything but the to be rated
+        % rollout is prepared.
         function background(obj, batch)
             
             obj.init_figure();
             obj.plot_background_batch(batch);
             obj.plot_reference();
             
-            obj.plot_annotations(batch);
-            
             obj.figure_handle.Visible = 'on';
         end
         
+        % Set up the figure window and the (sub-)plot axes.
         function init_figure(obj)
             
             obj.figure_handle = figure('Visible','on',...
@@ -128,29 +129,7 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.figure_handle.Visible = 'on';
         end
         
-        function plot_background_batch(obj, batch)
-            
-            for i = 1:batch.size
-                
-                rollout = batch.get_rollout(i);
-                
-                subplot(1,3,1);
-                hold on;
-                plot(rollout.time, rollout.tool_positions(1,:),...
-                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
-                
-                subplot(1,3,2);
-                hold on;
-                plot(rollout.time, rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
-                
-                subplot(1,3,3);
-                hold on;
-                plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
-                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
-            end
-        end
-        
+        % Plot the viapoint and viaplane of the objective.
         function plot_reference(obj)
             
             subplot(1,3,1);
@@ -178,6 +157,8 @@ classdef ManualAdvancedExpert < expert.Expert
                 'Color', 'cyan', 'LineWidth', 2);
         end
         
+        % Plot the to-be-rated rollout in the foreground. Also plot the
+        % mean values of each segment as scatter points in the foreground.
         function plot_rollout(obj, rollout)
             
             subplot(1,3,1);
@@ -213,6 +194,42 @@ classdef ManualAdvancedExpert < expert.Expert
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'LineWidth', 2, 'Color', 'red');
         end
         
+        % Plot any rated rollouts from the batch of rollouts in the
+        % background, including expert rating annotation for guiding the 
+        % expert. Makes it easier to see the relative performance of 
+        % rollouts.
+        function plot_background_batch(obj, batch)
+            
+            plot_background_rollouts(obj, batch)
+            plot_annotations(obj, batch)
+        end
+        
+        % Plot any rated rollouts from the batch of rollouts in the
+        % background for guiding the expert. 
+        function plot_background_rollouts(obj, batch)
+            
+            for i = 1:batch.size
+                
+                rollout = batch.get_rollout(i);
+                
+                subplot(1,3,1);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(1,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+                
+                subplot(1,3,2);
+                hold on;
+                plot(rollout.time, rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+                
+                subplot(1,3,3);
+                hold on;
+                plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:),...
+                    'b-', 'LineWidth', 1, 'Color', obj.bg_color);
+            end
+        end
+        
+        % Plot the ratings of all the background rollouts.
         function plot_annotations(obj, batch)
             
             subplot(1,3,1);

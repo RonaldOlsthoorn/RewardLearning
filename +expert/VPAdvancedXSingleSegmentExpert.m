@@ -16,12 +16,17 @@ classdef VPAdvancedXSingleSegmentExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % s: standard deviation, aka expert rating error.
+        % ref: struct containing info about viapoint(s) and viaplane.        
         function obj = VPAdvancedXSingleSegmentExpert(s, ref)
             
             obj.std = s;
             obj.ref = ref;
         end
         
+        % Returns the expert rating of a rollout. All segments are rated.  
+        % @return: vector containing ratings for each segment accordingly.        
         function rating = query_expert(obj, rollout)
    
             res = 0;
@@ -46,6 +51,8 @@ classdef VPAdvancedXSingleSegmentExpert < expert.Expert
             rating = res + obj.std*randn;
         end
         
+        % Returns the 'true' underlying reward of a rollout. Comes down to
+        % the expert rating without expert noise.        
         function rating = true_reward(obj, rollout)
    
             res = 0;

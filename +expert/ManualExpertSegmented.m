@@ -1,6 +1,6 @@
 classdef ManualExpertSegmented < expert.Expert
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Manual expert class for multi-objective task. Basically performs UI
+    % functionality for human expert.
     
     properties
         
@@ -23,6 +23,10 @@ classdef ManualExpertSegmented < expert.Expert
     
     methods
         
+        % Constructor.
+        % reference: contains viapoint / viaplane information, which will
+        % be displayed for the user.
+        % n_seg: number of considered segments. 
         function obj = ManualExpertSegmented(reference, n_seg)
             
             obj.n_segments = n_seg;
@@ -31,6 +35,8 @@ classdef ManualExpertSegmented < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indexes according to the number of
+        % segments chosen.
         function init_segments(obj)
             
             n = length(obj.reference.t);
@@ -42,6 +48,8 @@ classdef ManualExpertSegmented < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Don't think I use this. For manual expert 'true reward' does not
+        % mean anything.
         function rating = true_reward(obj, rollout)
             
             rating = zeros(1, obj.n_segments);
@@ -60,6 +68,8 @@ classdef ManualExpertSegmented < expert.Expert
             end
         end
         
+        % Callback from when the 'rate' button is clicked. We should then
+        % unlock the waiting loop and move on with processing the rating.
         function rating_callback(obj, ~, ~)
             
             [~, status] = str2num(obj.hinput.String);
@@ -69,6 +79,9 @@ classdef ManualExpertSegmented < expert.Expert
             end
         end
         
+        % Returns the rating of a FULL rollout according to the manual 
+        % expert input.
+        % rollout: demonstrated rollout (result will be plotted).        
         function rating = query_expert(obj, rollout)
             
             figure(obj.figure_handle);
@@ -97,7 +110,11 @@ classdef ManualExpertSegmented < expert.Expert
             
             close(obj.figure_handle);
         end
-        
+       
+        % Returns the rating of a rollout segment according to the manual 
+        % expert input.
+        % rollout: demonstrated rollout (result will be plotted).
+        % seg: segment of the rollout that will be rated.        
         function rating = query_expert_segment(obj, rollout, seg)
             
             figure(obj.figure_handle);
@@ -122,6 +139,8 @@ classdef ManualExpertSegmented < expert.Expert
             close(obj.figure_handle);
         end
         
+        % Set up UI environment for expert. Anything but the to be rated
+        % rollout is prepared.        
         function background(obj, batch)
             
             obj.init_figure();
@@ -130,6 +149,7 @@ classdef ManualExpertSegmented < expert.Expert
             % obj.plot_annotations(batch);
         end
         
+        % Set up the figure window and the (sub-)plot axes.        
         function init_figure(obj)
             
             obj.figure_handle = figure('Visible','on',...
@@ -157,6 +177,8 @@ classdef ManualExpertSegmented < expert.Expert
             obj.figure_handle.Visible = 'on';
         end
         
+        % Plot any rated rollouts from the batch of rollouts in the
+        % background for guiding the expert.        
         function plot_background_batch(obj, batch)
             
             for i = 1:batch.size
@@ -180,6 +202,7 @@ classdef ManualExpertSegmented < expert.Expert
             end
         end
         
+        % Plot the viapoint of the objective.         
         function plot_reference(obj)
             
             subplot(1,3,1);
@@ -198,6 +221,8 @@ classdef ManualExpertSegmented < expert.Expert
                 40, 'Marker', '+', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
         end
         
+        % Plot the to-be-rated rollout in the foreground. Also plot the
+        % mean values of each segment as scatter points in the foreground.        
         function plot_rollout(obj, rollout)
             
             figure(obj.figure_handle);
@@ -216,6 +241,7 @@ classdef ManualExpertSegmented < expert.Expert
             
         end
         
+        % Plot mean point of segment as an overlay.        
         function plot_overlay(obj, rollout, seg)
             
             i = 1;
@@ -264,6 +290,7 @@ classdef ManualExpertSegmented < expert.Expert
             obj.line_handles(10) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
         end
         
+        % Plot the ratings of all the background rollouts.          
         function plot_annotations(obj, batch, seg)
             
             subplot(1,3,3);

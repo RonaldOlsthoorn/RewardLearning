@@ -5,7 +5,7 @@ classdef MultiSegmentExpert < expert.Expert
         
         std; % rating error 
         n_segments;
-        weights  = [1 1 1 1];
+        weights  = [1 1 1 1]; % segment weights
         manual = false;
     end
     
@@ -20,7 +20,7 @@ classdef MultiSegmentExpert < expert.Expert
         function rating = query_expert(obj, rollout)
    
             rating = obj.weights.*rollout.sum_out;
-            % rating  = rating + obj.std*randn(1, 4);
+            % rating  = rating + obj.std*randn(1, 4); ignored for now
         end
     end
 end

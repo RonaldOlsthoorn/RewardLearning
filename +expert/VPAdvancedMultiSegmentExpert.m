@@ -21,6 +21,10 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % s: standard deviation, aka expert rating error.
+        % ref: struct containing info about viapoint(s) and viaplane.
+        % n: number of segments
         function obj = VPAdvancedMultiSegmentExpert(s, ref, n)
             
             obj.std = s;
@@ -30,6 +34,8 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indexes according to the number of
+        % segments chosen.
         function init_segments(obj)
             
             n = length(obj.ref.t);
@@ -41,6 +47,8 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Returns the expert rating of a rollout. All segments are rated.  
+        % @return: vector containing ratings for each segment accordingly.
         function rating = query_expert(obj, rollout)
             
             rating = zeros(1, obj.n_segments);
@@ -75,6 +83,10 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
             end
         end
         
+        % Returns the expert rating of a segment. 
+        % rollout: trajectory which will be examined.
+        % segment: part of the trajectory that will be rated.
+        % @return: vector containing ratings for each segment accordingly.
         function rating = query_expert_segment(obj, rollout, seg)
             
             rating = zeros(1, obj.n_segments);
@@ -107,6 +119,8 @@ classdef VPAdvancedMultiSegmentExpert < expert.Expert
             end
         end
         
+        % Returns the 'true' underlying reward of a rollout. Comes down to
+        % the expert rating without expert noise.
         function rating = true_reward(obj, rollout)
             
             rating = zeros(1, obj.n_segments);

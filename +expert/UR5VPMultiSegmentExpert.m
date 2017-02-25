@@ -22,6 +22,8 @@ classdef UR5VPMultiSegmentExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indexes according to the number of
+        % segments chosen.
         function init_segments(obj)
             
             n = length(obj.ref.t);
