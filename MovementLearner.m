@@ -55,7 +55,7 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
-            rng(20); % fix random seed. handy for comparisson
+            % rng(20); % fix random seed. handy for comparisson
             
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
@@ -237,6 +237,26 @@ classdef MovementLearner < handle
             ylabel('y_{ef} [m]');
             
             drawnow;
+        end
+        
+        function res = export(obj)
+            
+            res.reward_model = obj.reward_model.to_struct();
+            
+            noiseless_trajectory = obj.agent.get_noiseless_trajectory();
+            noiseless_rollout = obj.environment.run(noiseless_trajectory);
+            
+            res.final_rollout = noiseless_rollout.to_struct();
+            
+            if isa(obj.environment,'environment.DynamicEnvironment')
+                
+                res.R = obj.R;
+                res.R_expert = obj.R_expert;
+                res.n_queries = obj.environment.n_queries;
+            else
+                res.R = obj.R;
+            end
+            
         end
     end
 end

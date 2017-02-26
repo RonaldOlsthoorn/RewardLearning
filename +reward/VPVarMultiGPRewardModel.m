@@ -164,6 +164,19 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        function [struct] = to_struct(obj)
+            
+            struct.n_segments = obj.n_segments;
+            struct.n = obj.n;
+            struct.segment_start = obj.segment_start;
+            struct.segment_end = obj.segment_end;
+            
+            for i = 1:struct.n_segments
+                struct.gps(i) = obj.gps(i).to_struct();
+            end
+            
+        end
+        
         function print(obj)
             
             figure(obj.figID);
@@ -209,6 +222,22 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
                 xlabel('mean x');
                 ylabel('mean y');
                 zlabel('Return');
+            end
+        end
+    end
+    
+    methods(Static)
+        
+        function obj = from_struct(struct)
+            
+            obj = reward.VPSingleGPRewardModel();
+            obj.n_segments = struct.n_segments;
+            obj.n = struct.n;
+            obj.segment_start = struct.segment_start;
+            obj.segment_end = struct.segment_end;
+            
+            for i = 1:length(struct.gps)
+                obj.gps(i) = gp.GP.from_struct(struct.gps(i));
             end
         end
     end

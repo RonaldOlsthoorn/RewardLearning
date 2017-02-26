@@ -18,6 +18,17 @@ classdef GP < handle
         phi_measured = [];
     end
     
+    methods(Static)
+      
+        function obj = from_struct(struct)
+            
+            obj = gp.GP();
+            obj.hyp = struct.hyp;
+            obj.x_measured = struct.x_measured;
+            obj.y_measured = struct.y_measured;
+        end
+    end
+    
     methods
         
         function [reward, sPost] = assess(obj, x_infer)
@@ -382,6 +393,13 @@ classdef GP < handle
                     new.(p{i}) = this.(p{i});
                 end
             end
+        end
+        
+        function struct = to_struct(obj)
+            
+            struct.hyp = obj.hyp;
+            struct.x_measured = obj.x_measured;
+            struct.y_measured = obj.y_measured;
         end
     end
 end

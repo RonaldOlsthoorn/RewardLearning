@@ -36,6 +36,24 @@ classdef Rollout
             else
                 res=false;
             end
-        end 
-    end    
+        end
+        
+        
+        % Make a copy of a handle object.
+        function struct = to_struct(obj)
+            % Instantiate new object of the same class.
+            
+            % Copy all non-hidden properties.
+            p = properties(obj);
+            for i = 1:length(p)
+                
+                if ~isempty(p{i})
+                    struct.(p{i}) = obj.(p{i});
+                end
+            end
+        end
+        
+    end 
+    
+    
 end

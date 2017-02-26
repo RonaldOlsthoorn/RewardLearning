@@ -109,6 +109,20 @@ classdef RolloutBatch < handle
                arr(i) = obj.batch(i).to_struct();
            end
         end
+        
+    end
+    
+    methods(Static)
+        
+        % returns a batch from an array of structs
+        function obj = from_array(array)
+            
+            obj =  db.RolloutBatch();
+            
+            for i = 1:length(array)
+                obj.append_rollout(rolllout.Rollout.from_array(array(i)));
+            end
+        end
     end
 end
     

@@ -135,6 +135,16 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             end
         end
         
+        function [struct] = to_struct(obj)
+            
+            struct.n_segments = obj.n_segments;
+            struct.n = obj.n;
+            struct.segment_start = obj.segment_start;
+            struct.segment_end = obj.segment_end;
+            struct.gp = obj.gp.to_struct();
+            
+        end
+        
         function print(obj)
             
 %             figure(obj.figID);
@@ -184,5 +194,18 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
 %             end
         end
         
+    end
+    
+     methods(Static)
+        
+        function obj = from_struct(struct)
+            
+            obj = reward.VPSingleGPRewardModel();
+            obj.n_segments = struct.n_segments;
+            obj.n = struct.n;
+            obj.segment_start = struct.segment_start;
+            obj.segment_end = struct.segment_end;
+            obj.gp = gp.GP.from_struct(struct.gp);
+        end
     end
 end
