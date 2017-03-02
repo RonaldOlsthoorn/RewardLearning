@@ -1,7 +1,7 @@
 function [ output_args ] = run_all_protocols()
 
 [res_viapoint_multi] = run_multi_learning('viapoint_multi');
-save('saved_results\multi_runs\res_viapoint_multi', 'res_viapoint_multi');
+save('saved_results/multi_runs/res_viapoint_multi', 'res_viapoint_multi');
 
 [res_viapoint_advanced_multi] = run_multi_learning('viapoint_advanced_multi');
 save('saved_results/multi_runs/res_viapoint_advanced_multi', 'res_viapoint_advanced_multi');
