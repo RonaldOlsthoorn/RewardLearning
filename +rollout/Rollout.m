@@ -22,6 +22,7 @@ classdef Rollout
         r_cum;
         R;
         R_expert;
+        R_true;
         
         v_feed;
     end

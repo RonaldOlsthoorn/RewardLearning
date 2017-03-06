@@ -37,6 +37,23 @@ classdef VPReference < handle
             obj.t = 0:obj.Ts:(obj.duration-obj.Ts);
         end
         
+        function res = to_struct(obj)
+            
+           res.viapoints = obj.viapoints;
+           res.viapoints_t = obj.viapoints_t;
+           
+           res.duration = obj.duration;
+           res.Ts = obj.Ts;
+           res.t = obj.t;
+            
+        end
+        
+        function clear_overlay_handles(obj)
+            
+            obj.handles = [];           
+                        
+        end
+        
         function print_reference_overlay(obj, figure_handle)
             
             if ~isempty(obj.handles)
