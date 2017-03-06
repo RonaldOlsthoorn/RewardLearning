@@ -55,8 +55,13 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
-            rng(20); % fix random seed. handy for comparisson
+            rng(20); % fix random seed. handy for comparisson.
+            % Set seed 1 for total shitstorm on advancedx_single
+            % or nice result on advanced_var_multi
+            % Set seed 3 for decent result on advancedx_single.
+            % Set seed 20 for rest.
             
+                       
             obj.reference = init.init_reference(p.reference_par);
             obj.plant = init.init_plant(p.plant_par, p.controller_par);
             obj.plant.set_init_state(obj.reference.init_state);
