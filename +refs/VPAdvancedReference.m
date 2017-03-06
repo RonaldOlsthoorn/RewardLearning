@@ -40,6 +40,18 @@ classdef VPAdvancedReference < handle
             obj.t = 0:obj.Ts:(obj.duration-obj.Ts); 
         end     
         
+        function res = to_struct(obj)
+            
+           res.viapoints = obj.viapoints;
+           res.viapoints_t = obj.viapoints_t;
+           res.plane = obj.plane;
+           
+           res.duration = obj.duration;
+           res.Ts = obj.Ts;
+           res.t = obj.t;
+            
+        end
+        
         function print_reference_overlay(obj, figure_handle)
             
             figure(figure_handle);
