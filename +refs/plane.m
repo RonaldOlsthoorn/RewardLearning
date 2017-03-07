@@ -2,7 +2,7 @@ function [ plane ] = plane( reference_par )
 
 plane.t = (reference_par.viaplane_t(1):reference_par.viaplane_t(2))*reference_par.Ts;
 n = length(plane.t);
-d = length(reference_par.start_tool);
+d = length(reference_par.viapoint);
 
 switch reference_par.plane_dim
     case 'x'

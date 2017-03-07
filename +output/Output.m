@@ -286,5 +286,42 @@ classdef Output < handle
             res.granularity = obj.granularity;
             res.dynamic = obj.dynamic;
         end
-    end    
+    end
+    
+    methods(Static)
+        
+        function obj = from_struct(struct)
+            
+            obj = output.Output();
+            
+            obj.manual = struct.manual;
+            obj.granularity = struct.granularity;
+            obj.dynamic = struct.dynamic;
+            
+            obj.Reward_trace = struct.Reward_trace;
+            obj.Demo_trace = struct.Demo_trace;
+            
+            obj.db_obj = db.DB.from_struct(struct.db);
+            
+            switch struct.ref.type
+                case 'VPReference'
+                    obj.ref_obj = refs.VPReference(struct.ref);
+                case 'VPAdvancedReference'
+                    obj.ref_obj = refs.VPAdvancedReference(struct.ref);
+            end
+            
+            switch struct.rm.type
+                case 'VPSingleGPRewardModel'
+                    obj.rm_obj = reward.VPSingleGPRewardModel.from_struct(struct.rm);
+                case 'VPMultiGPRewardModel'
+                    obj.rm_obj = reward.VPMultiGPRewardModel.from_struct(struct.rm);
+                case 'VPVarSingleGPRewardModel'
+                    obj.rm_obj = reward.VPVarSingleGPRewardModel.from_struct(struct.rm);
+                case 'VPVarMultiGPRewardModel'
+                    obj.rm_obj = reward.VPVarMultiGPRewardModel.from_struct(struct.rm);
+            end
+            
+        end
+            
+    end
 end

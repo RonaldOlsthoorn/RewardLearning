@@ -53,8 +53,21 @@ classdef Rollout
                 end
             end
         end
-        
+                
     end 
-    
-    
+       
+    methods(Static)
+        
+        function obj = from_struct(struct)
+            
+            obj = rollout.Rollout;
+            
+            f = fields(struct);
+            
+            for i = 1:length(f)
+                
+                obj.(f{i}) = struct.(f{i});
+            end
+        end
+    end
 end

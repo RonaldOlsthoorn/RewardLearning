@@ -166,6 +166,8 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         
         function [struct] = to_struct(obj)
             
+            struct.type = 'VPMultiGPRewardModel';
+            
             struct.n_segments = obj.n_segments;
             struct.n = obj.n;
             struct.segment_start = obj.segment_start;
@@ -235,14 +237,19 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         
         function obj = from_struct(struct)
             
-            obj = reward.VPSingleGPRewardModel();
+            obj = reward.VPMultiGPRewardModel();
             obj.n_segments = struct.n_segments;
             obj.n = struct.n;
             obj.segment_start = struct.segment_start;
             obj.segment_end = struct.segment_end;
             
             for i = 1:length(struct.gps)
-                obj.gps(i) = gp.GP.from_struct(struct.gps(i));
+                
+                if isempty(obj.gps)
+                    obj.gps = gp.GP.from_struct(struct.gps(i));
+                else
+                    obj.gps(i) = gp.GP.from_struct(struct.gps(i));
+                end
             end
         end
     end

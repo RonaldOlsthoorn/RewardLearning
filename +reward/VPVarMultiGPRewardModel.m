@@ -166,6 +166,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
         
         function [struct] = to_struct(obj)
             
+            struct.type = 'VPVarMultiGPRewardModel';
+            
             struct.n_segments = obj.n_segments;
             struct.n = obj.n;
             struct.segment_start = obj.segment_start;
@@ -230,7 +232,7 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
         
         function obj = from_struct(struct)
             
-            obj = reward.VPSingleGPRewardModel();
+            obj = reward.VPVarMultiGPRewardModel();
             obj.n_segments = struct.n_segments;
             obj.n = struct.n;
             obj.segment_start = struct.segment_start;

@@ -7,6 +7,10 @@ classdef VPAdvancedReference < handle
         viapoints; % viapoints in 2d column vectors
         viapoints_t;
         
+        plane_dim;
+        plane_level;
+        
+        viaplane_t;
         plane;
         
         r_joints;
@@ -33,6 +37,10 @@ classdef VPAdvancedReference < handle
             obj.viapoints = ref_par.viapoint;
             obj.viapoints_t = ref_par.viapoint_t;
             
+            obj.plane_dim = ref_par.plane_dim;
+            obj.plane_level = ref_par.plane_level;
+            
+            obj.viaplane_t = ref_par.viaplane_t;
             obj.plane = refs.plane(ref_par);
                    
             obj.duration = ref_par.duration;
@@ -42,14 +50,28 @@ classdef VPAdvancedReference < handle
         
         function res = to_struct(obj)
             
-           res.viapoints = obj.viapoints;
-           res.viapoints_t = obj.viapoints_t;
+           res.type = 'VPAdvancedReference';
+
+           res.viapoint = obj.viapoints;
+           res.viapoint_t = obj.viapoints_t;
+           
+           res.viaplane_t = obj.viaplane_t;
            res.plane = obj.plane;
+           
+           res.plane_dim = obj.plane_dim;
+           res.plane_level = obj.plane_level;
            
            res.duration = obj.duration;
            res.Ts = obj.Ts;
            res.t = obj.t;
             
+        end
+        
+                
+        function clear_overlay_handles(obj)
+            
+            obj.handles = [];           
+                        
         end
         
         function print_reference_overlay(obj, figure_handle)

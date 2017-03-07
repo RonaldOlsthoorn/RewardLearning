@@ -137,6 +137,8 @@ classdef VPSingleGPRewardModel < reward.RewardModel
         
         function [struct] = to_struct(obj)
             
+            struct.type = 'VPSingleGPRewardModel';
+            
             struct.n_segments = obj.n_segments;
             struct.n = obj.n;
             struct.segment_start = obj.segment_start;

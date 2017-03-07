@@ -39,8 +39,10 @@ classdef VPReference < handle
         
         function res = to_struct(obj)
             
-           res.viapoints = obj.viapoints;
-           res.viapoints_t = obj.viapoints_t;
+           res.type = 'VPReference';
+            
+           res.viapoint = obj.viapoints;
+           res.viapoint_t = obj.viapoints_t;
            
            res.duration = obj.duration;
            res.Ts = obj.Ts;

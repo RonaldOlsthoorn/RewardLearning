@@ -120,7 +120,7 @@ classdef RolloutBatch < handle
             obj =  db.RolloutBatch();
             
             for i = 1:length(array)
-                obj.append_rollout(rolllout.Rollout.from_array(array(i)));
+                obj.append_rollout(rollout.Rollout.from_struct(array(i)));
             end
         end
     end

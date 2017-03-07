@@ -80,15 +80,12 @@ classdef MovementLearner < handle
             obj.output = output.Output;
             
             if isa(obj.environment,'environment.DynamicEnvironment')
-
                 obj.output.dynamic = true;
                 obj.output.manual = obj.environment.expert.manual;
             else
                 obj.output.dynamic = false;
                 obj.output.manual = false;
             end
-            
-            
             
             if isa(obj.environment.reward_model, 'reward.VPSingleGPRewardModel') ||...
                     isa(obj.environment.reward_model, 'reward.VPVarSingleGPRewardModel')

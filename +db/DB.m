@@ -21,5 +21,17 @@ classdef DB < handle
             end
         end
     end
+    
+    methods(Static)
+        
+        function obj = from_struct(struct)
+            
+            obj = db.DB;
+                        
+            for i = 1:length(struct)
+                obj.append_row(db.RolloutBatch.from_array(struct{i}));
+            end
+        end
+    end
 end
 
