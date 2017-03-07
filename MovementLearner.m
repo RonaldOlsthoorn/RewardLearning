@@ -147,9 +147,10 @@ classdef MovementLearner < handle
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
-                        
+            
             if isa(obj.environment,'environment.DynamicEnvironment')
-
+                obj.environment.expert.query_expert(noiseless_rollout);
+                
                 rating_true = obj.environment.expert.true_reward(noiseless_rollout);
             else
                 rating_true = noiseless_rollout.R;
@@ -169,7 +170,7 @@ classdef MovementLearner < handle
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             if isa(obj.environment,'environment.DynamicEnvironment')
-
+                obj.environment.expert.query_expert(noiseless_rollout);
                 rating_true = obj.environment.expert.true_reward(noiseless_rollout);
             else
                 rating_true = noiseless_rollout.R;
