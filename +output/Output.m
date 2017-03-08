@@ -20,6 +20,7 @@ classdef Output < handle
         
         Demo_trace;
         Reward_trace;
+        Weight_trace;
         
         dynamic;
         manual;
@@ -33,6 +34,7 @@ classdef Output < handle
            obj.iteration = obj.iteration + 1;
            obj.process_reward_trace(nr);
            obj.process_demo_trace(rm);
+           obj.process_weight_trace(nr);
         end
         
         function process_demo_trace(obj, rm)
@@ -99,6 +101,14 @@ classdef Output < handle
             else
                 obj.Reward_trace(end+1) = noiseless_rollout.to_struct();
             end
+        end
+        
+        function process_weight_trace(obj, noiseless_rollout)
+            
+            for i = 1:length(noiseless_rollout.policy.dof)
+                obj.Weight_trace(obj.iteration,i,:) = noiseless_rollout.policy.dof(i).theta_eps(1,:);
+            end
+            
         end
         
         function trace_rollouts(obj)
@@ -282,6 +292,7 @@ classdef Output < handle
             res.rm = obj.rm_str;
             res.Reward_trace = obj.Reward_trace;
             res.Demo_trace = obj.Demo_trace;
+            res.Weight_trace = obj.Weight_trace;
             res.manual = obj.manual;
             res.granularity = obj.granularity;
             res.dynamic = obj.dynamic;
@@ -300,6 +311,7 @@ classdef Output < handle
             
             obj.Reward_trace = struct.Reward_trace;
             obj.Demo_trace = struct.Demo_trace;
+            obj.Weight_trace = struct.Weight_trace;
             
             obj.db_obj = db.DB.from_struct(struct.db);
             
@@ -319,9 +331,7 @@ classdef Output < handle
                     obj.rm_obj = reward.VPVarSingleGPRewardModel.from_struct(struct.rm);
                 case 'VPVarMultiGPRewardModel'
                     obj.rm_obj = reward.VPVarMultiGPRewardModel.from_struct(struct.rm);
-            end
-            
-        end
-            
+            end           
+        end          
     end
 end

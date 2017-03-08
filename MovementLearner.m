@@ -102,7 +102,7 @@ classdef MovementLearner < handle
             
         end
         
-        function [Weights, Returns] = run_movement_learning(obj)
+        function [res] = run_movement_learning(obj)
             
             obj.iteration = 1;
             
@@ -123,10 +123,7 @@ classdef MovementLearner < handle
                 
                 obj.iteration = obj.iteration + 1;
             end
-            
-            Weights = obj.W;
-            Returns = obj.R;
-            
+                        
             obj.print_result();
             
             obj.output.process_final_ref(obj.reference);
@@ -135,9 +132,10 @@ classdef MovementLearner < handle
             
             to_save = obj.output.to_struct();
             
-            save(strcat('final/',obj.protocol_s), 'to_save');
+            save(strcat('+output/',obj.protocol_s), 'to_save');
+            %obj.output.print();
             
-            obj.output.print();
+            res = obj.output;
         end
         
         function print_progress(obj)
