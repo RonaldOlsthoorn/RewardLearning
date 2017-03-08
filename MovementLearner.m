@@ -132,8 +132,12 @@ classdef MovementLearner < handle
             
             to_save = obj.output.to_struct();
             
-            save(strcat('+output/',obj.protocol_s), 'to_save');
-            %obj.output.print();
+            try
+                save(strcat('+output/',obj.protocol_s), 'to_save');
+                %obj.output.print();
+            catch
+                save(obj.protocol_s, 'to_save');
+            end
             
             res = obj.output;
         end
@@ -144,7 +148,15 @@ classdef MovementLearner < handle
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             if isa(obj.environment,'environment.DynamicEnvironment')
-                obj.environment.expert.query_expert(noiseless_rollout);
+                
+                if obj.environment.expert.manual == false
+                    obj.environment.expert.query_expert(noiseless_rollout);
+                end
+                
+                if strcmp(obj.output.granularity, 'multi')
+                    r_segments = obj.environment.reward_model.get_reward_segments(noiseless_rollout);
+                    noiseless_rollout.R_segments = r_segments;
+                end
                 
                 rating_true = obj.environment.expert.true_reward(noiseless_rollout);
             else
@@ -165,7 +177,11 @@ classdef MovementLearner < handle
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             if isa(obj.environment,'environment.DynamicEnvironment')
-                obj.environment.expert.query_expert(noiseless_rollout);
+                
+                if obj.environment.expert.manual == false
+                    obj.environment.expert.query_expert(noiseless_rollout);
+                end
+                
                 rating_true = obj.environment.expert.true_reward(noiseless_rollout);
             else
                 rating_true = noiseless_rollout.R;

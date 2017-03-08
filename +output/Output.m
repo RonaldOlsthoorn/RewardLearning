@@ -255,11 +255,22 @@ classdef Output < handle
                     D(i,2) = obj.Demo_trace(i).R_expert;                  
                 end
                 
+                R = zeros(1,n_iterations);
+                
+                for i = 1:n_iterations
+                    
+                    R(i) = obj.Reward_trace(i).R;
+                end
+                
                 figure
                 title('expert rating convergence');
+                hold on;
                 scatter(D(:,1), D(:,2));
+                plot(R);
                 xlabel('iteration');
-                ylabel('expert rating');
+                ylabel('return');
+                
+                legend('expert rating return', 'reward model return');
                 
             else               
                 

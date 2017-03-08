@@ -40,6 +40,16 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             rollout.R = sum(R);
         end
         
+        function reward = get_reward_segments(obj, rollout)
+            
+            reward = zeros(obj.n_segments,1);
+            
+            for i = 1:obj.n_segments
+                
+                reward(i) = obj.gps(i).assess(rollout.outcomes(i,:));
+            end
+        end
+        
         function [m, s2] = assess(obj, rollout, segment)
             
             [m, s2] = obj.gps(segment).assess(rollout.outcomes(segment,:));            

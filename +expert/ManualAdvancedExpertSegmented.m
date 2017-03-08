@@ -160,6 +160,8 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             subplot(1,3,3);
             xlabel('tool position x [m]');
             ylabel('tool position y [m]');
+            axis('equal');
+
             
             obj.figure_handle.Visible = 'on';
         end
