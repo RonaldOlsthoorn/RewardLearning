@@ -1,20 +1,22 @@
-function [ res ] = run_multi_learning(protocol_name)
+function [ summary ] = run_multi_learning(protocol_name)
 % protocol_name: select from +protocols package
 
-l = 20;
+summary = output.Summary();
 
-for i = 1:l
+for i = 1:20
 
-    clc
-    i
+    disp(strcat('run number: ',{' '}, num2str(i)));
     m1 = MovementLearner(protocol_name);
-    m1.run_movement_learning();
-    end_result(i) = m1.export();
-    
+    res = m1.run_movement_learning();
+    summary.add_result(res);
     close all;
 end
 
-res = end_result;
+vname=@(x) inputname(1);
+summary_struct = summary.to_struct();
 
+try
+    save(strcat('+output/', protocol_name, '_summary'), vname(summary_struct));
+catch
+    save(strcat(protocol_name, '_summary'), vname(summary_struct));
 end
-

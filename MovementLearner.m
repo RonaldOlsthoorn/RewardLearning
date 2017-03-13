@@ -57,7 +57,7 @@ classdef MovementLearner < handle
             import plant.Plant;
             import environment.Environment;
             
-            rng(20); % fix random seed. handy for comparisson.
+            % rng(20); % fix random seed. handy for comparisson.
             % Set seed 1 for total shitstorm on advancedx_single
             % or nice result on advanced_var_multi
             % Set seed 3 for decent result on advancedx_single.
@@ -111,9 +111,15 @@ classdef MovementLearner < handle
             while obj.iteration < obj.totalIt % for now. Replace with EPD
                 
                 obj.print_progress();
+
+                try
+                    batch_trajectory = obj.agent.get_batch_trajectories();
+                catch
+                    obj.output.set_to_failed;
+                end
                 
-                batch_trajectory = obj.agent.get_batch_trajectories();
                 batch_rollouts = obj.environment.batch_run(batch_trajectory);
+                
                 obj.db.append_row(batch_rollouts);
                 batch_rollouts = obj.agent.mix_previous_rollouts(batch_rollouts);
                 
@@ -123,22 +129,15 @@ classdef MovementLearner < handle
                 
                 obj.iteration = obj.iteration + 1;
             end
-                        
-            obj.print_result();
             
-            obj.output.process_final_ref(obj.reference);
-            obj.output.process_final_db(obj.db);
-            obj.output.process_final_rm(obj.environment.reward_model);
-            
-            to_save = obj.output.to_struct();
-            
-            try
-                save(strcat('+output/',obj.protocol_s), 'to_save');
-                %obj.output.print();
-            catch
-                save(obj.protocol_s, 'to_save');
+            if obj.output.succeeded ==1
+                obj.print_result();
+                
+                obj.output.process_final_ref(obj.reference);
+                obj.output.process_final_db(obj.db);
+                obj.output.process_final_rm(obj.environment.reward_model);
             end
-            
+                        
             res = obj.output;
         end
         
@@ -174,6 +173,7 @@ classdef MovementLearner < handle
             
             noiseless_trajectory = obj.agent.get_noiseless_trajectory();
             disp('Final noiseless rollout');
+            
             noiseless_rollout = obj.environment.run(noiseless_trajectory);
             
             if isa(obj.environment,'environment.DynamicEnvironment')
@@ -193,37 +193,6 @@ classdef MovementLearner < handle
             
             obj.print_noiseless_rollout(noiseless_rollout);
             
-%             figure;
-%             hold on;
-%             
-%             if isa(obj.environment,'environment.DynamicEnvironment')
-%                 
-%                 plot(obj.n_rollouts, obj.R);
-%                 plot(obj.n_rollouts, obj.R_expert);
-%                 %plot(obj.n_rollouts, obj.R_true);
-%                 
-%                 dataY = [1 diff(obj.D)'];
-%                 dataY(dataY ~= 0) = 1;
-%                 dataY = dataY.*obj.R_expert;
-%                 data = [obj.n_rollouts'; dataY];
-%                 data( :, ~any(data(2,:),1) ) = [];
-%                 
-%                 scatter(data(1,:), data(2,:));
-% 
-%                 disp(strcat('number of queries: ', num2str(obj.environment.n_queries)));
-%             else
-%                 plot(obj.n_rollouts, obj.R);
-%             end
-%             
-%             title(strrep(obj.protocol_s, '_', ' '));
-%             xlabel('rollouts');
-%             ylabel('Return');
-%             
-%             figure;
-%             plot(obj.n_rollouts, obj.D);
-%             title(strrep(obj.protocol_s, '_', ' '));
-%             xlabel('rollouts');
-%             ylabel('expert queries');
         end
         
         function print_noiseless_rollout(obj, rollout)

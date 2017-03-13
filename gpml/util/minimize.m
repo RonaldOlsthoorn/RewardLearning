@@ -67,7 +67,7 @@ SIG = 0.1; RHO = SIG/2; % SIG and RHO are the constants controlling the Wolfe-
 % either with an error or returning Nan or Inf, and minimize should handle this
 % gracefully.
 
-verbose = true;
+verbose = false;
 
 if max(size(length)) == 2, red=length(2); length=length(1); else red=1; end
 if length>0, S='Linesearch'; else S='Function evaluation'; end 

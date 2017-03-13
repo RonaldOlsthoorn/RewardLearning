@@ -43,6 +43,7 @@ end
 
 if(i==max_iterations)
     disp('no solution found');
+    error('ik stuck');
 end
 
 theta_end = theta;
