@@ -15,7 +15,7 @@ classdef Output < handle
         reps;
         n_reuse;
         iteration = 0;
-
+        
         n_rollouts;
         
         Demo_trace;
@@ -24,23 +24,23 @@ classdef Output < handle
         
         dynamic;
         manual;
-        granularity;        
+        granularity;
     end
     
     methods
         
         function tick(obj, rm, nr)
             
-           obj.iteration = obj.iteration + 1;
-           obj.process_reward_trace(nr);
-           obj.process_demo_trace(rm);
-           obj.process_weight_trace(nr);
+            obj.iteration = obj.iteration + 1;
+            obj.process_reward_trace(nr);
+            obj.process_demo_trace(rm);
+            obj.process_weight_trace(nr);
         end
         
         function process_demo_trace(obj, rm)
             
             if obj.dynamic
- 
+                
                 if strcmp(obj.granularity, 'single')
                     
                     l = length(obj.Demo_trace);
@@ -67,7 +67,7 @@ classdef Output < handle
                         
                         if isempty(obj.Demo_trace)
                             l = 0;
-                        elseif i>length(obj.Demo_trace) 
+                        elseif i>length(obj.Demo_trace)
                             l = 0;
                         else
                             l = length(obj.Demo_trace{i});
@@ -82,15 +82,15 @@ classdef Output < handle
                                 
                                 if isempty(obj.Demo_trace)
                                     obj.Demo_trace{i} = demo_str;
-                                elseif i>length(obj.Demo_trace) 
+                                elseif i>length(obj.Demo_trace)
                                     obj.Demo_trace{i} = demo_str;
-                                else                                    
+                                else
                                     obj.Demo_trace{i}(end+1) = demo_str;
                                 end
                             end
-                        end                        
+                        end
                     end
-                end            
+                end
             end
         end
         
@@ -134,7 +134,7 @@ classdef Output < handle
             obj.ref_obj = ref;
             obj.ref_str = ref.to_struct();
         end
-                
+        
         function process_final_rm(obj, rm)
             
             obj.rm_obj = rm;
@@ -177,25 +177,25 @@ classdef Output < handle
                 subplot(1,3,1)
                 hold on;
                 plot(rollout.time, rollout.tool_positions(1,:), ...
-                'Color', color);
-            
+                    'Color', color);
+                
                 subplot(1,3,2)
                 hold on;
                 plot(rollout.time, rollout.tool_positions(2,:), ...
-                'Color', color);
-            
+                    'Color', color);
+                
                 subplot(1,3,3)
                 hold on;
                 plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), ...
-                'Color', color);
+                    'Color', color);
             end
             
             subplot(1,3,3)
             hold on;
             scatter(obj.Reward_trace(end).tool_positions(1,obj.ref_obj.viapoints_t),...
                 obj.Reward_trace(end).tool_positions(2,obj.ref_obj.viapoints_t),...
-                        40, 'Marker', '+', 'LineWidth', 2, ...
-                        'MarkerEdgeColor', 'r', 'MarkerFaceColor', 'r');
+                40, 'Marker', '+', 'LineWidth', 2, ...
+                'MarkerEdgeColor', 'r', 'MarkerFaceColor', 'r');
             
             obj.ref_obj.clear_overlay_handles();
             obj.ref_obj.print_reference_overlay(figHandle);
@@ -230,14 +230,14 @@ classdef Output < handle
                 'Color', [0, 0, 1]);
             scatter(obj.Reward_trace(end).tool_positions(1,obj.ref_obj.viapoints_t),...
                 obj.Reward_trace(end).tool_positions(2,obj.ref_obj.viapoints_t),...
-                        40, 'Marker', '+', 'LineWidth', 2, ...
-                        'MarkerEdgeColor', 'r', 'MarkerFaceColor', 'r');
-                    
+                40, 'Marker', '+', 'LineWidth', 2, ...
+                'MarkerEdgeColor', 'r', 'MarkerFaceColor', 'r');
+            
             xlabel('y end effector [m]');
             ylabel('y end effector [m]');
             
             obj.ref_obj.clear_overlay_handles();
-            obj.ref_obj.print_reference_overlay(figHandle);                     
+            obj.ref_obj.print_reference_overlay(figHandle);
             
             % reward plots
             if strcmp(obj.granularity, 'multi')
@@ -246,33 +246,123 @@ classdef Output < handle
             
             if obj.manual
                 
-                l = length(obj.Demo_trace);
-                D = zeros(l, 2);
                 
-                for i = 1:length(obj.Demo_trace)
+                if strcmp(obj.granularity, 'single')
+                    l = length(obj.Demo_trace);
+                    D = zeros(l, 2);
                     
-                    D(i,1) = obj.Demo_trace(i).iteration_queried;
-                    D(i,2) = obj.Demo_trace(i).R_expert;                  
+                    for i = 1:length(obj.Demo_trace)
+                        
+                        D(i,1) = obj.Demo_trace(i).iteration_queried;
+                        D(i,2) = obj.Demo_trace(i).R_expert;
+                    end
+                    
+                    R = zeros(1,n_iterations);
+                    
+                    for i = 1:n_iterations
+                        
+                        R(i) = obj.Reward_trace(i).R;
+                    end
+                    
+                    figure
+                    title('expert rating convergence');
+                    hold on;
+                    scatter(D(:,1), D(:,2));
+                    plot(R);
+                    xlabel('iteration');
+                    ylabel('return');
+                    
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
+                else
+                    
+                    R = zeros(n_iterations-1, 4);
+                    
+                    for i = 1:4
+                        
+                        l = length(obj.Demo_trace{i});
+                        d = zeros(l,2);
+                        
+                        for j = 1:l
+                            
+                            d(j,1) = obj.Demo_trace{i}(j).iteration_queried;
+                            d(j,2) = obj.Demo_trace{i}(j).R_expert(i);
+                        end
+                        
+                        D{i} = d;
+                        
+                        
+                        
+                        for j = 1:(n_iterations-1)
+                            
+                            if ~ isfield(obj.Reward_trace(j), 'R_segments')
+                                R(j,:) = [0 obj.Reward_trace(j).R 0 0];
+                            else
+                                
+                                R(j,i) = obj.Reward_trace(j).R_segments(i);
+                            end
+                        end
+                        
+                    end
+                    
+                    figure
+                    title('expert rating convergence');
+                    hold on;
+                    scatter(D{2}(:,1), D{2}(:,2));
+                    plot(R(:,2));
+                    xlabel('iteration');
+                    ylabel('return');
+                    
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
+                    figure
+                    suptitle('expert rating convergence');
+                    
+                    subplot(2,2,1)
+                    hold on;
+                    scatter(D{1}(:,1), D{1}(:,2));
+                    plot(R(:,1));
+                    xlabel('iteration');
+                    ylabel('return');
+                    title(strcat('segment',' 1'));
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
+                    subplot(2,2,2)
+                    hold on;
+                    scatter(D{2}(:,1), D{2}(:,2));
+                    plot(R(:,2));
+                    xlabel('iteration');
+                    ylabel('return');
+                    title(strcat('segment',' 2'));
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
+                    subplot(2,2,3)
+                    hold on;
+                    scatter(D{3}(:,1), D{3}(:,2));
+                    plot(R(:,3));
+                    xlabel('iteration');
+                    ylabel('return');
+                    title(strcat('segment',' 3'));
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
+                    subplot(2,2,4)
+                    hold on;
+                    scatter(D{4}(:,1), D{4}(:,2));
+                    plot(R(:,4));
+                    xlabel('iteration');
+                    ylabel('return');
+                    title(strcat('segment',' 4'));
+                    legend('expert return', 'reward model return',...
+                        'location', 'southeast');
+                    
                 end
                 
-                R = zeros(1,n_iterations);
-                
-                for i = 1:n_iterations
-                    
-                    R(i) = obj.Reward_trace(i).R;
-                end
-                
-                figure
-                title('expert rating convergence');
-                hold on;
-                scatter(D(:,1), D(:,2));
-                plot(R);
-                xlabel('iteration');
-                ylabel('return');
-                
-                legend('expert rating return', 'reward model return');
-                
-            else               
+            else
                 
                 n_iterations = length(obj.Reward_trace);
                 R = zeros(1,n_iterations);
@@ -291,10 +381,11 @@ classdef Output < handle
                 xlabel('iteration')
                 ylabel('return')
                 title('Convergence')
-                legend('reward model return', 'true return');
-                                
-            end            
-        end    
+                legend('reward model return', 'true return',...
+                    'location', 'southeast');
+                
+            end
+        end
         
         function res = to_struct(obj)
             
@@ -342,7 +433,7 @@ classdef Output < handle
                     obj.rm_obj = reward.VPVarSingleGPRewardModel.from_struct(struct.rm);
                 case 'VPVarMultiGPRewardModel'
                     obj.rm_obj = reward.VPVarMultiGPRewardModel.from_struct(struct.rm);
-            end           
-        end          
+            end
+        end
     end
 end
