@@ -168,140 +168,202 @@ R_true = zeros(length(summary_struct.batch_res(1).R_true),...
     length(summary_struct.batch_res));
 
 for i = 1:length(summary_struct.batch_res)
+    
     R(:,i) = summary_struct.batch_res(i).R';
     R_var(:,i) = summary_struct.batch_res(i).R_var';
-    R_true(:,i) = summary_struct.batch_res(i).R_true';
-    
+    R_true(:,i) = summary_struct.batch_res(i).R_true';   
 end
 
-hold on;
+
 
 mean_r = mean(R,2);
-var_r = R_var;
+var_r = mean(R_var, 2);
 
 mean_r_true = mean(R_true,2);
 var_r_true = var(R_true,0,2);
 
 it = 1:length(mean_r);
 
+hold on;
 patch([it, fliplr(it)],[(mean_r+var_r); flipud((mean_r-var_r))], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
-plot(mean_r);
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
 
-legend([children(1) children(2)], ...
+h1 = plot(mean_r, 'b');
+
+h2 = plot(mean_r_true, 'r');
+
+legend([h1 h2], ...
     'reward model return', 'true return',...
         'location', 'southeast');
     
-savefig('+output/viapoint/convergence_single_noise');
-print('+output/viapoint/convergence_single_noise', '-depsc');
+savefig('+output/viapoint/convergence_single_noise_sum');
+print('+output/viapoint/convergence_single_noise_sum', '-depsc');
 
 close all;
 
 %%
-load('+output/viapoint_multi');
+load('+output/viapoint_multi_summary');
 
+pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
+    length(summary_struct.batch_res));
+
+opt_pos = to_save.Reward_trace(end).tool_positions;
+
+t = summary_struct.batch_res(1).last_rollout.time;
+
+pos_init = summary_struct.batch_res(1).first_rollout.tool_positions;
+
+for i = 1:length(summary_struct.batch_res)
+    
+    pos(1,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(1,:);
+    pos(2,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(2,:);
+end
+
+mean_pos = mean(pos, 3);
+var_pos = std(pos, 0, 3);
 
 figure;
 
+% global
 set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFig);
 set(gcf, 'PaperPositionMode','auto');
 
 % set margins figures
-x = marginX;
 subplot(1,3,1);
+x = marginX;
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+xlabel('time [s]');
+ylabel('x position end effector [m]');
 
-x = x+widthX+marginX;
+hold on;
+
+patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_pos(1,:))')], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+ 
+plot(t, mean_pos(1,:), 'b');
+plot(t, opt_pos(1,:), 'r');
+
+scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 
 subplot(1,3,2);
+x = x+widthX+marginX;
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+xlabel('time [s]');
+ylabel('y position end effector [m]');
 
-x = x+widthX+marginX;
+hold on;
+patch([t, fliplr(t)],[(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+ 
+plot(t, mean_pos(2,:), 'b');
+plot(t, opt_pos(2,:), 'r');
+
+scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+
 
 subplot(1,3,3);
+x = x+widthX+marginX;
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+xlabel('x position end effector [m]');
+ylabel('y position end effector [m]');
 
-children = get(gca, 'Children');
+hold on;
+h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
+    [(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+ 
+h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
+h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
 
-suptitle('Resulting trajectory')
 
-legend([children(4) children(3) children(1) children(2)], ...
-    'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
-        'location', 'southwest');
+h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
+    'MarkerFaceColor', PPMarkerFaceColor);
 
-savefig('+output/viapoint/trajectory_multi_noise');
-print('+output/viapoint/trajectory_multi_noise', '-depsc');
+h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
+    'MarkerFaceColor', PPMarkerFaceColor);
 
-figure(3);
+h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+
+legend([h2, h3, h4, h5, h6],'average trajectory', 'optimal trajectory', ...
+    'average crosspoint', 'optimal crosspoint','reference viapoint', 'Location', 'northeast');
+
+suptitle('resulting trajectory');
+
+savefig('+output/viapoint/trajectory_multi_noise_sum');
+print('+output/viapoint/trajectory_multi_noise_sum', '-depsc');
+
+close all;
+
+figure;
 
 xlabel('iteration');
 ylabel('return noiseless rollout');
-
-children = get(gca, 'Children');
-
 title('Return convergence');
 
-legend([children(1) children(2)], ...
+R = zeros(length(summary_struct.batch_res(1).R),...
+    length(summary_struct.batch_res));
+
+R_var = zeros(length(summary_struct.batch_res(1).R),...
+    length(summary_struct.batch_res));
+
+R_true = zeros(length(summary_struct.batch_res(1).R_true),...
+    length(summary_struct.batch_res));
+
+for i = 1:length(summary_struct.batch_res)
+    
+    R(:,i) = summary_struct.batch_res(i).R(:,2)';
+    R_var(:,i) = summary_struct.batch_res(i).R_var(:,2)';
+    R_true(:,i) = summary_struct.batch_res(i).R_true(:,2)';   
+end
+
+
+
+mean_r = mean(R,2);
+var_r = mean(R_var, 2);
+
+mean_r_true = mean(R_true,2);
+var_r_true = var(R_true,0,2);
+
+it = 1:length(mean_r);
+
+hold on;
+patch([it, fliplr(it)],[(mean_r+var_r); flipud((mean_r-var_r))], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
+
+h1 = plot(mean_r, 'b');
+
+h2 = plot(mean_r_true, 'r');
+
+legend([h1 h2], ...
     'reward model return', 'true return',...
         'location', 'southeast');
     
-savefig('+output/viapoint/convergence_multi_noise');
-print('+output/viapoint/convergence_multi_noise', '-depsc');
-
-figure(6);
-
-set(gcf,'WindowStyle','normal')
-set(gcf, 'Position', posFigReward);
-set(gcf, 'PaperPositionMode','auto');
-
-x = marginXReward;
-y = 2*marginYReward+heightYReward;
-
-for i = 1:4
-    
-    subplot(2,2,i);
-    
-    children = get(gca, 'Children');
-    delete(children(2));
-    delete(children(3));
-    
-    pos = get(gca, 'Position');
-    pos(1) = x;
-    pos(2) = y;
-    pos(3) = widthXReward;
-    pos(4) = heightYReward;
-    set(gca, 'Position', pos);
-    
-    x = x + ((-1)^(i-1))*(widthXReward+marginXReward);
-    
-    if i==2
-        y = y - heightYReward - marginYReward;
-    end
-    
-    title(strcat('segment ', {' '}, num2str(i)));
-    colorbar();
-end
-
-suptitle('Multi segment return function');
-    
-savefig('+output/viapoint/return_flat_multi_noise');
-print('+output/viapoint/return_flat_multi_noise', '-depsc');
+savefig('+output/viapoint/return_flat_multi_noise_sum');
+print('+output/viapoint/return_flat_multi_noise_sum', '-depsc');
 
 close all;
 

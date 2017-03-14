@@ -7,6 +7,15 @@ classdef Summary < handle
         number_fails = 0;
         
         batch_res;
+        
+        number_of_queries_mean;
+        number_of_queries_std;
+        
+        viapoint_mean;
+        viapoint_std;
+        
+        viaplane_mean;
+        viaplane_std;
     end
     
     methods
@@ -112,7 +121,7 @@ classdef Summary < handle
                     
                     R = zeros(n_iterations-1, 4);
                     R_var = zeros(n_iterations-1, 4);
-                    R_true = zeros(1,n_iterations);
+                    R_true = zeros(n_iterations-1, 1);
                                         
                     for i = 1:4
                         
@@ -139,7 +148,7 @@ classdef Summary < handle
                                 
                             end
                             
-                            R_true(i) = res.Reward_trace(i).R_true;
+                            R_true(j,1) = res.Reward_trace(j).R_true;
                         end
                         
                     end
@@ -161,9 +170,53 @@ classdef Summary < handle
             end
         end
         
+        function process_results(obj)
+            
+            n_trials = length(obj.batch_res);
+            q = zeros(1, n_trials);
+            viapoint_err = zeros(1, n_trials);
+            viaplane_err = zeros(1, n_trials);
+            
+            for i = 1:n_trials
+
+                if length(obj.batch_res(i).R(1,:))>1
+                    for j = 1:length(obj.batch_res(i).D)
+                        q(i) = q(i) + length(obj.batch_res(i).D{j});
+                    end
+                else
+                    q(i) = length(obj.batch_res(i).D);
+                end
+                
+                pos = obj.batch_res(i).last_rollout.tool_positions;
+                
+                viapoint_err(i) = (pos(1,300)-0.3)^2 + (pos(2,300)-0.6)^2;              
+                viaplane_err(i) = sum((pos(1,600:end)-0.5).^2);
+            end
+            
+            obj.number_of_queries_mean = mean(q);
+            obj.number_of_queries_mean = std(q);
+            
+            obj.viapoint_mean = mean(viapoint_err);
+            obj.viapoint_std = std(viapoint_err);
+            
+            obj.viaplane_mean = mean(viaplane_err);
+            obj.viaplane_std = std(viaplane_err);
+            
+        end
+        
         function res = to_struct(obj)
             
+            obj.process_results();
             res.batch_res = obj.batch_res;
+            
+            res.number_fails = obj.number_fails;
+            res.number_of_queries = obj.number_of_queries_mean;
+            
+            res.viapoint_avg = obj.viapoint_mean;
+            res.viapoint_std = obj.viapoint_std;
+            
+            res.viaplane_error_mean = obj.viaplane_mean;
+            res.viaplane_error_std = obj.viaplane_std;
         end
     end
     
