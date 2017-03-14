@@ -27,12 +27,17 @@ classdef StaticVPAdvancedRewardModel < reward.RewardModel
             
             reward = obj.ex.query_expert(rollout);
             rollout.r = reward;
-            rollout.r_cum = obj.cumulative_reward(reward); 
+            rollout.r_cum = obj.cumulative_reward(reward);
             rollout.R = sum(reward);
-        end     
+        end
         
         function print(~)
             
         end
-    end    
+        
+        function [res] = to_struct(~)
+            
+            res = [];
+        end
+    end
 end

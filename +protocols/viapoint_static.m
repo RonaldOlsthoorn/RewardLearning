@@ -1,4 +1,4 @@
-function [ protocol ] = viapoint_single_static()
+function [ protocol ] = viapoint_static()
 
 plant_par.type = '2-dof';
 plant_par.sim = true;
@@ -45,10 +45,6 @@ policy_par.start = reference_par.start_tool;
 policy_par.goal = reference_par.goal_tool;
 
 env_par.dyn = false;
-env_par.acquisition = 'epd';
-env_par.expert = 'hard_coded_expert';
-env_par.expert_std = 1e-3;
-env_par.tol = 0.1;
 
 reward_model.type = 'reward_model_static_vp';
 

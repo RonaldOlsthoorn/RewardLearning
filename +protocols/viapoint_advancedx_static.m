@@ -49,10 +49,6 @@ policy_par.start = reference_par.start_tool;
 policy_par.goal = reference_par.goal_tool;
 
 env_par.dyn = false;
-env_par.acquisition = 'epd';
-env_par.expert = 'hard_coded_expert';
-env_par.expert_std = 0;
-env_par.tol = 0.1;
 
 reward_model.type = 'viapoint_advanced_static';
 
