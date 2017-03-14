@@ -186,9 +186,15 @@ if verbose
     fprintf('%s %6i;  Value %4.6e\r', S, i, f0);
 end
 
-X = rewrap(Z,X); 
+X = rewrap(Z,X);
 
-fprintf('\n'); if exist('fflush','builtin') fflush(stdout); end
+if verbose
+    fprintf('\n');
+end
+
+if exist('fflush','builtin') 
+    fflush(stdout); 
+end
 
 function v = unwrap(s)
 % Extract the numerical values from "s" into the column vector "v". The
