@@ -3,6 +3,8 @@ classdef Output < handle
     
     properties
         
+        succeeded = 1;
+        
         db_obj;
         rm_obj;
         ref_obj;
@@ -35,6 +37,10 @@ classdef Output < handle
             obj.process_reward_trace(nr);
             obj.process_demo_trace(rm);
             obj.process_weight_trace(nr);
+        end
+        
+        function set_to_failed(obj)
+            obj.succeeded = 0;
         end
         
         function process_demo_trace(obj, rm)
@@ -142,7 +148,7 @@ classdef Output < handle
         end
         
         
-        function print(obj)
+        function res = print(obj)
             
             % print all trajectories
             figHandle = figure;
@@ -160,7 +166,8 @@ classdef Output < handle
             ylabel('y end effector [m]');
             
             n_iterations = length(obj.Reward_trace);
-            
+ 
+            % print all trajectories
             for i = 1:n_iterations
                 
                 if i == 1
@@ -190,6 +197,7 @@ classdef Output < handle
                     'Color', color);
             end
             
+            %print final mark viapoint
             subplot(1,3,3)
             hold on;
             scatter(obj.Reward_trace(end).tool_positions(1,obj.ref_obj.viapoints_t),...
@@ -200,7 +208,7 @@ classdef Output < handle
             obj.ref_obj.clear_overlay_handles();
             obj.ref_obj.print_reference_overlay(figHandle);
             
-            % print all trajectories
+            % print first and last rollout
             figHandle = figure;
             
             subplot(1,3,1);
@@ -238,6 +246,10 @@ classdef Output < handle
             
             obj.ref_obj.clear_overlay_handles();
             obj.ref_obj.print_reference_overlay(figHandle);
+            
+            % save important info for summary
+            res.first_rollout = obj.Reward_trace(1)
+            
             
             % reward plots
             if strcmp(obj.granularity, 'multi')
@@ -291,8 +303,6 @@ classdef Output < handle
                         end
                         
                         D{i} = d;
-                        
-                        
                         
                         for j = 1:(n_iterations-1)
                             

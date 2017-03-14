@@ -67,7 +67,7 @@ SIG = 0.1; RHO = SIG/2; % SIG and RHO are the constants controlling the Wolfe-
 % either with an error or returning Nan or Inf, and minimize should handle this
 % gracefully.
 
-verbose = true;
+verbose = false;
 
 if max(size(length)) == 2, red=length(2); length=length(1); else red=1; end
 if length>0, S='Linesearch'; else S='Function evaluation'; end 
@@ -186,9 +186,15 @@ if verbose
     fprintf('%s %6i;  Value %4.6e\r', S, i, f0);
 end
 
-X = rewrap(Z,X); 
+X = rewrap(Z,X);
 
-fprintf('\n'); if exist('fflush','builtin') fflush(stdout); end
+if verbose
+    fprintf('\n');
+end
+
+if exist('fflush','builtin') 
+    fflush(stdout); 
+end
 
 function v = unwrap(s)
 % Extract the numerical values from "s" into the column vector "v". The
