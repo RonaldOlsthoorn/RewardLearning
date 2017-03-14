@@ -24,6 +24,8 @@ classdef Rollout
         R_expert;
         R_true;
         
+        R_var;
+        
         R_segments;
         
         v_feed;

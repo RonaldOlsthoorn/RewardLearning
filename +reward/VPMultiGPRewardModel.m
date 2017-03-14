@@ -31,13 +31,19 @@ classdef VPMultiGPRewardModel < reward.RewardModel
         function rollout = add_reward(obj, rollout)
             
             R = zeros(obj.n_segments,1);
+            S = zeros(obj.n_segments,1);
+            
             
             for i = 1:obj.n_segments
                 
-                R(i) = obj.gps(i).assess(rollout.outcomes(i,:));
+                [mu, sigma] = obj.gps(i).assess(rollout.outcomes(i,:));
+                R(i) = mu;
+                S(i) = sigma;
             end
             
             rollout.R = sum(R);
+            rollout.R_segments = R;
+            rollout.R_var = S;
         end
         
         function reward = get_reward_segments(obj, rollout)

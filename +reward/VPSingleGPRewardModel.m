@@ -37,8 +37,9 @@ classdef VPSingleGPRewardModel < reward.RewardModel
                 input(1,(i-1)*obj.n_segments+1:i*obj.n_segments) = ...
                     rollout.outcomes(:,i)';
             end
-            reward = obj.gp.assess(input);
+            [reward, var] = obj.gp.assess(input);
             rollout.R = reward;
+            rollout.R_var = var;
         end
         
         function [m, s2] = assess(obj, rollout)
