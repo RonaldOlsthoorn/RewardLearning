@@ -189,12 +189,12 @@ classdef Summary < handle
                 
                 pos = obj.batch_res(i).last_rollout.tool_positions;
                 
-                viapoint_err(i) = (pos(1,300)-0.3)^2 + (pos(2,300)-0.6)^2;              
+                viapoint_err(i) = sqrt((pos(1,300)-0.3)^2 + (pos(2,300)-0.6)^2);              
                 viaplane_err(i) = sum((pos(1,600:end)-0.5).^2);
             end
             
             obj.number_of_queries_mean = mean(q);
-            obj.number_of_queries_mean = std(q);
+            obj.number_of_queries_std = std(q);
             
             obj.viapoint_mean = mean(viapoint_err);
             obj.viapoint_std = std(viapoint_err);

@@ -3,7 +3,7 @@ function [ summary ] = run_multi_learning(protocol_name)
 
 summary = output.Summary();
 
-for i = 1:4
+for i = 1:20
 
     disp(strcat('run number: ',{' '}, num2str(i)));
     m1 = MovementLearner(protocol_name);
