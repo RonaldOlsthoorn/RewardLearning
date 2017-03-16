@@ -118,9 +118,9 @@ classdef Summary < handle
                     
                 else
                     
-                    R = zeros(n_iterations-1, 4);
-                    R_var = zeros(n_iterations-1, 4);
-                    R_true = zeros(n_iterations-1, 1);
+                    R = zeros(n_iterations, 4);
+                    R_var = zeros(n_iterations, 4);
+                    R_true = zeros(n_iterations, 4);
                                         
                     for i = 1:4
                         
@@ -135,7 +135,7 @@ classdef Summary < handle
                         
                         D{i} = d;
                         
-                        for j = 1:(n_iterations-1)
+                        for j = 1:(n_iterations)
                             
                             if ~ isfield(res.Reward_trace(j), 'R_segments')
                                 R(j,:) = [0 res.Reward_trace(j).R 0 0];
@@ -144,10 +144,10 @@ classdef Summary < handle
                             else                                
                                 R(j,i) = res.Reward_trace(j).R_segments(i);
                                 R_var(j,i) = res.Reward_trace(j).R_var(i);
-                                
+                                R_true(j,i) = res.Reward_trace(j).R_true(i);
                             end
                             
-                            R_true(j,1) = res.Reward_trace(j).R_true;
+                            
                         end
                         
                     end

@@ -162,7 +162,7 @@ classdef MovementLearner < handle
                 rating_true = noiseless_rollout.R;
             end
             
-            noiseless_rollout.R_true = sum(rating_true);
+            noiseless_rollout.R_true = rating_true;
             
             obj.output.tick(obj.environment.reward_model, noiseless_rollout);
             
@@ -187,7 +187,7 @@ classdef MovementLearner < handle
                 rating_true = noiseless_rollout.R;
             end
             
-            noiseless_rollout.R_true = sum(rating_true);
+            noiseless_rollout.R_true = rating_true;
             
             obj.output.tick(obj.environment.reward_model, noiseless_rollout);
             
