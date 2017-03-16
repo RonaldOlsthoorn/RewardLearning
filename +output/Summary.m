@@ -24,7 +24,6 @@ classdef Summary < handle
             
             if res.succeeded==0
                 obj.number_fails = obj.number_fails+1;
-                return;
             end
             
             % print all trajectories                       
@@ -179,7 +178,7 @@ classdef Summary < handle
             
             for i = 1:n_trials
 
-                if length(obj.batch_res(i).R(1,:))>1
+                if length(obj.batch_res(i).R(:,1))>1
                     for j = 1:length(obj.batch_res(i).D)
                         q(i) = q(i) + length(obj.batch_res(i).D{j});
                     end
@@ -210,7 +209,8 @@ classdef Summary < handle
             res.batch_res = obj.batch_res;
             
             res.number_fails = obj.number_fails;
-            res.number_of_queries = obj.number_of_queries_mean;
+            res.queries_mean = obj.number_of_queries_mean;
+            res.queries_std = obj.number_of_queries_std;
             
             res.viapoint_avg = obj.viapoint_mean;
             res.viapoint_std = obj.viapoint_std;
