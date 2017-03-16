@@ -152,6 +152,8 @@ print('+output/advancedx/trajectory_single_noise_sum', '-depsc');
 
 close all;
 
+%%
+
 figure;
 
 xlabel('iteration');
@@ -173,8 +175,6 @@ for i = 1:length(summary_struct.batch_res)
     R_var(1:49,i) = summary_struct.batch_res(i).R_var(1:49)';
     R_true(1:49,i) = summary_struct.batch_res(i).R_true(1:49)';   
 end
-
-
 
 mean_r = mean(R,2);
 var_r = mean(R_var, 2);
@@ -295,7 +295,6 @@ h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
 h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
 
-
 h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
     'MarkerFaceColor', PPMarkerFaceColor);
@@ -318,26 +317,26 @@ print('+output/advancedx/trajectory_multi_noise_sum', '-depsc');
 
 close all;
 
-
+%%
 
 R = zeros(length(summary_struct.batch_res), 49, 4);
 
 R_var = zeros(length(summary_struct.batch_res), 49, 4);
 
-R_true = zeros(length(summary_struct.batch_res), 49);
+R_true = zeros(length(summary_struct.batch_res), 49, 4);
 
 for i = 1:length(summary_struct.batch_res)
     
     R(i,:,:) = summary_struct.batch_res(i).R(1:49,:);
     R_var(i,:,:) = summary_struct.batch_res(i).R_var(1:49,:);
-    R_true(i,:) = summary_struct.batch_res(i).R_true;   
+    R_true(i,:,:) = summary_struct.batch_res(i).R_true(1:49,:);   
 end
 
 mean_r = squeeze(mean(R,1));
 var_r = squeeze(mean(R_var, 1));
 
-mean_r_true = mean(R_true,1)';
-var_r_true = var(R_true,0,1)';
+mean_r_true = squeeze(mean(R_true,1));
+var_r_true = squeeze(var(R_true,0,1));
 
 it = 1:length(mean_r);
 
@@ -358,6 +357,7 @@ for i = 1:4
     patch([it, fliplr(it)],[(mean_r(:,i)+var_r(:,i)); flipud((mean_r(:,i)-var_r(:,i)))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
     h1 = plot(mean_r(:,i), 'b');
+    h2 = plot(mean_r_true(:,i), 'r');
         
     pos = get(gca, 'Position');
     pos(1) = x;
@@ -376,8 +376,6 @@ for i = 1:4
     ylabel('return noiseless rollout');
 end    
 
-
-%h2 = plot(mean_r_true, 'r');
 
 legend([h1 h2], ...
     'reward model return', 'true return',...

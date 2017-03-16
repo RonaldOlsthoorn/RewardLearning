@@ -147,6 +147,10 @@ classdef Output < handle
             obj.rm_str = rm.to_struct();
         end
         
+        function print_reward(obj)
+            
+            obj.rm_obj.print();
+        end
         
         function res = print(obj)
             

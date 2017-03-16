@@ -36,9 +36,12 @@ PPMarkerFaceColor = 'w';
 %%
 load('+output/viapoint_advancedx_var_single');
 op = output.Output.from_struct(to_save);
-op.print();
+%op.print();
 
-figure(2);
+trajectory = op.Reward_trace(end).tool_positions;
+time = op.Reward_trace(end).time;
+
+figure;
 
 % global
 set(gcf,'WindowStyle','normal')
@@ -48,6 +51,12 @@ set(gcf, 'PaperPositionMode','auto');
 % set margins figures
 x = marginX;
 subplot(1,3,1);
+hold on;
+plot(time, trajectory(1,:), 'b');
+scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -58,6 +67,11 @@ set(gca, 'Position', pos);
 x = x+widthX+marginX;
 
 subplot(1,3,2);
+hold on;
+plot(time, trajectory(2,:), 'b');
+scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -68,6 +82,11 @@ set(gca, 'Position', pos);
 x = x+widthX+marginX;
 
 subplot(1,3,3);
+hold on;
+plot(trajectory(1,:), trajectory(2,:), 'b');
+scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -79,25 +98,45 @@ children = get(gca, 'Children');
 
 suptitle('Resulting trajectory')
 
-legend([children(4) children(3) children(1) children(2)], ...
-    'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
-        'location', 'southwest');
+% legend([children(4) children(3) children(1) children(2)], ...
+%     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
+%         'location', 'southwest');
     
 savefig('+output/advancedx-var/trajectory_single_noise');
 print('+output/advancedx-var/trajectory_single_noise', '-depsc');
 
-figure(3);
+close all;
+
+%%
+R = zeros(length(op.Reward_trace),1);
+R_var = zeros(length(op.Reward_trace),1);
+R_true = zeros(length(op.Reward_trace),1);
+
+for i = 1:length(R)
+    
+    R(i) = op.Reward_trace.R;
+    R_var(i) = op.Reward_trace.R_var';
+    R_true(i) = op.Reward_trace.R_true';   
+end
+
+it = 1:length(mean_r);
+
+figure;
+hold on;
+patch([it, fliplr(it)],[(R+R_var); flipud((R-R_var))], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
+plot(R, 'b');
+plot(R_true, 'r');
 
 xlabel('iteration');
 ylabel('return noiseless rollout');
 
-children = get(gca, 'Children');
-
 title('Return convergence');
 
-legend([children(1) children(2)], ...
-    'reward model return', 'true return',...
-        'location', 'southeast');
+% legend([children(1) children(2)], ...
+%     'reward model return', 'true return',...
+%         'location', 'southeast');
+    
     
 savefig('+output/advancedx-var/convergence_single_noise');
 print('+output/advancedx-var/convergence_single_noise', '-depsc');
@@ -107,9 +146,11 @@ close all;
 %%
 load('+output/viapoint_advancedx_var_multi');
 op = output.Output.from_struct(to_save);
-op.print();
 
-figure(2);
+trajectory = op.Reward_trace(end).tool_positions;
+time = op.Reward_trace(end).time;
+
+figure;
 
 set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFig);
@@ -118,6 +159,11 @@ set(gcf, 'PaperPositionMode','auto');
 % set margins figures
 x = marginX;
 subplot(1,3,1);
+hold on;
+plot(time, trajectory(1,:), 'b');
+scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -128,6 +174,11 @@ set(gca, 'Position', pos);
 x = x+widthX+marginX;
 
 subplot(1,3,2);
+hold on;
+plot(time, trajectory(2,:), 'b');
+scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -138,6 +189,10 @@ set(gca, 'Position', pos);
 x = x+widthX+marginX;
 
 subplot(1,3,3);
+plot(trajectory(1,:), trajectory(2,:), 'b');
+scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
@@ -149,29 +204,73 @@ children = get(gca, 'Children');
 
 suptitle('Resulting trajectory')
 
-legend([children(4) children(3) children(1) children(2)], ...
-    'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
-        'location', 'southwest');
+% legend([children(4) children(3) children(1) children(2)], ...
+%     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
+%         'location', 'southwest');
 
 savefig('+output/advancedx-var/trajectory_multi_noise');
 print('+output/advancedx-var/trajectory_multi_noise', '-depsc');
 
-figure(3);
+close all
 
-xlabel('iteration');
-ylabel('return noiseless rollout');
+%%
 
-children = get(gca, 'Children');
+R = zeros(length(op.Reward_trace),4);
+R_var = zeros(length(op.Reward_trace),4);
+R_true = zeros(length(op.Reward_trace),4);
 
-title('Return convergence');
+for i = 1:length(op.Reward_trace)
+    
+    R(i,:) = op.Reward_trace(i).R;
+    R_var(i,:) = op.Reward_trace(i).R_var;
+    R_true(i,:) = op.Reward_trace(i).R_true;   
+end
 
-legend([children(1) children(2)], ...
-    'reward model return', 'true return',...
-        'location', 'southeast');
+it = 1:length(mean_r);
+
+figure;
+set(gcf,'WindowStyle','normal')
+set(gcf, 'Position', posFigReward);
+set(gcf, 'PaperPositionMode','auto');
+
+%suptitle('Return convergence');
+    
+x = marginXReward;
+y = 2*marginYReward+heightYReward;
+
+for i = 1:4
+    
+    subplot(2,2,i);
+    hold on;
+    patch([it, fliplr(it)],[(R(:,i)+R_var(:,i)); flipud((R(:,i)-R_var(:,i)))], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
+    h1 = plot(R(:,i), 'b');
+        
+    pos = get(gca, 'Position');
+    pos(1) = x;
+    pos(2) = y;
+    pos(3) = widthXReward;
+    pos(4) = heightYReward;
+    set(gca, 'Position', pos);
+    
+    x = x + ((-1)^(i-1))*(widthXReward+marginXReward);
+    
+    if i==2
+        y = y - heightYReward - marginYReward;
+    end
+        
+    xlabel('iteration');
+    ylabel('return noiseless rollout');
+end    
+    
     
 savefig('+output/advancedx-var/convergence_multi_noise');
 print('+output/advancedx-var/convergence_multi_noise', '-depsc');
 
+close all;
+
+%%
+op.print_reward();
 figure(6);
 
 set(gcf,'WindowStyle','normal')
@@ -188,6 +287,13 @@ for i = 1:4
     children = get(gca, 'Children');
     delete(children(2));
     delete(children(3));
+    
+    if i==2
+        hold on;
+        scatter(0.3, 0.6, 0,  VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+    end
     
     pos = get(gca, 'Position');
     pos(1) = x;
@@ -212,49 +318,3 @@ savefig('+output/advancedx-var/return_flat_multi_noise');
 print('+output/advancedx-var/return_flat_multi_noise', '-depsc');
 
 close all;
-%%
-
-load('+output/viapoint_advancedx_var_single');
-to_save_single = to_save;
-
-load('+output/viapoint_advancedx_var_multi');
-to_save_multi = to_save;
-
-% Load saved figures
-c=hgload('+output/advancedx-var/convergence_single_noise.fig');
-k=hgload('+output/advancedx-var/convergence_multi_noise.fig');
-% Prepare subplots
-
-figure
-set(gcf,'WindowStyle','normal')
-set(gcf, 'Position', posFigCon);
-set(gcf, 'PaperPositionMode','auto');
-
-h(1)=subplot(1,2,1);
-h(2)=subplot(1,2,2);
-% Paste figures on the subplots
-copyobj(allchild(get(c,'CurrentAxes')),h(1));
-copyobj(allchild(get(k,'CurrentAxes')),h(2));
-% Add legends
-
-subplot(1,2,1)
-l(1) = legend(h(1), 'reward model return', 'true return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return noiseless rollout');
-title('single GP return convergence');
-
-subplot(1,2,2)
-l(2) = legend(h(2), 'reward model return', 'true return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return noiseless rollout');
-title('multi GP return convergence');
-
-suptitle('Return convergence')
-
-savefig('+output/advancedx-var/convergence_combi_noise');
-print('+output/advancedx-var/convergence_combi_noise', '-depsc');
-
-
-close all; clear; clc;

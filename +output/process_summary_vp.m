@@ -152,26 +152,28 @@ print('+output/viapoint/trajectory_single_noise_sum', '-depsc');
 
 close all;
 
+%%
+
 figure;
 
 xlabel('iteration');
 ylabel('return noiseless rollout');
 title('Return convergence');
 
-R = zeros(length(summary_struct.batch_res(1).R),...
+R = zeros(49,...
     length(summary_struct.batch_res));
 
-R_var = zeros(length(summary_struct.batch_res(1).R),...
+R_var = zeros(49,...
     length(summary_struct.batch_res));
 
-R_true = zeros(length(summary_struct.batch_res(1).R_true),...
+R_true = zeros(49,...
     length(summary_struct.batch_res));
 
 for i = 1:length(summary_struct.batch_res)
     
-    R(:,i) = summary_struct.batch_res(i).R';
-    R_var(:,i) = summary_struct.batch_res(i).R_var';
-    R_true(:,i) = summary_struct.batch_res(i).R_true';   
+    R(1:49,i) = summary_struct.batch_res(i).R(1:49)';
+    R_var(1:49,i) = summary_struct.batch_res(i).R_var(1:49)';
+    R_true(1:49,i) = summary_struct.batch_res(i).R_true(1:49)';   
 end
 
 mean_r = mean(R,2);
@@ -293,7 +295,6 @@ h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
 h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
 
-
 h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
     'MarkerFaceColor', PPMarkerFaceColor);
@@ -316,43 +317,65 @@ print('+output/viapoint/trajectory_multi_noise_sum', '-depsc');
 
 close all;
 
-figure;
+%%
 
-xlabel('iteration');
-ylabel('return noiseless rollout');
-title('Return convergence');
+R = zeros(length(summary_struct.batch_res), 49, 4);
 
-R = zeros(49,...
-    length(summary_struct.batch_res));
+R_var = zeros(length(summary_struct.batch_res), 49, 4);
 
-R_var = zeros(49,...
-    length(summary_struct.batch_res));
-
-R_true = zeros(49,...
-    length(summary_struct.batch_res));
+R_true = zeros(length(summary_struct.batch_res), 49, 4);
 
 for i = 1:length(summary_struct.batch_res)
     
-    R(1:49,i) = summary_struct.batch_res(i).R(1:49,2);
-    R_var(1:49,i) = summary_struct.batch_res(i).R_var(1:49,2);
-    R_true(1:49,i) = summary_struct.batch_res(i).R_true(1:49,1);   
+    R(i,:,:) = summary_struct.batch_res(i).R(1:49,:);
+    R_var(i,:,:) = summary_struct.batch_res(i).R_var(1:49,:);
+    R_true(i,:,:) = summary_struct.batch_res(i).R_true(1:49,:);   
 end
 
-mean_r = mean(R,2);
-var_r = mean(R_var, 2);
+mean_r = squeeze(mean(R,1));
+var_r = squeeze(mean(R_var, 1));
 
-mean_r_true = mean(R_true,2);
-var_r_true = var(R_true,0,2);
+mean_r_true = squeeze(mean(R_true,1));
+var_r_true = squeeze(var(R_true,0,1));
 
 it = 1:length(mean_r);
 
-hold on;
-patch([it, fliplr(it)],[(mean_r+var_r); flipud((mean_r-var_r))], 1, ...
+figure;
+set(gcf,'WindowStyle','normal')
+set(gcf, 'Position', posFigReward);
+set(gcf, 'PaperPositionMode','auto');
+
+%suptitle('Return convergence');
+    
+x = marginXReward;
+y = 2*marginYReward+heightYReward;
+
+for i = 1:4
+    
+    subplot(2,2,i);
+    hold on;
+    patch([it, fliplr(it)],[(mean_r(:,i)+var_r(:,i)); flipud((mean_r(:,i)-var_r(:,i)))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
+    h1 = plot(mean_r(:,i), 'b');
+    h2 = plot(mean_r_true(:,i), 'r');
+        
+    pos = get(gca, 'Position');
+    pos(1) = x;
+    pos(2) = y;
+    pos(3) = widthXReward;
+    pos(4) = heightYReward;
+    set(gca, 'Position', pos);
+    
+    x = x + ((-1)^(i-1))*(widthXReward+marginXReward);
+    
+    if i==2
+        y = y - heightYReward - marginYReward;
+    end
+        
+    xlabel('iteration');
+    ylabel('return noiseless rollout');
+end    
 
-h1 = plot(mean_r, 'b');
-
-h2 = plot(mean_r_true, 'r');
 
 legend([h1 h2], ...
     'reward model return', 'true return',...

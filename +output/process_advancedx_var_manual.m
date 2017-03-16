@@ -207,6 +207,13 @@ for i = 1:4
     delete(children(2));
     delete(children(3));
     
+    if i==2
+        hold on;
+        scatter(0.3, 0.6, 0,  VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+    end
+    
     pos = get(gca, 'Position');
     pos(1) = x;
     pos(2) = y;
