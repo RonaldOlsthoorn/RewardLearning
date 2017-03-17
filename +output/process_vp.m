@@ -35,7 +35,7 @@ PPMarkerFaceColor = 'w';
 
 %%
 load('+output/viapoint_single');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 % op.print();
 
 trajectory = op.Reward_trace(end).tool_positions;
@@ -115,12 +115,12 @@ R_true = zeros(length(op.Reward_trace),1);
 
 for i = 1:length(R)
     
-    R(i) = op.Reward_trace.R;
-    R_var(i) = op.Reward_trace.R_var';
-    R_true(i) = op.Reward_trace.R_true';   
+    R(i) = op.Reward_trace(i).R;
+    R_var(i) = op.Reward_trace(i).R_var;
+    R_true(i) = op.Reward_trace(i).R_true;   
 end
 
-it = 1:length(mean_r);
+it = 1:length(R);
 
 figure;
 hold on;
@@ -145,7 +145,7 @@ close all;
 
 %%
 load('+output/viapoint_multi');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 
 trajectory = op.Reward_trace(end).tool_positions;
 time = op.Reward_trace(end).time;
@@ -189,6 +189,7 @@ set(gca, 'Position', pos);
 x = x+widthX+marginX;
 
 subplot(1,3,3);
+hold on;
 plot(trajectory(1,:), trajectory(2,:), 'b');
 scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
@@ -221,12 +222,12 @@ R_true = zeros(length(op.Reward_trace),4);
 
 for i = 1:length(op.Reward_trace)
     
-    R(i,:) = op.Reward_trace(i).R;
-    R_var(i,:) = op.Reward_trace(i).R_var;
-    R_true(i,:) = op.Reward_trace(i).R_true;   
+    R(i,:) = op.Reward_trace(i).R_segments';
+    R_var(i,:) = op.Reward_trace(i).R_var';
+    R_true(i,:) = op.Reward_trace(i).R_true';   
 end
 
-it = 1:length(mean_r);
+it = 1:length(R);
 
 figure;
 set(gcf,'WindowStyle','normal')
@@ -289,7 +290,7 @@ for i = 1:4
       
     if i==2
         hold on;
-        scatter(0.3, 0.6, 0,  VPMarkerSize, 'Marker', VPMarkerType, ...
+        scatter3(0.3, 0.6, max(max(children(4).ZData)), VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
     end

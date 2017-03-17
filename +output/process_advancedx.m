@@ -35,7 +35,7 @@ PPMarkerFaceColor = 'w';
 
 %%
 load('+output/viapoint_advancedx_single');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 % op.print();
 
 trajectory = op.Reward_trace(end).tool_positions;
@@ -44,6 +44,110 @@ time = op.Reward_trace(end).time;
 figure;
 
 % global
+set(gcf,'WindowStyle','normal')
+set(gcf, 'Position', posFig);
+set(gcf, 'PaperPositionMode','auto');
+
+% set margins figures
+x = marginX;
+subplot(1,3,1);
+hold on;
+plot(time, trajectory(1,:), 'b');
+scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+
+pos = get(gca, 'Position');
+pos(1) = x;
+pos(2) = marginY;
+pos(3) = widthX;
+pos(4) = heightY;
+set(gca, 'Position', pos);
+
+x = x+widthX+marginX;
+
+subplot(1,3,2);
+hold on;
+plot(time, trajectory(2,:), 'b');
+scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+pos = get(gca, 'Position');
+pos(1) = x;
+pos(2) = marginY;
+pos(3) = widthX;
+pos(4) = heightY;
+set(gca, 'Position', pos);
+
+x = x+widthX+marginX;
+
+subplot(1,3,3);
+hold on;
+plot(trajectory(1,:), trajectory(2,:), 'b');
+scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
+    'MarkerFaceColor', VPMarkerFaceColor);
+pos = get(gca, 'Position');
+pos(1) = x;
+pos(2) = marginY;
+pos(3) = widthX;
+pos(4) = heightY;
+set(gca, 'Position', pos);
+
+children = get(gca, 'Children');
+
+suptitle('Resulting trajectory')
+
+% legend([children(4) children(3) children(1) children(2)], ...
+%     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
+%         'location', 'southwest');
+    
+savefig('+output/advancedx/trajectory_single_noise');
+print('+output/advancedx/trajectory_single_noise', '-depsc');
+
+close all;
+
+%%
+
+R = zeros(length(op.Reward_trace),1);
+R_var = zeros(length(op.Reward_trace),1);
+R_true = zeros(length(op.Reward_trace),1);
+
+for i = 1:length(R)
+    
+    R(i) = op.Reward_trace(i).R;
+    R_var(i) = op.Reward_trace(i).R_var;
+    R_true(i) = op.Reward_trace(i).R_true;   
+end
+
+it = 1:length(R);
+
+figure;
+hold on;
+patch([it, fliplr(it)],[(R+R_var); flipud((R-R_var))], 1, ...
+     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
+plot(R, 'b');
+plot(R_true, 'r');
+
+xlabel('iteration');
+ylabel('return noiseless rollout');
+
+title('Return convergence');
+    
+savefig('+output/advancedx/convergence_single_noise');
+print('+output/advancedx/convergence_single_noise', '-depsc');
+
+close all;
+
+%%
+load('+output/viapoint_advancedx_multi');
+op = output.Output.from_struct(res_struct);
+
+trajectory = op.Reward_trace(end).tool_positions;
+time = op.Reward_trace(end).time;
+
+figure;
+
 set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFig);
 set(gcf, 'PaperPositionMode','auto');
@@ -87,7 +191,6 @@ scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 pos = get(gca, 'Position');
-pos = get(gca, 'Position');
 pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
@@ -97,102 +200,6 @@ set(gca, 'Position', pos);
 children = get(gca, 'Children');
 
 suptitle('Resulting trajectory')
-
-% legend([children(4) children(3) children(1) children(2)], ...
-%     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
-%         'location', 'southwest');
-    
-savefig('+output/advancedx/trajectory_single_noise');
-print('+output/advancedx/trajectory_single_noise', '-depsc');
-
-close all;
-
-%%
-
-R = zeros(length(op.Reward_trace),1);
-R_var = zeros(length(op.Reward_trace),1);
-R_true = zeros(length(op.Reward_trace),1);
-
-for i = 1:length(R)
-    
-    R(i) = op.Reward_trace.R;
-    R_var(i) = op.Reward_trace.R_var';
-    R_true(i) = op.Reward_trace.R_true';   
-end
-
-it = 1:length(mean_r);
-
-figure;
-hold on;
-patch([it, fliplr(it)],[(R+R_var); flipud((R-R_var))], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
-plot(R, 'b');
-plot(R_true, 'r');
-
-xlabel('iteration');
-ylabel('return noiseless rollout');
-
-title('Return convergence');
-legend([children(1) children(2)], ...
-    'reward model return', 'true return',...
-        'location', 'southeast');
-    
-savefig('+output/advancedx/convergence_single_noise');
-print('+output/advancedx/convergence_single_noise', '-depsc');
-
-close all;
-
-%%
-load('+output/viapoint_advancedx_multi');
-op = output.Output.from_struct(to_save);
-
-% set margins figures
-x = marginX;
-subplot(1,3,1);
-hold on;
-plot(time, trajectory(1,:), 'b');
-scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
-    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
-    'MarkerFaceColor', VPMarkerFaceColor);
-pos = get(gca, 'Position');
-pos(1) = x;
-pos(2) = marginY;
-pos(3) = widthX;
-pos(4) = heightY;
-set(gca, 'Position', pos);
-
-x = x+widthX+marginX;
-
-subplot(1,3,2);
-hold on;
-plot(time, trajectory(2,:), 'b');
-scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
-    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
-    'MarkerFaceColor', VPMarkerFaceColor);
-pos = get(gca, 'Position');
-pos(1) = x;
-pos(2) = marginY;
-pos(3) = widthX;
-pos(4) = heightY;
-set(gca, 'Position', pos);
-
-x = x+widthX+marginX;
-
-subplot(1,3,3);
-plot(trajectory(1,:), trajectory(2,:), 'b');
-scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
-    'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
-    'MarkerFaceColor', VPMarkerFaceColor);
-pos = get(gca, 'Position');
-pos(1) = x;
-pos(2) = marginY;
-pos(3) = widthX;
-pos(4) = heightY;
-set(gca, 'Position', pos);
-
-children = get(gca, 'Children');
-
-suptitle('Resulting trajectory');
 
 % legend([children(4) children(3) children(1) children(2)], ...
 %     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
@@ -211,12 +218,12 @@ R_true = zeros(length(op.Reward_trace),4);
 
 for i = 1:length(op.Reward_trace)
     
-    R(i,:) = op.Reward_trace(i).R;
-    R_var(i,:) = op.Reward_trace(i).R_var;
-    R_true(i,:) = op.Reward_trace(i).R_true;   
+    R(i,:) = op.Reward_trace(i).R_segments';
+    R_var(i,:) = op.Reward_trace(i).R_var';
+    R_true(i,:) = op.Reward_trace(i).R_true';   
 end
 
-it = 1:length(mean_r);
+it = 1:length(R);
 
 figure;
 set(gcf,'WindowStyle','normal')
@@ -235,6 +242,7 @@ for i = 1:4
     patch([it, fliplr(it)],[(R(:,i)+R_var(:,i)); flipud((R(:,i)-R_var(:,i)))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
     h1 = plot(R(:,i), 'b');
+    h2 = plot(R_true(:,i), 'r');
         
     pos = get(gca, 'Position');
     pos(1) = x;
@@ -280,7 +288,7 @@ for i = 1:4
       
     if i==2
         hold on;
-        scatter(0.3, 0.6, 0,  VPMarkerSize, 'Marker', VPMarkerType, ...
+        scatter3(0.3, 0.6, max(max(children(4).ZData)), VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
     end
