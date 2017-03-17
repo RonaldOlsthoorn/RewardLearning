@@ -13,6 +13,12 @@ heightYReward = (1-3*marginYReward)/2;
 
 posFig = [1 1 1350 550];
 
+%yLimTrajX;
+%yLimTrajY;
+yLimTrajXY = [0.25 0.75];
+
+yLimCon = [-0.08 0.03];
+
 % margins
 marginX = 0.07;
 marginY = 0.1;
@@ -93,6 +99,7 @@ pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
+ylim(yLimTrajXY);
 set(gca, 'Position', pos);
 xlabel('time [s]');
 ylabel('y position end effector [m]');
@@ -116,6 +123,7 @@ pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
+ylim(yLimTrajXY);
 set(gca, 'Position', pos);
 xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
@@ -128,22 +136,20 @@ h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
 h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
 
-
-h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
-    'MarkerFaceColor', PPMarkerFaceColor);
-
-h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
-    'MarkerFaceColor', PPMarkerFaceColor);
+% h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
+%     'MarkerFaceColor', PPMarkerFaceColor);
+% 
+% h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
+%     'MarkerFaceColor', PPMarkerFaceColor);
 
 h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h2, h3, h4, h5, h6],'average trajectory', 'optimal trajectory', ...
-    'average crosspoint', 'optimal crosspoint','reference viapoint', 'Location', 'northeast');
-
+legend([h2, h1, h3, h6],'average SARL result', 'std SARL result', 'RL result', ...
+    'reference viapoint', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
 
@@ -157,8 +163,8 @@ close all;
 figure;
 
 xlabel('iteration');
-ylabel('return noiseless rollout');
-title('Return convergence');
+ylabel('return');
+title('Convergence');
 
 R = zeros(49,...
     length(summary_struct.batch_res));
@@ -185,15 +191,17 @@ var_r_true = var(R_true,0,2);
 it = 1:length(mean_r);
 
 hold on;
-patch([it, fliplr(it)],[(mean_r+var_r); flipud((mean_r-var_r))], 1, ...
+h1 = patch([it, fliplr(it)],[(mean_r+var_r); flipud((mean_r-var_r))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
 
-h1 = plot(mean_r, 'b');
+h2 = plot(mean_r, 'b');
 
-h2 = plot(mean_r_true, 'r');
+h3 = plot(mean_r_true, 'r');
 
-legend([h1 h2], ...
-    'reward model return', 'true return',...
+ylim(yLimCon);
+
+legend([h2 h1 h3], ...
+    'average reward model return', 'std reward model return', 'true return',...
         'location', 'southeast');
     
 savefig('+output/viapoint/convergence_single_noise_sum');
@@ -260,6 +268,7 @@ pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
+ylim(yLimTrajXY);
 set(gca, 'Position', pos);
 xlabel('time [s]');
 ylabel('y position end effector [m]');
@@ -275,7 +284,6 @@ scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-
 subplot(1,3,3);
 x = x+widthX+marginX;
 pos = get(gca, 'Position');
@@ -283,6 +291,7 @@ pos(1) = x;
 pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
+ylim(yLimTrajXY);
 set(gca, 'Position', pos);
 xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
@@ -295,20 +304,20 @@ h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
 h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
 
-h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
-    'MarkerFaceColor', PPMarkerFaceColor);
-
-h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-    'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
-    'MarkerFaceColor', PPMarkerFaceColor);
+% h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
+%     'MarkerFaceColor', PPMarkerFaceColor);
+% 
+% h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
+%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
+%     'MarkerFaceColor', PPMarkerFaceColor);
 
 h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h2, h3, h4, h5, h6],'average trajectory', 'optimal trajectory', ...
-    'average crosspoint', 'optimal crosspoint','reference viapoint', 'Location', 'northeast');
+legend([h2, h1, h3, h6],'average SARL result', 'std SARL result', 'RL result', ...
+    'reference viapoint', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
 
@@ -344,8 +353,6 @@ figure;
 set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFigReward);
 set(gcf, 'PaperPositionMode','auto');
-
-%suptitle('Return convergence');
     
 x = marginXReward;
 y = 2*marginYReward+heightYReward;
@@ -354,10 +361,10 @@ for i = 1:4
     
     subplot(2,2,i);
     hold on;
-    patch([it, fliplr(it)],[(mean_r(:,i)+var_r(:,i)); flipud((mean_r(:,i)-var_r(:,i)))], 1, ...
+    h1 = patch([it, fliplr(it)],[(mean_r(:,i)+var_r(:,i)); flipud((mean_r(:,i)-var_r(:,i)))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
-    h1 = plot(mean_r(:,i), 'b');
-    h2 = plot(mean_r_true(:,i), 'r');
+    h2 = plot(mean_r(:,i), 'b');
+    h3 = plot(mean_r_true(:,i), 'r');
         
     pos = get(gca, 'Position');
     pos(1) = x;
@@ -365,6 +372,7 @@ for i = 1:4
     pos(3) = widthXReward;
     pos(4) = heightYReward;
     set(gca, 'Position', pos);
+    ylim(yLimCon);
     
     x = x + ((-1)^(i-1))*(widthXReward+marginXReward);
     
@@ -373,13 +381,15 @@ for i = 1:4
     end
         
     xlabel('iteration');
-    ylabel('return noiseless rollout');
+    ylabel('return');
+    title(strcat('segment', {' '}, num2str(i)));
 end    
 
-
-legend([h1 h2], ...
-    'reward model return', 'true return',...
+legend([h2 h1 h3], ...
+    'average reward model return', 'std reward model return', 'true return',...
         'location', 'southeast');
+    
+suptitle('Convergence');
     
 savefig('+output/viapoint/convergence_multi_noise_sum');
 print('+output/viapoint/convergence_multi_noise_sum', '-depsc');
