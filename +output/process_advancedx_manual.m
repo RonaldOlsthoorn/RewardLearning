@@ -86,6 +86,8 @@ legend([children(4) children(3) children(1) children(2)], ...
 savefig('+output/advancedx/trajectory_single_manual');
 print('+output/advancedx/trajectory_single_manual', '-depsc');
 
+%%
+
 figure(3);
 
 xlabel('iteration');
@@ -156,6 +158,8 @@ legend([children(4) children(3) children(1) children(2)], ...
 savefig('+output/advancedx/trajectory_multi_manual');
 print('+output/advancedx/trajectory_multi_manual', '-depsc');
 
+%%
+
 figure(4);
 set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFigReward);
@@ -189,6 +193,8 @@ end
    
 savefig('+output/advancedx/convergence_multi_manual');
 print('+output/advancedx/convergence_multi_manual', '-depsc');
+
+%%
 
 figure(6);
 
@@ -236,164 +242,4 @@ suptitle('Multi segment return function');
 savefig('+output/advancedx/return_flat_multi_manual');
 print('+output/advancedx/return_flat_multi_manual', '-depsc');
 
-close all;
-
-%%
-
-load('+output/viapoint_advancedx_single_manual');
-to_save_single = to_save;
-
-load('+output/viapoint_advancedx_multi_manual');
-to_save_multi = to_save;
-
-% Load saved figures
-c=hgload('+output/advancedx/convergence_single_manual.fig');
-k=hgload('+output/advancedx/convergence_multi_manual.fig');
-% Prepare subplots
-
-figure
-set(gcf,'WindowStyle','normal')
-set(gcf, 'Position', posFigCon);
-set(gcf, 'PaperPositionMode','auto');
-
-h(1)=subplot(1,2,1);
-h(2)=subplot(1,2,2);
-% Paste figures on the subplots
-copyobj(allchild(get(c,'CurrentAxes')),h(1));
-copyobj(allchild(get(k,'CurrentAxes')),h(2));
-% Add legends
-
-subplot(1,2,1)
-l(1) = legend(h(1), 'reward model return', 'expert return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return');
-title('single GP return convergence');
-
-
-subplot(1,2,2)
-l(2) = legend(h(2), 'reward model return', 'expert return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return');
-title('multi GP return convergence');
-
-suptitle('Return convergence')
-
-savefig('+output/advancedx/convergence_combi_manual');
-print('+output/advancedx/convergence_combi_manual', '-depsc');
-
-close all;
-
-%%
-
-% % Load saved figures
-% hgload('+output/advancedx/trajectory_single_noise.fig');
-% c(1) = subplot(1,3,1);
-% c(2) = subplot(1,3,2);
-% c(3) = subplot(1,3,3);
-% 
-% k=hgload('+output/advancedx/trajectory_multi_noise.fig');
-% k(1) = subplot(1,3,1);
-% k(2) = subplot(1,3,2);
-% k(3) = subplot(1,3,3);
-% % Prepare subplots
-% 
-% figure
-% set(gcf,'WindowStyle','normal')
-% set(gcf, 'Position', posFig);
-% set(gcf, 'PaperPositionMode','auto');
-% 
-% h(1)=subplot(2,3,1);
-% xlabel('time [s]');
-% ylabel('x end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = marginX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(2)=subplot(2,3,2);
-% xlabel('time [s]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 2*marginX + widthX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(3)=subplot(2,3,3);
-% xlabel('x end effector [m]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 3*marginX + 2*widthX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(4)=subplot(2,3,4);
-% xlabel('time [s]');
-% ylabel('x end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = marginX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(5)=subplot(2,3,5);
-% xlabel('time [s]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 2*marginX + widthX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(6)=subplot(2,3,6);
-% xlabel('x end effector [m]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 3*marginX + 2*widthX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% % Paste figures on the subplots
-% copyobj(allchild(get(c(1),'CurrentAxes')),h(1));
-% copyobj(allchild(get(c(2),'CurrentAxes')),h(2));
-% copyobj(allchild(get(c(3),'CurrentAxes')),h(3));
-% 
-% copyobj(allchild(get(k(1),'CurrentAxes')),h(4));
-% copyobj(allchild(get(k(2),'CurrentAxes')),h(5));
-% copyobj(allchild(get(k(3),'CurrentAxes')),h(6));
-% % Add legends
-% 
-% subplot(2,3,3)
-% l(1) = legend(h(1), 'reward model return', 'true return',...
-%         'location', 'southeast');
-% 
-% 
-% 
-% subplot(2,3,6)
-% l(2) = legend(h(2), 'reward model return', 'true return',...
-%         'location', 'southeast');
-% 
-% 
-% suptitle('Resulting trajectories')
-% 
-% savefig('+output/advancedx/trajectories_combi_noise');
-% print('+output/advancedx/trajectories_combi_noise', '-depsc');
-
-close all; clear; clc;
+clear; close all; clc;
