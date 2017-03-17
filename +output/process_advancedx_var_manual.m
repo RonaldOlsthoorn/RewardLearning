@@ -13,6 +13,12 @@ heightYReward = (1-3*marginYReward)/2;
 
 posFig = [1 1 1000 500];
 
+%yLimTrajX;
+%yLimTrajY;
+yLimTrajXY = [0.25 0.75];
+
+yLimCon = [-0.08 0.03];
+
 % margins
 marginX = 0.07;
 marginY = 0.1;
@@ -38,6 +44,10 @@ load('+output/viapoint_advancedx_var_single_manual');
 op = output.Output.from_struct(to_save);
 op.print();
 
+time = op.Reward_trace(end).time;
+t_plane = time(600:end);
+plane = 0.5*ones(1,length(t_plane));
+
 figure(2);
 
 % global
@@ -54,6 +64,8 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+children = get(gca, 'Children');
+delete(children(4));
 
 x = x+widthX+marginX;
 
@@ -64,6 +76,8 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+children = get(gca, 'Children');
+delete(children(4));
 
 x = x+widthX+marginX;
 
@@ -74,17 +88,19 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
-
 children = get(gca, 'Children');
+delete(children(4));
 
 suptitle('Resulting trajectory')
 
-legend([children(4) children(3) children(1) children(2)], ...
-    'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
+legend([children(3) children(1) children(2)], ...
+    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', ...
         'location', 'southwest');
-    
+
 savefig('+output/advancedx-var/trajectory_single_manual');
 print('+output/advancedx-var/trajectory_single_manual', '-depsc');
+
+%%
 
 figure(3);
 
@@ -93,7 +109,7 @@ ylabel('return');
 
 children = get(gca, 'Children');
 
-title('Return convergence');
+title('Convergence');
 
 legend([children(1) children(2)], ...
     'reward model return', 'expert return',...
@@ -124,6 +140,8 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+children = get(gca, 'Children');
+delete(children(4));
 
 x = x+widthX+marginX;
 
@@ -134,6 +152,8 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+children = get(gca, 'Children');
+delete(children(4));
 
 x = x+widthX+marginX;
 
@@ -144,17 +164,22 @@ pos(2) = marginY;
 pos(3) = widthX;
 pos(4) = heightY;
 set(gca, 'Position', pos);
+children = get(gca, 'Children');
+delete(children(4));
 
 children = get(gca, 'Children');
 
 suptitle('Resulting trajectory')
 
-legend([children(4) children(3) children(1) children(2)], ...
-    'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
+legend([ children(3) children(1) children(2)], ...
+    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', ...
         'location', 'southwest');
+
 
 savefig('+output/advancedx-var/trajectory_multi_manual');
 print('+output/advancedx-var/trajectory_multi_manual', '-depsc');
+
+%%
 
 figure(4);
 set(gcf,'WindowStyle','normal')
@@ -190,6 +215,9 @@ end
 savefig('+output/advancedx-var/convergence_multi_manual');
 print('+output/advancedx-var/convergence_multi_manual', '-depsc');
 
+
+%%
+
 figure(6);
 
 set(gcf,'WindowStyle','normal')
@@ -209,10 +237,19 @@ for i = 1:4
     
     if i==2
         hold on;
-        scatter(0.3, 0.6, 0,  VPMarkerSize, 'Marker', VPMarkerType, ...
+        scatter3(0.3, 0.6, max(max(children(4).ZData)),  VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
     end
+    
+%     if i==4
+%         
+%         yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
+%         xPlane = 0.5*ones(1, length(yPlane));
+%         zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
+%         hold on;
+%         plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 1)     
+%     end
     
     pos = get(gca, 'Position');
     pos(1) = x;
@@ -231,169 +268,9 @@ for i = 1:4
     colorbar();
 end
 
-suptitle('Multi segment return function');
+suptitle('Multi segment reward function');
     
 savefig('+output/advancedx-var/return_flat_multi_manual');
 print('+output/advancedx-var/return_flat_multi_manual', '-depsc');
-
-close all;
-
-%%
-
-load('+output/viapoint_advancedx_var_single_manual');
-to_save_single = to_save;
-
-load('+output/viapoint_advancedx_var_multi_manual');
-to_save_multi = to_save;
-
-% Load saved figures
-c=hgload('+output/advancedx-var/convergence_single_manual.fig');
-k=hgload('+output/advancedx-var/convergence_multi_manual.fig');
-% Prepare subplots
-
-figure
-set(gcf,'WindowStyle','normal')
-set(gcf, 'Position', posFigCon);
-set(gcf, 'PaperPositionMode','auto');
-
-h(1)=subplot(1,2,1);
-h(2)=subplot(1,2,2);
-% Paste figures on the subplots
-copyobj(allchild(get(c,'CurrentAxes')),h(1));
-copyobj(allchild(get(k,'CurrentAxes')),h(2));
-% Add legends
-
-subplot(1,2,1)
-l(1) = legend(h(1), 'reward model return', 'expert return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return');
-title('single GP return convergence');
-
-
-subplot(1,2,2)
-l(2) = legend(h(2), 'reward model return', 'expert return',...
-        'location', 'southeast');
-xlabel('iteration');
-ylabel('return');
-title('multi GP return convergence');
-
-suptitle('Return convergence')
-
-savefig('+output/advancedx-var/convergence_combi_manual');
-print('+output/advancedx-var/convergence_combi_manual', '-depsc');
-
-close all;
-
-%%
-
-% % Load saved figures
-% hgload('+output/advancedx/trajectory_single_noise.fig');
-% c(1) = subplot(1,3,1);
-% c(2) = subplot(1,3,2);
-% c(3) = subplot(1,3,3);
-% 
-% k=hgload('+output/advancedx/trajectory_multi_noise.fig');
-% k(1) = subplot(1,3,1);
-% k(2) = subplot(1,3,2);
-% k(3) = subplot(1,3,3);
-% % Prepare subplots
-% 
-% figure
-% set(gcf,'WindowStyle','normal')
-% set(gcf, 'Position', posFig);
-% set(gcf, 'PaperPositionMode','auto');
-% 
-% h(1)=subplot(2,3,1);
-% xlabel('time [s]');
-% ylabel('x end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = marginX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(2)=subplot(2,3,2);
-% xlabel('time [s]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 2*marginX + widthX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(3)=subplot(2,3,3);
-% xlabel('x end effector [m]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 3*marginX + 2*widthX;
-% pos(2) = 2*marginYReward + heightYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(4)=subplot(2,3,4);
-% xlabel('time [s]');
-% ylabel('x end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = marginX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(5)=subplot(2,3,5);
-% xlabel('time [s]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 2*marginX + widthX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% h(6)=subplot(2,3,6);
-% xlabel('x end effector [m]');
-% ylabel('y end effector [m]');
-% 
-% pos = get(gca, 'Position');
-% pos(1) = 3*marginX + 2*widthX;
-% pos(2) = marginYReward;
-% pos(3) = widthXReward;
-% pos(4) = heightYReward;
-% set(gca, 'Position', pos);
-% 
-% % Paste figures on the subplots
-% copyobj(allchild(get(c(1),'CurrentAxes')),h(1));
-% copyobj(allchild(get(c(2),'CurrentAxes')),h(2));
-% copyobj(allchild(get(c(3),'CurrentAxes')),h(3));
-% 
-% copyobj(allchild(get(k(1),'CurrentAxes')),h(4));
-% copyobj(allchild(get(k(2),'CurrentAxes')),h(5));
-% copyobj(allchild(get(k(3),'CurrentAxes')),h(6));
-% % Add legends
-% 
-% subplot(2,3,3)
-% l(1) = legend(h(1), 'reward model return', 'true return',...
-%         'location', 'southeast');
-% 
-% 
-% 
-% subplot(2,3,6)
-% l(2) = legend(h(2), 'reward model return', 'true return',...
-%         'location', 'southeast');
-% 
-% 
-% suptitle('Resulting trajectories')
-% 
-% savefig('+output/advancedx/trajectories_combi_noise');
-% print('+output/advancedx/trajectories_combi_noise', '-depsc');
 
 close all; clear; clc;
