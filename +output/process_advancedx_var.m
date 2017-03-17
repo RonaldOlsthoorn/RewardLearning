@@ -13,6 +13,13 @@ heightYReward = (1-3*marginYReward)/2;
 
 posFig = [1 1 1000 500];
 
+%yLimTrajX;
+%yLimTrajY;
+yLimTrajXY = [0.25 0.75];
+
+yLimCon = [-0.13 0.08];
+
+
 % margins
 marginX = 0.07;
 marginY = 0.1;
@@ -123,20 +130,21 @@ it = 1:length(R);
 
 figure;
 hold on;
-patch([it, fliplr(it)],[(R+R_var); flipud((R-R_var))], 1, ...
+h2 = patch([it, fliplr(it)],[(R+R_var); flipud((R-R_var))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
-plot(R, 'b');
-plot(R_true, 'r');
+h1 = plot(R, 'b');
+h3 = plot(R_true, 'r');
 
 xlabel('iteration');
-ylabel('return noiseless rollout');
+ylabel('return');
 
-title('Return convergence');
+title('Convergence');
 
-% legend([children(1) children(2)], ...
-%     'reward model return', 'true return',...
-%         'location', 'southeast');
-    
+ylim(yLimCon);
+
+legend([h1 h2 h3], ...
+     'reward model return', 'std reward model return', 'true return',...
+         'location', 'southeast');
     
 savefig('+output/advancedx-var/convergence_single_noise');
 print('+output/advancedx-var/convergence_single_noise', '-depsc');
@@ -233,7 +241,7 @@ set(gcf,'WindowStyle','normal')
 set(gcf, 'Position', posFigReward);
 set(gcf, 'PaperPositionMode','auto');
 
-%suptitle('Return convergence');
+suptitle('Convergence');
     
 x = marginXReward;
 y = 2*marginYReward+heightYReward;
@@ -242,17 +250,18 @@ for i = 1:4
     
     subplot(2,2,i);
     hold on;
-    patch([it, fliplr(it)],[(R(:,i)+R_var(:,i)); flipud((R(:,i)-R_var(:,i)))], 1, ...
+    h2 = patch([it, fliplr(it)],[(R(:,i)+R_var(:,i)); flipud((R(:,i)-R_var(:,i)))], 1, ...
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); 
     h1 = plot(R(:,i), 'b');
-    h2 = plot(R_true(:,i), 'r');
-            
+    h3 = plot(R_true(:,i), 'r');
+        
     pos = get(gca, 'Position');
     pos(1) = x;
     pos(2) = y;
     pos(3) = widthXReward;
     pos(4) = heightYReward;
     set(gca, 'Position', pos);
+    ylim(yLimCon);
     
     x = x + ((-1)^(i-1))*(widthXReward+marginXReward);
     
@@ -261,8 +270,12 @@ for i = 1:4
     end
         
     xlabel('iteration');
-    ylabel('return noiseless rollout');
+    ylabel('return');
+    title(strcat('segment: ',{' '},num2str(i)));
 end    
+
+legend([h1 h2 h3], 'reward model return', 'std reward model return', 'true return',...
+    'location', 'southeast');
     
 savefig('+output/advancedx-var/convergence_multi_noise');
 print('+output/advancedx-var/convergence_multi_noise', '-depsc');
@@ -295,6 +308,15 @@ for i = 1:4
     'MarkerFaceColor', VPMarkerFaceColor);
     end
     
+    if i==4
+        
+        yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
+        xPlane = 0.5*ones(1, length(yPlane));
+        zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
+        hold on;
+        plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 2)     
+    end
+    
     pos = get(gca, 'Position');
     pos(1) = x;
     pos(2) = y;
@@ -312,7 +334,7 @@ for i = 1:4
     colorbar();
 end
 
-suptitle('Multi segment return function');
+suptitle('Multi segment reward model');
 
 savefig('+output/advancedx-var/return_flat_multi_noise');
 print('+output/advancedx-var/return_flat_multi_noise', '-depsc');

@@ -43,9 +43,6 @@ PPMarkerFaceColor = 'w';
 load('+output/viapoint_advancedx_single_summary');
 load('+output/viapoint_advancedx_static');
 
-load('+output/viapoint_single_summary');
-load('+output/viapoint_static');
-
 pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
     length(summary_struct.batch_res));
 
@@ -395,7 +392,7 @@ legend([h2 h1 h3], ...
     
 suptitle('Convergence');
     
-savefig('+output/advancedx/return_flat_multi_noise_sum');
-print('+output/advancedx/return_flat_multi_noise_sum', '-depsc');
+savefig('+output/advancedx/convergence_multi_noise_sum');
+print('+output/advancedx/convergence_multi_noise_sum', '-depsc');
 
 close all;
