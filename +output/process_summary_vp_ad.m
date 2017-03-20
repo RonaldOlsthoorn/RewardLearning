@@ -41,28 +41,40 @@ PPMarkerFaceColor = 'w';
 
 %%
 load('+output/viapoint_advancedx_single_summary');
-load('+output/viapoint_advancedx_static');
+summary_struct_res = summary_struct;
+load('+output/viapoint_advancedx_static_summary');
+summary_struct_opt = summary_struct;
 
-pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
-    length(summary_struct.batch_res));
+pos = zeros(2, length(summary_struct_res.batch_res(1).last_rollout.tool_positions(1,:)),...
+    length(summary_struct_res.batch_res));
 
-opt_pos = to_save.Reward_trace(end).tool_positions;
+opt_pos = zeros(2, length(summary_struct_opt.batch_res(1).last_rollout.tool_positions(1,:)),...
+    length(summary_struct_opt.batch_res));
 
-t = summary_struct.batch_res(1).last_rollout.time;
+t = summary_struct_res.batch_res(1).last_rollout.time;
 
 t_plane = t(600:end);
 plane = 0.5*ones(1, length(t_plane));
 
-pos_init = summary_struct.batch_res(1).first_rollout.tool_positions;
+pos_init = summary_struct_res.batch_res(1).first_rollout.tool_positions;
 
-for i = 1:length(summary_struct.batch_res)
+for i = 1:length(summary_struct_res.batch_res)
     
-    pos(1,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(1,:);
-    pos(2,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(2,:);
+    pos(1,:,i) = summary_struct_res.batch_res(i).last_rollout.tool_positions(1,:);
+    pos(2,:,i) = summary_struct_res.batch_res(i).last_rollout.tool_positions(2,:);
+end
+
+for i = 1:length(summary_struct_opt.batch_res)
+    
+    opt_pos(1,:,i) = summary_struct_opt.batch_res(i).last_rollout.tool_positions(1,:);
+    opt_pos(2,:,i) = summary_struct_opt.batch_res(i).last_rollout.tool_positions(2,:);
 end
 
 mean_pos = mean(pos, 3);
 var_pos = std(pos, 0, 3);
+
+mean_pos_opt = mean(opt_pos, 3);
+var_pos_opt = std(opt_pos, 0, 3);
 
 figure;
 
@@ -85,12 +97,15 @@ ylabel('x position end effector [m]');
 
 hold on;
 
+patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
+     'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
+
 patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_pos(1,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+     'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none'); 
  
+plot(t, mean_pos_opt(1,:), 'r');
 plot(t, mean_pos(1,:), 'b');
-plot(t, opt_pos(1,:), 'r');
-h4 = plot(t_plane, plane, 'k');
+h6 = plot(t_plane, plane, 'k');
 
 scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
@@ -109,11 +124,13 @@ xlabel('time [s]');
 ylabel('y position end effector [m]');
 
 hold on;
+patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
 patch([t, fliplr(t)],[(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+     'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
  
+plot(t, mean_pos_opt(2,:), 'r');
 plot(t, mean_pos(2,:), 'b');
-plot(t, opt_pos(2,:), 'r');
 
 scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
@@ -132,26 +149,23 @@ xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
 
 hold on;
-h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
+h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
+    [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+    'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
+
+h2 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
     [(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
- 
-h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
-h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
+    'FaceColor', [0.9,0.9,1],  'FaceAlpha', 0.5,'EdgeColor', 'none'); % This is the grey area in the plot.
 
-% h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
-%     'MarkerFaceColor', PPMarkerFaceColor);
-% 
-% h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
-%     'MarkerFaceColor', PPMarkerFaceColor);
+h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
+h4 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 
-h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h2, h1, h3, h6, h4],'average SARL result', 'std SARL result', 'RL result', ...
+
+legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
      'reference viapoint', 'reference viaplane', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
@@ -163,24 +177,26 @@ close all;
 
 %%
 
+figure;
+
 xlabel('iteration');
 ylabel('return');
 title('Convergence');
 
 R = zeros(49,...
-    length(summary_struct.batch_res));
+    length(summary_struct_res.batch_res));
 
 R_var = zeros(49,...
-    length(summary_struct.batch_res));
+    length(summary_struct_res.batch_res));
 
 R_true = zeros(49,...
-    length(summary_struct.batch_res));
+    length(summary_struct_res.batch_res));
 
-for i = 1:length(summary_struct.batch_res)
+for i = 1:length(summary_struct_res.batch_res)
     
-    R(1:49,i) = summary_struct.batch_res(i).R(1:49)';
-    R_var(1:49,i) = summary_struct.batch_res(i).R_var(1:49)';
-    R_true(1:49,i) = summary_struct.batch_res(i).R_true(1:49)';   
+    R(1:49,i) = summary_struct_res.batch_res(i).R(1:49)';
+    R_var(1:49,i) = summary_struct_res.batch_res(i).R_var(1:49)';
+    R_true(1:49,i) = summary_struct_res.batch_res(i).R_true(1:49)';   
 end
 
 mean_r = mean(R,2);
@@ -205,31 +221,42 @@ legend([h2 h1 h3], ...
     'average reward model return', 'std reward model return', 'true return',...
         'location', 'southeast');
     
-savefig('+output/advancedx/convergence_single_noise_sum');
-print('+output/advancedx/convergence_single_noise_sum', '-depsc');
+% savefig('+output/advancedx/convergence_single_noise_sum');
+% print('+output/advancedx/convergence_single_noise_sum', '-depsc');
 
 close all;
 
 %%
 load('+output/viapoint_advancedx_multi_summary');
+summary_struct_res = summary_struct;
 
-pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
-    length(summary_struct.batch_res));
+pos = zeros(2, length(summary_struct_res.batch_res(1).last_rollout.tool_positions(1,:)),...
+    length(summary_struct_res.batch_res));
 
-opt_pos = to_save.Reward_trace(end).tool_positions;
+opt_pos = zeros(2, length(summary_struct_opt.batch_res(1).last_rollout.tool_positions(1,:)),...
+    length(summary_struct_opt.batch_res));
 
-t = summary_struct.batch_res(1).last_rollout.time;
+t = summary_struct_res.batch_res(1).last_rollout.time;
 
-pos_init = summary_struct.batch_res(1).first_rollout.tool_positions;
+pos_init = summary_struct_res.batch_res(1).first_rollout.tool_positions;
 
-for i = 1:length(summary_struct.batch_res)
+for i = 1:length(summary_struct_res.batch_res)
     
-    pos(1,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(1,:);
-    pos(2,:,i) = summary_struct.batch_res(i).last_rollout.tool_positions(2,:);
+    pos(1,:,i) = summary_struct_res.batch_res(i).last_rollout.tool_positions(1,:);
+    pos(2,:,i) = summary_struct_res.batch_res(i).last_rollout.tool_positions(2,:);
+end
+
+for i = 1:length(summary_struct_opt.batch_res)
+    
+    opt_pos(1,:,i) = summary_struct_opt.batch_res(i).last_rollout.tool_positions(1,:);
+    opt_pos(2,:,i) = summary_struct_opt.batch_res(i).last_rollout.tool_positions(2,:);
 end
 
 mean_pos = mean(pos, 3);
 var_pos = std(pos, 0, 3);
+
+mean_pos_opt = mean(opt_pos, 3);
+var_pos_opt = std(opt_pos, 0, 3);
 
 figure;
 
@@ -252,11 +279,15 @@ ylabel('x position end effector [m]');
 
 hold on;
 
+patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
+     'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
+
 patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_pos(1,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
- 
+     'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none'); 
+
+plot(t, mean_pos_opt(1,:), 'r');
 plot(t, mean_pos(1,:), 'b');
-plot(t, opt_pos(1,:), 'r');
+
 h4 = plot(t_plane, plane, 'k');
 
 scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
@@ -276,11 +307,13 @@ xlabel('time [s]');
 ylabel('y position end effector [m]');
 
 hold on;
+patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
 patch([t, fliplr(t)],[(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
+     'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
  
+plot(t, mean_pos_opt(2,:), 'r');
 plot(t, mean_pos(2,:), 'b');
-plot(t, opt_pos(2,:), 'r');
 
 scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
@@ -299,27 +332,23 @@ xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
 
 hold on;
-h1 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
+h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
+    [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+    'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
+
+h2 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
     [(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
-     'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
- 
-h2 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
-h3 = plot(opt_pos(1,:), opt_pos(2,:), 'r');
+    'FaceColor', [0.9,0.9,1],  'FaceAlpha', 0.5,'EdgeColor', 'none'); % This is the grey area in the plot.
 
-% h4 = scatter(mean_pos(1,300), mean_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', PPMarkerEdgeColor, ...
-%     'MarkerFaceColor', PPMarkerFaceColor);
-% 
-% h5 = scatter(opt_pos(1,300), opt_pos(2,300), PPMarkerSize, 'Marker', PPMarkerType, ...
-%     'LineWidth', PPMarkerEdge, 'MarkerEdgeColor', 'r', ...
-%     'MarkerFaceColor', PPMarkerFaceColor);
+h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
+h4 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 
-h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
+h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h2, h1, h3, h4, h6],'average SARL result', 'std SARL result', 'RL result', ...
-    'reference viapoint', 'reference viaplane', 'Location', 'southwest');
+legend([h4, h2, h3, h1, h5],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+    'reference viapoint', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
 
@@ -329,17 +358,20 @@ print('+output/advancedx/trajectory_multi_noise_sum', '-depsc');
 close all;
 
 %%
-R = zeros(length(summary_struct.batch_res), 49, 4);
 
-R_var = zeros(length(summary_struct.batch_res), 49, 4);
+figure;
 
-R_true = zeros(length(summary_struct.batch_res), 49, 4);
+R = zeros(length(summary_struct_res.batch_res), 49, 4);
 
-for i = 1:length(summary_struct.batch_res)
+R_var = zeros(length(summary_struct_res.batch_res), 49, 4);
+
+R_true = zeros(length(summary_struct_res.batch_res), 49, 4);
+
+for i = 1:length(summary_struct_res.batch_res)
     
-    R(i,:,:) = summary_struct.batch_res(i).R(1:49,:);
-    R_var(i,:,:) = summary_struct.batch_res(i).R_var(1:49,:);
-    R_true(i,:,:) = summary_struct.batch_res(i).R_true(1:49,:);   
+    R(i,:,:) = summary_struct_res.batch_res(i).R(1:49,:);
+    R_var(i,:,:) = summary_struct_res.batch_res(i).R_var(1:49,:);
+    R_true(i,:,:) = summary_struct_res.batch_res(i).R_true(1:49,:);   
 end
 
 mean_r = squeeze(mean(R,1));
@@ -392,7 +424,7 @@ legend([h2 h1 h3], ...
     
 suptitle('Convergence');
     
-savefig('+output/advancedx/convergence_multi_noise_sum');
-print('+output/advancedx/convergence_multi_noise_sum', '-depsc');
+% savefig('+output/advancedx/convergence_multi_noise_sum');
+% print('+output/advancedx/convergence_multi_noise_sum', '-depsc');
 
 close all;

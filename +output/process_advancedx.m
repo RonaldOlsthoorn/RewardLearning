@@ -108,8 +108,8 @@ suptitle('Resulting trajectory')
 %     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
 %         'location', 'southwest');
     
-savefig('+output/advancedx/trajectory_single_noise');
-print('+output/advancedx/trajectory_single_noise', '-depsc');
+% savefig('+output/advancedx/trajectory_single_noise');
+% print('+output/advancedx/trajectory_single_noise', '-depsc');
 
 close all;
 
@@ -217,8 +217,8 @@ suptitle('Resulting trajectory')
 %     'First rollout','Final rollout', 'Reference via point', 'Final rollout viapoint', ...
 %         'location', 'southwest');
 
-savefig('+output/advancedx/trajectory_multi_noise');
-print('+output/advancedx/trajectory_multi_noise', '-depsc');
+% savefig('+output/advancedx/trajectory_multi_noise');
+% print('+output/advancedx/trajectory_multi_noise', '-depsc');
 
 close all;
 
