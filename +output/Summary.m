@@ -32,6 +32,17 @@ classdef Summary < handle
             res_sum.first_rollout = res.Reward_trace(1);
             res_sum.last_rollout = res.Reward_trace(end);
             
+            if res.dynamic == 0
+                
+                if isempty(obj.batch_res)
+                    obj.batch_res = res_sum;
+                else
+                    obj.batch_res(end+1) = res_sum;
+                end
+                
+                return;
+            end
+            
             if res.manual
                 
                 if strcmp(res.granularity, 'single')
@@ -178,12 +189,14 @@ classdef Summary < handle
             
             for i = 1:n_trials
 
+                if isfield(obj.batch_res(i), 'R')
                 if length(obj.batch_res(i).R(:,1))>1
                     for j = 1:length(obj.batch_res(i).D)
                         q(i) = q(i) + length(obj.batch_res(i).D{j});
                     end
                 else
                     q(i) = length(obj.batch_res(i).D);
+                end
                 end
                 
                 pos = obj.batch_res(i).last_rollout.tool_positions;

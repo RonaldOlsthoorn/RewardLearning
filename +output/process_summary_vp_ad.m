@@ -152,7 +152,7 @@ h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
 legend([h2, h1, h3, h6, h4],'average SARL result', 'std SARL result', 'RL result', ...
-    'reference viapoint', 'reference viaplane', 'Location', 'southwest');
+     'reference viapoint', 'reference viaplane', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
 

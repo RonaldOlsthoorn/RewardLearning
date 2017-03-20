@@ -46,7 +46,7 @@ load('+output/viapoint_static');
 pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
     length(summary_struct.batch_res));
 
-opt_pos = to_save.Reward_trace(end).tool_positions;
+opt_pos = res_struct.Reward_trace(end).tool_positions;
 
 t = summary_struct.batch_res(1).last_rollout.time;
 
@@ -215,7 +215,7 @@ load('+output/viapoint_multi_summary');
 pos = zeros(2, length(summary_struct.batch_res(1).last_rollout.tool_positions(1,:)),...
     length(summary_struct.batch_res));
 
-opt_pos = to_save.Reward_trace(end).tool_positions;
+opt_pos = res_struct.Reward_trace(end).tool_positions;
 
 t = summary_struct.batch_res(1).last_rollout.time;
 

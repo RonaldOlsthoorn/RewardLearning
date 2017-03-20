@@ -89,7 +89,7 @@ patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_p
      'FaceColor', [0.9,0.9,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
  
 plot(t, mean_pos(1,:), 'b');
-plot(t, opt_pos(1,:), 'r');
+%plot(t, opt_pos(1,:), 'r');
 h4 = plot(t_plane, plane, 'k');
 
 scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
@@ -118,7 +118,6 @@ plot(t, opt_pos(2,:), 'r');
 scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
-
 
 subplot(1,3,3);
 x = x+widthX+marginX;
@@ -153,8 +152,8 @@ h6 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
 legend([h2, h1, h3, h4, h6],'average SARL result', 'std SARL result', 'RL result', ...
-    'reference viapoint', 'reference viaplane', 'Location', 'southwest');
-
+     'reference viapoint', 'reference viaplane', 'Location', 'southwest');
+ 
 suptitle('resulting trajectory');
 
 savefig('+output/advancedx-var/trajectory_single_noise_sum');
@@ -390,7 +389,6 @@ for i = 1:4
     xlabel('iteration');
     ylabel('return noiseless rollout');
 end    
-
 
 legend([h1 h2], ...
     'reward model return', 'true return',...

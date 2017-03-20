@@ -15,7 +15,7 @@ classdef VPAdvancedXMultiSegmentExpert < expert.Expert
         threshold = 0.9;
         penalty = 10;
         
-        w_plane = 2;
+        w_plane = 1;
         w_point = 1;
     end
     
