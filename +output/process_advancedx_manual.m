@@ -122,7 +122,7 @@ close all;
 
 %%
 load('+output/viapoint_advancedx_multi_manual');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 op.print();
 
 figure(2);

@@ -11,5 +11,5 @@ res_struct = res.to_struct();
 try
     save(strcat('+output/', protocol_name), vname(res_struct));
 catch
-    save(obj.protocol_s, 'to_save');
+    save(obj.protocol_s, vname(res_struct));
 end
