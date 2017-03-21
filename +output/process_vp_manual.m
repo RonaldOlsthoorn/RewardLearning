@@ -35,7 +35,7 @@ PPMarkerFaceColor = 'w';
 
 %%
 load('+output/viapoint_single_manual');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 op.print();
 
 figure(2);
@@ -113,7 +113,7 @@ close all;
 
 %%
 load('+output/viapoint_multi_manual');
-op = output.Output.from_struct(to_save);
+op = output.Output.from_struct(res_struct);
 op.print();
 
 figure(2);

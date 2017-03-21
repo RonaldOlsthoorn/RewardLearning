@@ -230,6 +230,8 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             subplot(1,3,3);
             hold on;
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'k');
+            scatter(rollout.tool_positions(1, 300), rollout.tool_positions(2, 300), ...
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             
         end
         
@@ -276,6 +278,8 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             obj.line_handles(9) = plot(m_segment_x, rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), 'Color', 'b');
             obj.line_handles(10) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
+            
+            
         end
         
         function plot_annotations(obj, batch, seg)

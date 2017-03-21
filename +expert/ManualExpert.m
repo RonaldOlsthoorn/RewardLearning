@@ -192,6 +192,8 @@ classdef ManualExpert < expert.Expert
             subplot(1,3,3);
             hold on;
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'LineWidth', 2, 'Color', 'red');
+            scatter(rollout.tool_positions(1, 300), rollout.tool_positions(2, 300), ...
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
         end
         
         function plot_annotations(obj, batch)
