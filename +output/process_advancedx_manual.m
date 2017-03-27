@@ -40,8 +40,8 @@ PPMarkerEdgeColor = 'r';
 PPMarkerFaceColor = 'w';
 
 %%
-load('+output/viapoint_advancedx_single_manual');
-op = output.Output.from_struct(to_save);
+load('+output/manual/viapoint_advancedx_single_manual');
+op = output.Output.from_struct(res_struct);
 op.print();
 
 time = op.Reward_trace(end).time;
@@ -121,7 +121,7 @@ print('+output/advancedx/convergence_single_manual', '-depsc');
 close all;
 
 %%
-load('+output/viapoint_advancedx_multi_manual');
+load('+output/manual/viapoint_advancedx_multi_manual');
 op = output.Output.from_struct(res_struct);
 op.print();
 

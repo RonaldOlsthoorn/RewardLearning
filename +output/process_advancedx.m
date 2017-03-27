@@ -40,7 +40,7 @@ PPMarkerEdgeColor = 'r';
 PPMarkerFaceColor = 'w';
 
 %%
-load('+output/viapoint_advancedx_single');
+load('+output/computer/viapoint_advancedx_single');
 op = output.Output.from_struct(res_struct);
 % op.print();
 
@@ -152,7 +152,7 @@ print('+output/advancedx/convergence_single_noise', '-depsc');
 close all;
 
 %%
-load('+output/viapoint_advancedx_multi');
+load('+output/computer/viapoint_advancedx_multi');
 op = output.Output.from_struct(res_struct);
 
 trajectory = op.Reward_trace(end).tool_positions;

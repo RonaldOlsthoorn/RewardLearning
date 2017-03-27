@@ -40,9 +40,9 @@ PPMarkerEdgeColor = 'b';
 PPMarkerFaceColor = 'w';
 
 %%
-load('+output/viapoint_advancedx_single_summary');
+load('+output/computer/viapoint_advancedx_single_summary');
 summary_struct_res = summary_struct;
-load('+output/viapoint_advancedx_static_summary');
+load('+output/computer/viapoint_advancedx_static_summary');
 summary_struct_opt = summary_struct;
 
 pos = zeros(2, length(summary_struct_res.batch_res(1).last_rollout.tool_positions(1,:)),...
@@ -227,7 +227,7 @@ legend([h2 h1 h3], ...
 close all;
 
 %%
-load('+output/viapoint_advancedx_multi_summary');
+load('+output/computer/viapoint_advancedx_multi_summary');
 summary_struct_res = summary_struct;
 
 pos = zeros(2, length(summary_struct_res.batch_res(1).last_rollout.tool_positions(1,:)),...

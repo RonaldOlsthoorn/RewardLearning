@@ -34,7 +34,7 @@ PPMarkerEdgeColor = 'r';
 PPMarkerFaceColor = 'w';
 
 %%
-load('+output/viapoint_single_manual');
+load('+output/manual/viapoint_single_manual');
 op = output.Output.from_struct(res_struct);
 op.print();
 
@@ -112,7 +112,7 @@ print('+output/viapoint/convergence_single_manual', '-depsc');
 close all;
 
 %%
-load('+output/viapoint_multi_manual');
+load('+output/manual/viapoint_multi_manual');
 op = output.Output.from_struct(res_struct);
 op.print();
 
