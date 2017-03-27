@@ -17,6 +17,9 @@ classdef ManualExpertSegmented < expert.Expert
         manual = true;
         
         line_handles;
+        text_handles;
+        
+        background_batch;
         
         bg_color = (1-5/20)*ones(1,3);
     end
@@ -79,6 +82,7 @@ classdef ManualExpertSegmented < expert.Expert
             for seg = 1:obj.n_segments
                 
                 obj.plot_overlay(rollout, seg);
+                obj.plot_annotations(obj.background_batch, seg);
                 obj.lock = true;
                 
                 while (obj.lock)
@@ -93,6 +97,11 @@ classdef ManualExpertSegmented < expert.Expert
                     
                     delete(obj.line_handles(i));
                 end
+                
+                for i = 1:length(obj.text_handles)
+                    
+                    delete(obj.text_handles(i));
+                end
             end
             
             close(obj.figure_handle);
@@ -106,6 +115,7 @@ classdef ManualExpertSegmented < expert.Expert
             
             obj.plot_rollout(rollout);
             obj.plot_overlay(rollout, seg);
+            obj.plot_annotations(obj.background_batch, seg);
             obj.lock = true;
             
             while (obj.lock)
@@ -115,6 +125,10 @@ classdef ManualExpertSegmented < expert.Expert
             for i = 1:length(obj.line_handles)
                 
                 delete(obj.line_handles(i));
+            end
+            for i = 1:length(obj.text_handles)
+                
+                delete(obj.text_handles(i));
             end
             
             rating(seg) = str2double(obj.hinput.String);
@@ -127,7 +141,7 @@ classdef ManualExpertSegmented < expert.Expert
             obj.init_figure();
             obj.plot_background_batch(batch);
             obj.plot_reference();
-            % obj.plot_annotations(batch);
+            
         end
         
         function init_figure(obj)
@@ -160,6 +174,8 @@ classdef ManualExpertSegmented < expert.Expert
         end
         
         function plot_background_batch(obj, batch)
+            
+            obj.background_batch = batch;
             
             for i = 1:batch.size
                 
@@ -271,18 +287,33 @@ classdef ManualExpertSegmented < expert.Expert
         
         function plot_annotations(obj, batch, seg)
             
-            subplot(1,3,3);
-            hold on;
             
-            t_segment = obj.segment_start(seg) + (obj.segment_end(seg) - obj.segment_start(seg))/2;
+            t_segment = floor(obj.segment_start(seg) + (obj.segment_end(seg) - obj.segment_start(seg))/2);
+            
+            j = 1;
             
             for i = 1:batch.size
                 rollout = batch.get_rollout(i);
                 
                 if ~isempty(rollout.R_expert)
                     
-                    text(rollout.tool_positions(1,t_segment), rollout.tool_positions(2,500), ...
-                        strcat('\leftarrow R=',num2str(rollout.R_expert)));
+                    subplot(1,3,1);
+                    hold on;
+                    obj.text_handles(j) = text(t_segment*obj.reference.Ts, rollout.tool_positions(1, t_segment), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert(seg))));
+                    j = j + 1;
+                    
+                    subplot(1,3,2);
+                    hold on;
+                    obj.text_handles(j) = text(t_segment*obj.reference.Ts, rollout.tool_positions(2, t_segment), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert(seg))));
+                    j = j + 1;
+                    
+                    subplot(1,3,3);
+                    hold on;
+                    obj.text_handles(j) = text(rollout.tool_positions(1, t_segment), rollout.tool_positions(2, t_segment), ...
+                        strcat('\leftarrow R=',num2str(rollout.R_expert(seg))));
+                    j = j + 1;
                 end
             end
         end
