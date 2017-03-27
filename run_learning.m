@@ -9,7 +9,13 @@ vname=@(x) inputname(1);
 res_struct = res.to_struct();
 
 try
-    save(strcat('+output/', protocol_name), vname(res_struct));
+    if isempty(strfind(protocol_name, 'manual'))
+        save(strcat('+output/computer', ...
+            protocol_name, '_summary'), vname(res_struct));
+    else
+        save(strcat('+output/computer', ...
+            protocol_name, '_summary'), vname(res_struct));
+    end
 catch
-    save(obj.protocol_s, vname(res_struct));
+    save(strcat(protocol_name, '_summary'), vname(res_struct));
 end
