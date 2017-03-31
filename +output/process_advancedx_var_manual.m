@@ -242,14 +242,14 @@ for i = 1:4
     'MarkerFaceColor', VPMarkerFaceColor);
     end
     
-%     if i==4
-%         
-%         yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
-%         xPlane = 0.5*ones(1, length(yPlane));
-%         zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
-%         hold on;
-%         plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 1)     
-%     end
+    if i==4
+        
+        yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
+        xPlane = 0.5*ones(1, length(yPlane));
+        zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
+        hold on;
+        plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 1, 'LineStyle', '--')     
+    end
     
     pos = get(gca, 'Position');
     pos(1) = x;
