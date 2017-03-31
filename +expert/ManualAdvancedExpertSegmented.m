@@ -125,6 +125,11 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 delete(obj.line_handles(i));
             end
             
+            for i = 1:length(obj.text_handles)
+                
+                delete(obj.text_handles(i));
+            end
+            
             rating(seg) = str2double(obj.hinput.String);
             
             close(obj.figure_handle);
