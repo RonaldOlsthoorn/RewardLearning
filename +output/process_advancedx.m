@@ -17,7 +17,7 @@ posFig = [1 1 1000 500];
 %yLimTrajY;
 yLimTrajXY = [0.25 0.75];
 
-yLimCon = [-0.13 0.08];
+yLimCon = [-0.4 0.12];
 
 % margins
 marginX = 0.07;
@@ -311,14 +311,14 @@ for i = 1:4
     'MarkerFaceColor', VPMarkerFaceColor);
     end
     
-%     if i==4
-%         
-%         yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
-%         xPlane = 0.5*ones(1, length(yPlane));
-%         zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
-%         hold on;
-%         plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 2)     
-%     end
+    if i==4
+        
+        yPlane = min(min(children(4).YData)):0.01:max(max(children(4).YData));
+        xPlane = 0.5*ones(1, length(yPlane));
+        zPlane = max(max(children(4).ZData))*ones(1, length(yPlane));
+        hold on;
+        plot3(xPlane, yPlane, zPlane, 'k', 'LineWidth', 1, 'LineStyle', '--');     
+    end
     
     pos = get(gca, 'Position');
     pos(1) = x;

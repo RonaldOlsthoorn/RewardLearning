@@ -209,8 +209,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
                 dx = (maxx-minx);
                 dy = (maxy-miny);
                 
-                [x_grid, y_grid] = meshgrid(((minx-dx):(dx/10):(maxx+dx))',...
-                                        ((miny-dy):(dy/10):(maxy+dy))');
+                [x_grid, y_grid] = meshgrid(((minx-dx):(dx/100):(maxx+dx))',...
+                                        ((miny-dy):(dy/100):(maxy+dy))');
                 
                 mPost = zeros(size(x_grid));
                 sPost = zeros(size(x_grid));
@@ -231,9 +231,9 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
 %                 patch([x_grid; flip(x_grid)],[mPost-sPost; flipud(mPost+sPost)], 1, 'FaceColor', [0.8,0.8,1], 'EdgeColor', 'none'); % This is the grey area in the plot.
 %                 set(gca, 'layer', 'top'); % We make sure that the grid lines and axes are above the grey area.
                 
-                surface(x_grid, y_grid, mPost); % We plot the mean line.
-                surface(x_grid, y_grid, mPost-sPost);
-                surface(x_grid, y_grid, mPost+sPost);
+                surface(x_grid, y_grid, mPost, 'EdgeColor','none','LineStyle','none'); % We plot the mean line.
+                surface(x_grid, y_grid, mPost-sPost, 'EdgeColor','none','LineStyle','none');
+                surface(x_grid, y_grid, mPost+sPost, 'EdgeColor','none','LineStyle','none');
                 
                 scatter3(obj.gps(i).x_measured(:,1),obj.gps(i).x_measured(:,2) , obj.gps(i).y_measured, 'ro'); % We plot the measurement points.
                 xlabel('mean x');

@@ -10,12 +10,12 @@ res_struct = res.to_struct();
 
 try
     if isempty(strfind(protocol_name, 'manual'))
-        save(strcat('+output/computer', ...
-            protocol_name, '_summary'), vname(res_struct));
+        save(strcat('+output/computer/', ...
+            protocol_name), vname(res_struct));
     else
-        save(strcat('+output/computer', ...
-            protocol_name, '_summary'), vname(res_struct));
+        save(strcat('+output/manual/', ...
+            protocol_name), vname(res_struct));
     end
 catch
-    save(strcat(protocol_name, '_summary'), vname(res_struct));
+    save(strcat(protocol_name), vname(res_struct));
 end
