@@ -66,6 +66,7 @@ pos(4) = heightY;
 set(gca, 'Position', pos);
 children = get(gca, 'Children');
 delete(children(4));
+h_vplane = children(1);
 
 x = x+widthX+marginX;
 
@@ -93,8 +94,8 @@ delete(children(4));
 
 suptitle('Resulting trajectory')
 
-legend([children(3) children(1) children(2)], ...
-    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', ...
+legend([children(3) children(1) children(2) h_vplane], ...
+    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', 'Reference viaplane',...
         'location', 'southwest');
 
 savefig('+output/advancedx-var/trajectory_single_manual');
@@ -142,6 +143,7 @@ pos(4) = heightY;
 set(gca, 'Position', pos);
 children = get(gca, 'Children');
 delete(children(4));
+h_vplane = children(1);
 
 x = x+widthX+marginX;
 
@@ -171,10 +173,9 @@ children = get(gca, 'Children');
 
 suptitle('Resulting trajectory')
 
-legend([ children(3) children(1) children(2)], ...
-    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', ...
+legend([ children(3) children(1) children(2) h_vplane], ...
+    'Final rollout', 'Reference viapoint', 'Final rollout viapoint', 'Reference viaplane',...
         'location', 'southwest');
-
 
 savefig('+output/advancedx-var/trajectory_multi_manual');
 print('+output/advancedx-var/trajectory_multi_manual', '-depsc');

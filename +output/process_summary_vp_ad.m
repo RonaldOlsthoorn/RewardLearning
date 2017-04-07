@@ -288,7 +288,7 @@ patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_p
 plot(t, mean_pos_opt(1,:), 'r');
 plot(t, mean_pos(1,:), 'b');
 
-h4 = plot(t_plane, plane, 'k');
+h6 = plot(t_plane, plane, 'k');
 
 scatter(3, 0.3, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
@@ -347,8 +347,8 @@ h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h4, h2, h3, h1, h5],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
-    'reference viapoint', 'Location', 'southwest');
+legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+    'reference viapoint', 'reference viaplane', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
 

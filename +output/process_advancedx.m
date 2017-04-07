@@ -17,7 +17,7 @@ posFig = [1 1 1000 500];
 %yLimTrajY;
 yLimTrajXY = [0.25 0.75];
 
-yLimCon = [-0.4 0.12];
+yLimCon = [-0.2 0.12];
 
 % margins
 marginX = 0.07;
