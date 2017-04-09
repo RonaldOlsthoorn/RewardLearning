@@ -1,4 +1,5 @@
 classdef affine
+    % obsolete.
     
     properties
     end

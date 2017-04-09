@@ -1,5 +1,8 @@
 clear; close all; clc
 
+% Create plots of the results of the following protocols
+% viapoint_advancedx_single_manual and viapoint_advancedx_multi_manual
+%
 %%
 % set globals
 posFigCon = [1 1 800 500];

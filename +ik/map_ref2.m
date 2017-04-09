@@ -1,5 +1,5 @@
 function [j, jd, jdd] = map_ref2(r_tool, x0, Ts, par)
-% maps refernce from ef space to joint space (2Dof).
+% Maps reference from ef space to joint space (2Dof).
 
 j = zeros(2, length(r_tool(1,:)));
 j(:,1) = x0;

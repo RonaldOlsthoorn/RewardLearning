@@ -1,4 +1,5 @@
 function [reward_model] = init_VPMultiGPRewardModel(reference, reward_model_par)
+% initialize multi gp reward model for viapoint tracking.
 
 obj = reward.VPMultiGPRewardModel();
 obj.feature_block = reward.VPSegmentedOutcomeBlock(reference, reward_model_par.n_segments);

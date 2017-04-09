@@ -1,6 +1,5 @@
 classdef VPSegmentedOutcomeBlock < reward.OutcomeBlock
-    % VPOUTCOMEBLOCK feature block containing only squared error.
-    
+    % VPOUTCOMEBLOCK feature block containing only end effector mean. 
     properties
         
         n_features = 2;
@@ -22,6 +21,7 @@ classdef VPSegmentedOutcomeBlock < reward.OutcomeBlock
                 reward.outcome.OutcomeVPY(obj.segment_start, obj.segment_end)};
         end
         
+        % Initialize start and end time indices
         function init_segments(obj)
             
             segment = floor(obj.n/obj.n_segments);

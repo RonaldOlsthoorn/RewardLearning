@@ -1,5 +1,8 @@
 clear; close all; clc
 
+% Processes results of multiple runs of protocols
+% viapoint_advancedx_single and viapoint_advancedx_multi.
+%
 %%
 % set globals
 posFigCon = [1 1 800 500];

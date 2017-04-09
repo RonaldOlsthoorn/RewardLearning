@@ -17,6 +17,11 @@ classdef DynamicEnvironment < environment.Environment
     
     methods
         
+        % Constructor.
+        % p: plant.
+        % r: reward model.
+        % e: expert.
+        % a: agent.
         function obj = DynamicEnvironment(p, r, e, a)
             
             obj = obj@environment.Environment(p, r);
@@ -24,8 +29,8 @@ classdef DynamicEnvironment < environment.Environment
             obj.agent = a;
         end
         
-        % Prepares the environment by demonstrating 4 rollouts and
-        % initializing the reward function
+        % Prepares the environment by demonstrating 8 rollouts and
+        % initializing the reward function.
         function prepare(obj)
             
             obj.index = 1;
@@ -39,6 +44,7 @@ classdef DynamicEnvironment < environment.Environment
             % allocate new batch (batch_trajectory is index-less)
             batch_rollouts = db.RolloutBatch();
             
+            % put index numbers on the rollouts. bit hacky.
             for i = 1:batch_trajectory.size
                 
                 rollout = batch_trajectory.get_rollout(i);
@@ -51,6 +57,7 @@ classdef DynamicEnvironment < environment.Environment
                 batch_rollouts.append_rollout(rollout);
             end
             
+            % query expert
             for i = 1:batch_rollouts.size
                 
                 rollout = batch_rollouts.get_rollout(i);
@@ -67,12 +74,15 @@ classdef DynamicEnvironment < environment.Environment
             
             obj.iteration = obj.iteration + 1;
             
+            % optimize hyper parameters.
             obj.reward_model.add_batch_demonstrations(batch_rollouts);
             obj.reward_model.init_hypers();
             obj.reward_model.minimize();
             obj.reward_model.print();
         end
       
+        % demonstrate by running trajectory on the system.
+        % sample: trajectory to be demonstrated.
         function [rollout] = demonstrate_rollout(obj, sample)
             
             disp('demonstrate rollout');

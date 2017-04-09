@@ -9,11 +9,15 @@ classdef DB < handle
     
     methods
         
+        % Append batch of rollouts to the database.
+        % batch_rollouts: batch to be added to the database.
         function append_row(obj, batch_rollouts)
             
             obj.table = [obj.table; batch_rollouts];
         end
         
+        % Convert complete database to struct
+        % res: array containing database
         function res = to_struct(obj)
             
             for i = 1:length(obj.table)
@@ -24,6 +28,8 @@ classdef DB < handle
     
     methods(Static)
         
+        % Create new DB object from struct.
+        % struct: struct containing all batches.
         function obj = from_struct(struct)
             
             obj = db.DB;

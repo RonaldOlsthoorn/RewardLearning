@@ -1,5 +1,7 @@
 clear; close all; clc
 
+% Creates relevant plots of manaual viapoint protocols:
+% viapoint_single_manual and viapoint_multi_manual.
 %%
 % set globals
 posFigCon = [1 1 800 500];

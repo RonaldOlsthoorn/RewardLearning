@@ -1,16 +1,17 @@
 classdef MultiSegmentEnvironment < environment.DynamicEnvironment
-    %
+    % Dynamic environment containing a multi segment adaptive reward model
+    % and acquisition algorithm.
     
     properties
         
         n_queries = 0;
         original_batch;
-        tol;
-        
+        tol;    
     end
     
     methods
         
+        % Constructor.
         function obj = MultiSegmentEnvironment(plant, reward_model,...
                 expert, agent)
             
@@ -64,15 +65,20 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             end
         end
         
-        
+        % Expected Policy Divergence (EPD) multi segment acquisition function.
+        % rollout: trajectory for which the acquisition value will be
+        % calculated.
         function [res, seg] = epd(obj, rollout)
             
+            % epd for two sigma points. will take average later.
             epd = zeros(obj.reward_model.n_segments, 2);
+            % policy according to unaltered reward model.
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
             m = zeros(obj.reward_model.n_segments, 1);
             s2 = zeros(obj.reward_model.n_segments, 1);
             
+            % calculate reward estimate for each segment.
             for segment = 1:obj.reward_model.n_segments
                 
                 [m(segment), s2(segment)] = ...
@@ -81,11 +87,13 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             
             for segment = 1:obj.reward_model.n_segments
                 
+                % construct sigma points for segment.
                 sigma_points = m(segment)*[1 1];
                 sigma_points = sigma_points +[s2(segment) -s2(segment)];
                 
                 for sigma = 1:2
                     
+                    % extend reward model with sigma point.
                     batch = obj.original_batch.copy();
                     rollout.R_expert = m;
                     rollout.R_expert(segment) = sigma_points(:, sigma);
@@ -93,6 +101,8 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                     rm_ext = obj.reward_model.copy();
                     rm_ext.add_demonstration(rollout);
                     
+                    % calculate reward extended reward model for each
+                    % trajectory in the batch.
                     for i=1:batch.size
                         
                         ro = batch.get_rollout(i);
@@ -101,16 +111,26 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
                         batch.update_rollout(ro);
                     end
                     
+                    % calculate policy extended reward model.
                     theta_star = obj.agent.get_probability_trajectories(batch);
+                    % calculate KL divergence.
                     epd(segment, sigma) = sum(theta_star.*log(theta_star./theta_tilda));
                 end
             end
             
+            % average epd over two sigma points. return segment with
+            % highest epd.
             [res, seg] = max(mean(epd,2));         
             
             %mean(epd, 2)
         end
         
+        % returns maximum epd segment.
+        % batch_rollouts: set of rollouts from which we are to find the
+        % maximum segment.
+        % max_rollout: rollout containing the maximum epd segment.
+        % max_epd: maximum epd value.
+        % max_seg: segment containing the maximum (max_epd) epd value.
         function [max_rollout, max_epd, max_seg] = find_max_acquisition(obj, batch_rollouts)
             
             epd = zeros(1,batch_rollouts.size);
@@ -126,6 +146,9 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             max_seg = seg(j);
         end
         
+        % demonstrate query and obtain expert rating for specific segment.
+        % sample: trajectory from which segment has to be queried.
+        % segment: target trajectory segment.
         function rollout = demonstrate_and_query_expert(obj, sample, segment)
             
             rollout = obj.demonstrate_rollout(sample);
@@ -133,6 +156,7 @@ classdef MultiSegmentEnvironment < environment.DynamicEnvironment
             rollout.R_expert = obj.expert.query_expert_segment(rollout, segment);
         end
         
+        % print difference between reward models. Not used.
         function print_reward_kl(obj, rm_ext)
             
             figure(11);

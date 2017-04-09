@@ -23,6 +23,7 @@ classdef StaticVPAdvancedRewardModel < reward.RewardModel
             
         end
         
+        % Uses expert to calculate reward. Add to rollout object.
         function rollout = add_reward(obj, rollout)
             
             reward = obj.ex.query_expert(rollout);

@@ -1,5 +1,5 @@
 classdef VPOutcomeBlock < reward.OutcomeBlock
-    % VPOUTCOMEEBLOCK feature block containing only squared error.
+    % VPOUTCOMEEBLOCK feature block containing only end effector mean.
     
     properties
         
@@ -18,6 +18,7 @@ classdef VPOutcomeBlock < reward.OutcomeBlock
             obj.init_segments();
         end
         
+        % Initialize segment start and end time indices.
         function init_segments(obj)
             
             segment = floor(obj.n/obj.n_segments);

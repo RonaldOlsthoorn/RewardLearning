@@ -18,6 +18,8 @@ classdef StaticLinearRewardModel < reward.RewardModel
             obj.feature_block = reward.SimpleOutcomeBlock(reference);           
         end
         
+        % Compute reward. assumed squared error function is already in the
+        % feature outcomes.
         function rollout = add_reward(obj, rollout)
             
             reward = obj.weights*rollout.outcomes;
@@ -27,4 +29,3 @@ classdef StaticLinearRewardModel < reward.RewardModel
         end      
     end    
 end
-

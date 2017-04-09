@@ -1,5 +1,9 @@
 clear; close all; clc
 
+% Create plots of multiple runs of 
+% viapoint_single and viapoint_multi
+% primarily mean trajectory results.
+
 %%
 % set globals
 posFigCon = [1 1 800 500];

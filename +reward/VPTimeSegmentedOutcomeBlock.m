@@ -1,5 +1,5 @@
 classdef VPTimeSegmentedOutcomeBlock< reward.OutcomeBlock
-    % VPOUTCOMEEBLOCK feature block containing only squared error.
+    % VPOUTCOMEEBLOCK feature block containing only end effector mean.
     
     properties
     end

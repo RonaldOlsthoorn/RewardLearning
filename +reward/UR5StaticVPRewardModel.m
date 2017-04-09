@@ -1,5 +1,5 @@
 classdef UR5StaticVPRewardModel < reward.RewardModel
-    % STATICVPREWARDMODEL: simple reward model based on the squared
+    % STATICVPREWARDMODEL: static reward model based on the squared
     % tracking error of the trajectory.
     
     properties(Constant)
@@ -13,6 +13,7 @@ classdef UR5StaticVPRewardModel < reward.RewardModel
     
     methods
         
+        
         function obj = UR5StaticVPRewardModel(reference)
             
             % obj.feature_block = reward.VPOutcomeBlock(reference);
@@ -23,6 +24,7 @@ classdef UR5StaticVPRewardModel < reward.RewardModel
             
         end
         
+        % Uses expert to calculate reward. Add to rollout object.
         function rollout = add_reward(obj, rollout)
             
             reward = obj.ex.query_expert(rollout);

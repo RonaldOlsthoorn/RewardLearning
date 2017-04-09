@@ -1,7 +1,8 @@
 function [env] = init_environment(env_par, plant, reward_model, agent, ref)
+% Create and initialize the environment.
 
 if env_par.dyn
-    switch env_par.expert
+    switch env_par.expert %dynamic environments need an expert.
         case 'hard_coded_expert'
             ex = expert.HardCodedExpert(env_par.expert_std);
         case 'multi_segment_expert'
@@ -30,7 +31,7 @@ if env_par.dyn
             ex = [];
     end
     
-    switch env_par.acquisition
+    switch env_par.acquisition 
         case 'epd_single'
             env = environment.SingleSegmentEnvironment(plant, reward_model, ex, agent);
         case 'epd_multi'
@@ -40,7 +41,7 @@ if env_par.dyn
     end
     
     env.tol = env_par.tol;
-else
+else % static environments don't
     env = environment.StaticEnvironment(plant, reward_model);
 end
 

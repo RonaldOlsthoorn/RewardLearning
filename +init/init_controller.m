@@ -1,5 +1,5 @@
 function [ c ] = init_controller(controller_par, system)
-% create and initialise controller.
+% Create and initialize controller.
 
 switch controller_par.type
     case 'controllerPID'

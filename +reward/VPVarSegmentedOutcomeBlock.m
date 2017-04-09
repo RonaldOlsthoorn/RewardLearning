@@ -1,5 +1,6 @@
 classdef VPVarSegmentedOutcomeBlock < reward.OutcomeBlock
-    % VPOUTCOMEBLOCK feature block containing only squared error.
+    % VPOUTCOMEBLOCK feature block containing end effector position mean 
+    % and variance.
     
     properties
         

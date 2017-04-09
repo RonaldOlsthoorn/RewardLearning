@@ -1,5 +1,9 @@
 clear; close all; clc
 
+% Create plots for manual results
+% viapoint_advancedx_var_single_manual and viapoint_advancedx_var_manual_manual
+% 
+
 %%
 % set globals
 posFigCon = [1 1 800 500];

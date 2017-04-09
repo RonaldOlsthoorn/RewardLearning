@@ -1,5 +1,5 @@
 classdef Expert < handle
-    % Base class for experts
+    % Base class for experts.
     
     properties
     end

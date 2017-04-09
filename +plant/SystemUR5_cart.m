@@ -1,4 +1,4 @@
-classdef SystemUR5 < plant.System
+classdef SystemUR5_cart < plant.System
 % Wrapper class for ur5 robotic commands.
 
     properties(Constant)

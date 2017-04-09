@@ -109,8 +109,7 @@ classdef SystemUR5 < plant.System
             while norm(s) > tol
                 obj.arm.update();
                 pause(0.1)
-                s = obj.arm.getJointsSpeeds();
-                
+                s = obj.arm.getJointsSpeeds();             
             end
         end
     end

@@ -12,6 +12,7 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
     
     methods
         
+        % Initialize start and end time indices time segments.
         function init_segments(obj)
             
             segment = floor(obj.n/obj.n_segments);
@@ -22,12 +23,14 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             obj.segment_end = [obj.segment_end obj.n];
         end
         
+        % Add feature outcomes to rollout object using feature block.
         function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);           
             rollout.outcomes = outcomes;          
         end
         
+        % Compute reward and add reward to rollout object.
         function rollout = add_reward(obj, rollout)
             
             R = zeros(obj.n_segments,1);
@@ -45,6 +48,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             rollout.R_var = S;
         end
         
+        % Perform gp inference for specific rollout on segment and add to 
+        % rollout object. Assumed rollout has feature outcomes.
         function reward = get_reward_segments(obj, rollout)
             
             reward = zeros(obj.n_segments,1);
@@ -55,11 +60,15 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Perform gp inference for specific rollout. Assumed rollout has
+        % feature outcomes.
         function [m, s2] = assess(obj, rollout, segment)
             
             [m, s2] = obj.gps(segment).assess(rollout.outcomes(segment,:));            
         end
         
+        % Add rated demonstrations to reward model. Update gp training
+        % points accordingly.
         function add_demonstration(obj, demonstration)
             
             for i = 1:obj.n_segments
@@ -68,12 +77,15 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             obj.update_gps();
         end 
         
+        % Add segment specific demonstration to segment seg.
         function add_demonstration_segment(obj, demonstration, seg)
             
             obj.db_demo(seg).append_rollout(demonstration);
             obj.update_gps();
         end
         
+        % Remove rated demonstrations from reward model. Update gp training
+        % points accordingly.
         function remove_demonstration(obj, demonstration)
             
             for s = 1:obj.n_segments
@@ -83,6 +95,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             obj.update_gps();
         end
         
+        % Add set of rated demonstrations to reward model (used for reward 
+        % model intialization). Update gp training points accordingly.
         function add_batch_demonstrations(obj, batch_demonstrations)
             
             for i = 1:obj.n_segments
@@ -104,6 +118,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Synchronize reward model set of demonstrations and gp training
+        % points.
         function update_gps(obj)
             
             for i = 1:obj.n_segments
@@ -123,6 +139,7 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Initialize hyper parameters gp using heuristics.
         function init_hypers(obj)
             
             d = length(obj.gps(1).x_measured(1,:));
@@ -144,6 +161,7 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Minimize hyper parameters gp.
         function minimize(obj)
             
            for i = 1:obj.n_segments
@@ -179,6 +197,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Returns a struct containing all properties of the reward model 
+        % (including gp training points). Used for storage (MATLAB cannot save objects).  
         function [struct] = to_struct(obj)
             
             struct.type = 'VPVarMultiGPRewardModel';
@@ -194,6 +214,7 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
             
         end
         
+        % Print reward model mean and variance in nice segmented 3D plots.
         function print(obj)
             
             figure(obj.figID);
@@ -245,6 +266,8 @@ classdef VPVarMultiGPRewardModel < reward.RewardModel
     
     methods(Static)
         
+        % Create reward model object from struct properties, so we can use
+        % the functions again (yeay).
         function obj = from_struct(struct)
             
             obj = reward.VPVarMultiGPRewardModel();

@@ -1,4 +1,5 @@
 classdef constant
+    % obsolete.
     
     properties
     end

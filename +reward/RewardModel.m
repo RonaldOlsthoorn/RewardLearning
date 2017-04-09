@@ -20,20 +20,22 @@ classdef RewardModel < handle
     
     methods
         
+        % Add outcomes feature functions to rollout.
         function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
             rollout.outcomes = outcomes;
         end
         
-        function rollout = add_outcomes_and_reward(obj, rollout)
-            % Complements the rollout with reward and the outcomes of
-            % reward primitives.
+        % Complements the rollout with reward and the outcomes of
+        % reward primitives.
+        function rollout = add_outcomes_and_reward(obj, rollout)        
             
             rollout = obj.add_outcomes(rollout);
             rollout = obj.add_reward(rollout);
         end
         
+        % Add reward to rollout.
         function batch = add_reward_batch(obj, batch)
             
             for i = 1:batch.size

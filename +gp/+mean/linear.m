@@ -1,5 +1,6 @@
 classdef linear
-    
+    % obsolete.
+
     properties
     end
     

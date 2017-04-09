@@ -1,6 +1,6 @@
 classdef Summary < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %SUMMARY Container class that gathers results of multiple runs of a
+    %SARL protocol.
     
     properties
         
@@ -20,6 +20,8 @@ classdef Summary < handle
     
     methods
         
+        % Add result of a single run of an algorithm. 
+        % res: output object.
         function add_result(obj, res)
             
             if res.succeeded==0
@@ -180,6 +182,7 @@ classdef Summary < handle
             end
         end
         
+        % Process average results of different runs.
         function process_results(obj)
             
             n_trials = length(obj.batch_res);
@@ -216,6 +219,9 @@ classdef Summary < handle
             
         end
         
+        % Converts object to struct, since only structs can be stored by
+        % MATLAB.
+        % res: struct containing all summary properties.
         function res = to_struct(obj)
             
             obj.process_results();
@@ -231,7 +237,5 @@ classdef Summary < handle
             res.viaplane_error_mean = obj.viaplane_mean;
             res.viaplane_error_std = obj.viaplane_std;
         end
-    end
-    
+    end 
 end
-

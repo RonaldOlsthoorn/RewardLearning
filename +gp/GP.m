@@ -1,5 +1,6 @@
 classdef GP < handle
-    %Gaussian Process class.
+    %Gaussian Process class. Basically wrapper for gpml. manual
+    %implementations are in this class are obsolote. need to remove.
     
     properties(Constant)
         
@@ -86,6 +87,7 @@ classdef GP < handle
 %             s2 = real(sPost);
         end
         
+        % obsolete
         function compute_features_measurements(obj)
             
             Xm = obj.x_measured';
@@ -93,6 +95,7 @@ classdef GP < handle
             obj.phi_measured = Phi_m;
         end
         
+        % obsolete
         function Phi = gp_features(~, X)
            
             [d, nm]  = size(X);
@@ -115,6 +118,7 @@ classdef GP < handle
             Phi(end,:) = ones(1,nm);
         end
         
+        % Wrapper function. Performes hyper parameter minimization.
         function logp = minimize(obj)
             
             %logp = obj.minimize_hypers(obj.hyp);
@@ -122,6 +126,7 @@ classdef GP < handle
             logp = obj.minimize_gpml();
         end
         
+        % Performes hyper parameter minimization, using gpml.
         function logp = minimize_gpml(obj)
             
             [h, logp] = minimize(obj.hyp, ...
@@ -140,7 +145,9 @@ classdef GP < handle
             
             obj.hyp = h;
         end
-        
+
+        % Performes hyper parameter minimization, based on hildo bijl example (www.hildobijl.com).
+        % not used, obsolete.
         function logp = minimize_sigma(obj)
             
             nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
@@ -233,7 +240,9 @@ classdef GP < handle
             obj.hyp.lik =hLik;   
             
         end
-        
+
+        % Performes hyper parameter minimization, based on hildo bijl example (www.hildobijl.com).
+        % not used, obsolete.
         function logp = minimize_hypers(obj, hyp0)
             
             nm = length(obj.x_measured(:,1)); % This is the number of measurements we will do.
@@ -342,7 +351,8 @@ classdef GP < handle
             obj.hyp.mean = hMean;
             obj.hyp.lik =hLik;   
         end
-          
+        
+        % update hyper parameters after adding/changing training points.
         function update_hyper_parameters(obj)
             
             obj.minimize(obj.hyp);
@@ -371,6 +381,7 @@ classdef GP < handle
             plot(obj.x_measured, obj.y_measured, 'ro'); % We plot the measurement points.
         end
         
+        % reset figure positions. clear plots.
         function reset_figure(obj)
             figure(obj.figID);
             set(double(obj.figID),...
@@ -395,6 +406,7 @@ classdef GP < handle
             end
         end
         
+        % returns struct representation of this object.
         function struct = to_struct(obj)
             
             struct.hyp = obj.hyp;

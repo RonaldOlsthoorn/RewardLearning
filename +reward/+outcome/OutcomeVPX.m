@@ -1,5 +1,5 @@
 classdef OutcomeVPX < reward.outcome.Outcome
-    % viapoint error reward feature function.
+    % End effector x position mean outcome function.
     
     properties
         
@@ -16,6 +16,8 @@ classdef OutcomeVPX < reward.outcome.Outcome
             obj.segment_end = se;
         end
                 
+        % Compute end effector x position mean as outcome.
+        % rollout: input trajectory for which outcome has to be calculated.        
         function outcome = compute_outcome(obj, rollout)
             
             outcome = zeros(length(obj.segment_start), 1);

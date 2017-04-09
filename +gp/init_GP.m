@@ -6,7 +6,7 @@ obj.hyp = gp_par.hyp;
 
 obj.mean = str2func(strcat('gp.mean.', gp_par.mean));
 
-switch gp_par.cov
+switch gp_par.cov %This part is completely obsolete
     case 'squared_exponential'
         obj.cov = gp.cov.squared_exponential();
     case 'quadratic'
@@ -15,7 +15,7 @@ switch gp_par.cov
         obj.cov = [];
 end
 
-switch gp_par.mean
+switch gp_par.mean %This part is completely obsolete as well
     case 'zero'
         obj.mean = gp.mean.zero();
     case 'constant'

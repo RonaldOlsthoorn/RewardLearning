@@ -1,4 +1,5 @@
 function [reward_model] = init_VPSingleGPRewardModel(reference, reward_model_par)
+% initialize single gp reward model for trajectory tracking.
 
 obj = reward.VPSingleGPRewardModel();
 obj.feature_block = reward.VPSegmentedOutcomeBlock(reference, reward_model_par.n_segments);

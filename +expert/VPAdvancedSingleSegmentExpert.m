@@ -16,12 +16,18 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % s: standard deviation expert noise.
+        % ref: object containing viapoints.
         function obj = VPAdvancedSingleSegmentExpert(s, ref)
             
             obj.std = s;
             obj.ref = ref;
         end
         
+        % Computes the expert rating. Expert noise included.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.
         function rating = query_expert(obj, rollout)
    
             res = 0;
@@ -46,6 +52,9 @@ classdef VPAdvancedSingleSegmentExpert < expert.Expert
             rating = res + obj.std*randn;
         end
         
+        % Computes the expert rating. Expert noise excluded.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating. 
         function rating = true_reward(obj, rollout)
    
             res = 0;

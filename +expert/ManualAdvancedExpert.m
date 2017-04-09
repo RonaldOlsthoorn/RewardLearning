@@ -1,6 +1,5 @@
 classdef ManualAdvancedExpert < expert.Expert
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Manual expert class for multi objective tasks. 
     
     properties
         
@@ -23,6 +22,9 @@ classdef ManualAdvancedExpert < expert.Expert
     
     methods
         
+        % Constructor.
+        % reference: object containing viapoints/viaplance.
+        % n_seg: number of segments.
         function obj = ManualAdvancedExpert(reference, n_seg)
             
             obj.n_segments = n_seg;
@@ -31,6 +33,7 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indices of segments.
         function init_segments(obj)
             
             n = length(obj.reference.t);
@@ -42,6 +45,10 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Query rollout by showing the human expert the trajectory and
+        % receiving a rating.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.
         function rating = query_expert(obj, rollout)
             
             obj.plot_rollout(rollout);
@@ -56,6 +63,8 @@ classdef ManualAdvancedExpert < expert.Expert
             close(obj.figure_handle);
         end
         
+        % Returns the true reward, for comparisson. Not used due to
+        % difference in rating scaling.
         function rating = true_reward(obj, rollout)
             
             res = zeros(1, length(obj.reference.viapoints(1,:)));
@@ -67,6 +76,7 @@ classdef ManualAdvancedExpert < expert.Expert
             rating = sum(res);
         end
         
+        % Callback for expert input event.
         function rating_callback(obj, ~, ~)
             
             [~, status] = str2num(obj.hinput.String);
@@ -76,6 +86,9 @@ classdef ManualAdvancedExpert < expert.Expert
             end
         end
         
+        % Prepare background window. 
+        % batch: set of rated trajectories, will be displayed in the
+        % background.
         function background(obj, batch)
             
             obj.init_figure();
@@ -87,6 +100,7 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.figure_handle.Visible = 'on';
         end
         
+        % Initialize figure properties (sizes, axes, UI).
         function init_figure(obj)
             
             obj.figure_handle = figure('Visible','on',...
@@ -115,6 +129,9 @@ classdef ManualAdvancedExpert < expert.Expert
             obj.figure_handle.Visible = 'on';
         end
         
+        % Plot the batch of background trajectories in the rating window.
+        % batch: set of rated trajectories, will be displayed in the
+        % background.
         function plot_background_batch(obj, batch)
             
             for i = 1:batch.size
@@ -138,6 +155,7 @@ classdef ManualAdvancedExpert < expert.Expert
             end
         end
         
+        % Plot the reference viapoints/viaplane in the rating window.
         function plot_reference(obj)
             
             subplot(1,3,1);
@@ -165,6 +183,8 @@ classdef ManualAdvancedExpert < expert.Expert
                 'Color', 'cyan', 'LineWidth', 2);
         end
         
+        % Plot the to be rated rollout prominently in the rating window.
+        % rollout: to be rated end effector trajectory.
         function plot_rollout(obj, rollout)
             
             subplot(1,3,1);
@@ -203,6 +223,9 @@ classdef ManualAdvancedExpert < expert.Expert
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
         end
         
+        % Plot annotations to the background trajectories, indicating the
+        % previous given ratings.
+        % batch: set of background rollouts.
         function plot_annotations(obj, batch)
             
             subplot(1,3,1);

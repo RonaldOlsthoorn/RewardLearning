@@ -13,6 +13,8 @@ classdef OutcomeVP < reward.outcome.Outcome
             obj.viapoint = viapoint;
         end
         
+        % Compute viapoint error as outcome.
+        % rollout: input trajectory for which outcome has to be calculated.
         function outcome = compute_outcome(obj, rollout)
             
             outcome = -sum((rollout.tool_positions' - ...

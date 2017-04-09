@@ -1,5 +1,7 @@
 clear; close all; clc
 
+% Create plots for computer expert protocols.
+% viapoint_advancedx_var_single and viapoint_advancedx_var_multi
 %%
 % set globals
 posFigCon = [1 1 800 500];

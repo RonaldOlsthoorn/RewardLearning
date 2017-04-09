@@ -1,5 +1,5 @@
 classdef OutcomeVPY < reward.outcome.Outcome
-    % viapoint error reward feature function.
+    % End effector y position mean outcome function.
     
     properties
         
@@ -16,7 +16,9 @@ classdef OutcomeVPY < reward.outcome.Outcome
             obj.segment_start = ss;
             obj.segment_end = se;
         end
-                
+        
+        % Compute end effector y position mean as outcome.
+        % rollout: input trajectory for which outcome has to be calculated.        
         function outcome = compute_outcome(obj, rollout)
             
             outcome = zeros(length(obj.segment_start), 1);

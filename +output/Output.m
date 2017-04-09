@@ -1,5 +1,6 @@
 classdef Output < handle
-    % OUTPUT
+    % OUTPUT. Container class, collecting all relevant result of one run of
+    % any SARL protocol.
     
     properties
         
@@ -31,6 +32,11 @@ classdef Output < handle
     
     methods
         
+        % Collect reward and trajectory information per iteration. needs to
+        % be called every iteration of the algorithm to work (needless
+        % coupling).
+        % rm: reward model (needed for demo trace).
+        % nr: noiseless rollout (needed for trajectory trace).
         function tick(obj, rm, nr)
             
             obj.iteration = obj.iteration + 1;
@@ -39,10 +45,13 @@ classdef Output < handle
             obj.process_weight_trace(nr);
         end
         
+        % Sometimes, algorithms fail (singularity problems). If this the 
+        % case, use it for statistics.
         function set_to_failed(obj)
             obj.succeeded = 0;
         end
         
+        % Collect information regarding demonstrations.
         function process_demo_trace(obj, rm)
             
             if obj.dynamic
@@ -100,6 +109,8 @@ classdef Output < handle
             end
         end
         
+        % Collect reward convergence information.
+        % noiseless_rollout: noiseless rollout (containing its reward)
         function process_reward_trace(obj, noiseless_rollout)
             
             if isempty(obj.Reward_trace)
@@ -109,6 +120,7 @@ classdef Output < handle
             end
         end
         
+        % Collect policy information
         function process_weight_trace(obj, noiseless_rollout)
             
             for i = 1:length(noiseless_rollout.policy.dof)
@@ -117,6 +129,7 @@ classdef Output < handle
             
         end
         
+        % Calculates number of rollouts each iteration.
         function trace_rollouts(obj)
             if obj.iteration == 1
                 obj.n_rollouts(1,1) = obj.n_init_samples;
@@ -129,29 +142,34 @@ classdef Output < handle
             end
         end
         
+        % Called after algorithm completes. Saves complete set of rollouts.
         function process_final_db(obj, db)
             
             obj.db_obj = db;
             obj.db_str = db.to_struct();
         end
         
+        % Called after algorithm completes. Store reference info.
         function process_final_ref(obj, ref)
             
             obj.ref_obj = ref;
             obj.ref_str = ref.to_struct();
         end
         
+        % Called after algorithm completes. Store final reward model (used for plotting).
         function process_final_rm(obj, rm)
             
             obj.rm_obj = rm;
             obj.rm_str = rm.to_struct();
         end
         
+        % Print final reward function.
         function print_reward(obj)
             
             obj.rm_obj.print();
         end
         
+        % Print several important plots.
         function res = print(obj)
             
             % print all trajectories
@@ -401,6 +419,7 @@ classdef Output < handle
             end
         end
         
+        % Collect all information in a single struct (MATLAB cannot save objects)
         function res = to_struct(obj)
             
             res.db = obj.db_str;
@@ -417,6 +436,7 @@ classdef Output < handle
     
     methods(Static)
         
+        % Generate object from struct
         function obj = from_struct(struct)
             
             obj = output.Output();

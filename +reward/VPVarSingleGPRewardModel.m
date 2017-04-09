@@ -12,6 +12,7 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
     
     methods
         
+        % Initialize start and end time indices time segments.
         function init_segments(obj)
             
             segment = floor(obj.n/obj.n_segments);
@@ -22,12 +23,14 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             obj.segment_end = [obj.segment_end obj.n];
         end
         
+        % Add feature outcomes to rollout object using feature block.
         function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
             rollout.outcomes = outcomes;
         end
         
+        % Compute reward and add reward to rollout object.
         function rollout = add_reward(obj, rollout)
             
             input = zeros(1,obj.n_segments*length(rollout.outcomes(1,:)));
@@ -43,6 +46,8 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             rollout.R_var = var;
         end
         
+        % Perform gp inference for specific rollout. Assumed rollout has
+        % feature outcomes.
         function [m, s2] = assess(obj, rollout)
             
             input = zeros(1,obj.n_segments*length(rollout.outcomes(1,:)));
@@ -56,24 +61,32 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             [m, s2] = obj.gp.assess(input);
         end
         
+        % Add rated demonstrations to reward model. Update gp training
+        % points accordingly.
         function add_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.append_rollout(demonstration);
             obj.update_gps();
         end
         
+        % Remove rated demonstrations from reward model. Update gp training
+        % points accordingly.
         function remove_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.delete(demonstration);
             obj.update_gps();
         end
         
+        % Add set of rated demonstrations to reward model (used for reward 
+        % model intialization). Update gp training points accordingly.
         function add_batch_demonstrations(obj, batch_demonstrations)
             
             obj.batch_demonstrations.append_batch(batch_demonstrations)
             obj.update_gps();
         end
         
+        % Synchronize reward model set of demonstrations and gps training
+        % points.
         function update_gps(obj)
             % TODO automatically compute dimensionality of outcomes.
             x_meas = zeros(obj.batch_demonstrations.size, obj.n_segments*2);
@@ -96,6 +109,7 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             %obj.gp.compute_features_measurements();
         end
         
+        % Initialize hyper parameters gp using heuristics.
         function init_hypers(obj)
             
             d = length(obj.gp.x_measured(1,:));
@@ -114,6 +128,7 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             obj.gp.hyp.lik = log(sigma);
         end
         
+        % Minimize hyper parameters gp.
         function minimize(obj)
             
             obj.gp.minimize();
@@ -137,6 +152,8 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
             end
         end
         
+        % Returns a struct containing all properties of the reward model 
+        % (including gp training points). Used for storage (MATLAB cannot save objects).       
         function [struct] = to_struct(obj)
             
             struct.type = 'VPVarSingleGPRewardModel';
@@ -202,6 +219,8 @@ classdef VPVarSingleGPRewardModel < reward.RewardModel
     
      methods(Static)
         
+        % Create reward model object from struct properties, so we can use
+        % the functions again (yeay).
         function obj = from_struct(struct)
             
             obj = reward.VPVarSingleGPRewardModel();

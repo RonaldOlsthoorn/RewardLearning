@@ -9,10 +9,10 @@ classdef OutcomeBlock < handle
     
     methods
         
+        % Returns the outcome of the reward primitive functions, based
+        % on the rollout (Rollout object).
         function outcomes = compute_outcomes(obj, rollout)
-            % returns the outcome of the reward primitive functions, based
-            % on the rollout (Rollout object).
-            
+     
             outcomes = zeros(length(rollout.time), length(obj.reward_primitives));
             
             for i = 1:length(obj.reward_primitives)

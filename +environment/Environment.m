@@ -19,6 +19,9 @@ classdef Environment < handle
     
     methods
         
+        % Constructor.
+        % p: plant.
+        % r: reward model.
         function obj = Environment(p, r)
             
             obj.plant = p;

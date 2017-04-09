@@ -1,3 +1,5 @@
+% Runs all plot producing protocols
+
 output.process_vp;
 output.process_advancedx;
 output.process_advancedx_var;

@@ -1,5 +1,9 @@
 clear; close all; clc
 
+% Process results of multiple runs of 
+% viapoint_advancedx_var_single and viapoint_advancedx_var_multi
+% Produces mean trajectory plots.
+
 %%
 % set globals
 posFigCon = [1 1 800 500];

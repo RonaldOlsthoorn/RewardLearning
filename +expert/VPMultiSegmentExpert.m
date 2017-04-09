@@ -15,6 +15,9 @@ classdef VPMultiSegmentExpert < expert.Expert
     
     methods
         
+        % s: standard deviation expert noise.
+        % ref: object containing viapoints.
+        % n: number of segments.
         function obj = VPMultiSegmentExpert(s, ref, n)
             
             obj.std = s;
@@ -24,6 +27,7 @@ classdef VPMultiSegmentExpert < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indices of segments.
         function init_segments(obj)
             
             n = length(obj.ref.t);
@@ -35,6 +39,9 @@ classdef VPMultiSegmentExpert < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Computes the expert rating. Expert noise included.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.        
         function rating = query_expert(obj, rollout)
    
             rating = zeros(1, obj.n_segments);
@@ -54,6 +61,10 @@ classdef VPMultiSegmentExpert < expert.Expert
             end            
         end
         
+        % Computes the expert rating over specific segment. Expert noise included.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.    
+        % seg: time segment.
         function rating = query_expert_segment(obj, rollout, seg)
             
             rating = zeros(1, obj.n_segments);
@@ -69,6 +80,9 @@ classdef VPMultiSegmentExpert < expert.Expert
             end
         end
         
+        % Computes the expert rating. Expert noise excluded.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.
         function rating = true_reward(obj, rollout)
             
             rating = zeros(1, obj.n_segments);

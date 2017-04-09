@@ -10,12 +10,16 @@ classdef RolloutBatch < handle
     
     methods
         
+        % Append rollout to batch.
+        % rollout: trajectory to be appended.
         function append_rollout(obj, rollout)
             
             obj.batch = [obj.batch rollout];
             obj.size = obj.size+1;
         end
         
+        % Append batch of rollouts to this batch.
+        % batch: batch of trajectories to be appended.
         function append_batch(obj, batch)
             
             obj.batch = [obj.batch batch.batch];
@@ -62,6 +66,7 @@ classdef RolloutBatch < handle
             end
         end
         
+        % Returns true if batch contains no rollouts at all.
         function res = is_empty(obj)
             
             if obj.size==0
@@ -102,6 +107,8 @@ classdef RolloutBatch < handle
         end
         
         % Write as an array.
+        % arr: array containing all properties of the batch (including
+        % rollouts).
         function arr = to_str_array(obj)
             
            for i = 1:obj.size

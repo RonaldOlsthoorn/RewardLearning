@@ -1,6 +1,6 @@
 classdef ManualAdvancedExpertSegmented < expert.Expert
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Manual expert for multi objective tasks, using segment specific
+    % ratings.
     
     properties
         
@@ -26,6 +26,9 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
     
     methods
         
+        % Constructor.
+        % reference: object containing viapoints/viaplance.
+        % n_seg: number of segments.
         function obj = ManualAdvancedExpertSegmented(reference, n_seg)
             
             obj.n_segments = n_seg;
@@ -34,6 +37,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.init_segments();
         end
         
+        % Initializes start and end indices of segments.
         function init_segments(obj)
             
             n = length(obj.reference.t);
@@ -45,6 +49,8 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.segment_end = [obj.segment_end n];
         end
         
+        % Returns the true reward, for comparisson. Not used due to
+        % difference in rating scaling.
         function rating = true_reward(obj, rollout)
             
             rating = zeros(1, obj.n_segments);
@@ -63,6 +69,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             end
         end
         
+        % Callback for expert input event.
         function rating_callback(obj, ~, ~)
             
             [~, status] = str2num(obj.hinput.String);
@@ -72,6 +79,10 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             end
         end
         
+        % Query rollout by showing the human expert the trajectory and
+        % receiving a rating for each segment in the rollout.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.
         function rating = query_expert(obj, rollout)
             
             figure(obj.figure_handle);
@@ -107,6 +118,11 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             close(obj.figure_handle);
         end
         
+        % Query rollout segment by showing the human expert the trajectory and
+        % receiving a rating for that specific segment.
+        % rollout: end effector trajectory to be rated.
+        % rating: expert rating.
+        % segment: time segment.
         function rating = query_expert_segment(obj, rollout, seg)
             
             figure(obj.figure_handle);
@@ -135,6 +151,9 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             close(obj.figure_handle);
         end
         
+        % Prepare background window. 
+        % batch: set of rated trajectories, will be displayed in the
+        % background.
         function background(obj, batch)
             
             obj.init_figure();
@@ -142,6 +161,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.plot_reference();
         end
         
+        % Initialize figure properties (sizes, axes, UI).
         function init_figure(obj)
             
             obj.figure_handle = figure('Visible','on',...
@@ -171,6 +191,9 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             obj.figure_handle.Visible = 'on';
         end
         
+        % Plot the batch of background trajectories in the rating window.
+        % batch: set of rated trajectories, will be displayed in the
+        % background.        
         function plot_background_batch(obj, batch)
             
             obj.background_batch = batch;
@@ -196,6 +219,7 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             end
         end
         
+        % Plot the reference viapoints/viaplane in the rating window.        
         function plot_reference(obj)
             
             subplot(1,3,1);
@@ -219,7 +243,9 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             plot(obj.reference.plane.tool(1,:), obj.reference.plane.tool(2,:), ...
                 'Color', 'cyan', 'LineWidth', 2);
         end
-        
+     
+        % Plot the to be rated rollout prominently in the rating window.
+        % rollout: to be rated end effector trajectory.        
         function plot_rollout(obj, rollout)
             
             figure(obj.figure_handle);
@@ -236,10 +262,12 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
             hold on;
             plot(rollout.tool_positions(1,:), rollout.tool_positions(2,:), 'k');
             scatter(rollout.tool_positions(1, 300), rollout.tool_positions(2, 300), ...
-                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
-            
+                40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');          
         end
         
+        % Plot the to be rated rollout prominently in the rating window.
+        % rollout: to be rated end effector trajectory.
+        % seg: time segment.        
         function plot_overlay(obj, rollout, seg)
             
             figure(obj.figure_handle);
@@ -283,10 +311,12 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 40, 'Marker', 'd', 'LineWidth', 2, 'MarkerEdgeColor', 'k');
             obj.line_handles(9) = plot(m_segment_x, rollout.tool_positions(2, obj.segment_start(seg):obj.segment_end(seg)), 'Color', 'b');
             obj.line_handles(10) = plot(rollout.tool_positions(1, obj.segment_start(seg):obj.segment_end(seg)), m_segment_y, 'Color', 'b');
-            
-            
         end
         
+        % Plot annotations to the background trajectories, indicating the
+        % previous given ratings.
+        % batch: set of background rollouts.
+        % seg: time segment.
         function plot_annotations(obj, batch, seg)
               
             t_segment = floor(obj.segment_start(seg) + (obj.segment_end(seg) - obj.segment_start(seg))/2);

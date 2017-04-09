@@ -11,6 +11,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
     
     methods
         
+        % Constructor.
         function obj = SingleSegmentEnvironment(plant, reward_model,...
                 expert, agent)
             
@@ -70,22 +71,32 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
         end
         
         
+        % Expected Policy Divergence (EPD) acquisition function.
+        % rollout: trajectory for which the acquisition value will be
+        % calculated.        
         function res = epd(obj, rollout)
             
+            % calculate expected expert return and variance.
             [m, s2] = obj.reward_model.assess(rollout);
+            % construct sigma points.
             sigma_points = m(end) + [1 -1]*s2(end);
-            
+              
             epd = zeros(1, 2);
+            
+            % policy according to unaltered reward model.             
             theta_tilda = obj.agent.get_probability_trajectories(obj.original_batch);
             
             for sigma = 1:length(sigma_points)
                 
+                % extend reward model with sigma point.
                 batch = obj.original_batch.copy();
                 rollout.R_expert = sigma_points(sigma);
                 
                 rm_ext = obj.reward_model.copy();
                 rm_ext.add_demonstration(rollout);
                 
+                % calculate reward extended reward model for each
+                % trajectory in the batch.
                 for i=1:batch.size
                     
                     ro = batch.get_rollout(i);
@@ -93,14 +104,20 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
                     
                     batch.update_rollout(ro);
                 end
-                
+                % calculate policy extended reward model.
                 theta_star = obj.agent.get_probability_trajectories(batch);
+                 % calculate KL divergence.
                 epd(sigma) = sum(theta_star.*log(theta_star./theta_tilda));
             end
-            
+            % average epd over two sigma points.
             res = mean(epd);
         end
         
+        % returns maximum epd trajectory.
+        % batch_rollouts: set of rollouts from which we are to find the
+        % maximum epd rollout.
+        % max_rollout: rollout containing the maximum epd value.
+        % max_epd: maximum epd value.
         function [max_rollout, max_epd] = find_max_acquisition(obj, batch_rollouts)
             
             max_rollout = batch_rollouts.get_rollout(1);
@@ -121,12 +138,15 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             end
         end
         
+        % demonstrate query and obtain expert rating for specific rollout.
+        % sample: trajectory to be queried.
         function rollout = demonstrate_and_query_expert(obj, sample)
             
             rollout = obj.demonstrate_rollout(sample);
             rollout.R_expert = obj.expert.query_expert(rollout);
         end
         
+        % print difference between reward models. Not used.
         function print_reward_kl(~, batch_tilda, batch_star)
             
             R_tilda = zeros(batch_tilda.size, 1);
@@ -144,6 +164,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             scatter(R_star, zeros(batch_star.size, 1));
         end
         
+        % print difference between policies. Not used.
         function print_kl(~, theta_tilda, theta_star)
             
             figure
@@ -152,6 +173,7 @@ classdef SingleSegmentEnvironment < environment.DynamicEnvironment
             scatter(theta_star, zeros(length(theta_star), 1));
         end
         
+        % print difference between reward models. Not used.
         function print_r_in_rm(~, batch_tilda, batch_star)
             
             R_tilda = zeros(batch_tilda.size, 1);

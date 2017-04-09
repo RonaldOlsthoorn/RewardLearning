@@ -1,5 +1,9 @@
 clear; close all; clc
 
+% Create relevant plots for computer generated viapoint tasks:
+% viapoint_single and viapoint_multi. Produces example convergence and
+% reward model plots.
+%
 %%
 % set globals
 posFigCon = [1 1 800 500];

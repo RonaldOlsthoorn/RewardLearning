@@ -1,5 +1,6 @@
 classdef zero
-    
+    % obsolete.
+
     properties
     end
     
