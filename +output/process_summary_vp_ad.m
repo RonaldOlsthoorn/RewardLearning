@@ -100,13 +100,13 @@ ylabel('x position end effector [m]');
 
 hold on;
 
-patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
-     'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
+% patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
+%      'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
 
 patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_pos(1,:))')], 1, ...
      'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none'); 
  
-plot(t, mean_pos_opt(1,:), 'r');
+% plot(t, mean_pos_opt(1,:), 'r');
 plot(t, mean_pos(1,:), 'b');
 h6 = plot(t_plane, plane, 'k');
 
@@ -127,12 +127,12 @@ xlabel('time [s]');
 ylabel('y position end effector [m]');
 
 hold on;
-patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
-     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
+% patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+%      'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
 patch([t, fliplr(t)],[(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
      'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
  
-plot(t, mean_pos_opt(2,:), 'r');
+% plot(t, mean_pos_opt(2,:), 'r');
 plot(t, mean_pos(2,:), 'b');
 
 scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
@@ -152,15 +152,15 @@ xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
 
 hold on;
-h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
-    [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
-    'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
+% h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
+%     [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+%     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
 
 h2 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
     [(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
     'FaceColor', [0.9,0.9,1],  'FaceAlpha', 0.5,'EdgeColor', 'none'); % This is the grey area in the plot.
 
-h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
+% h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
 h4 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 
 h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
@@ -168,7 +168,10 @@ h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
 
-legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+% legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+%      'reference viapoint', 'reference viaplane', 'Location', 'southwest');
+ 
+ legend([h4, h2, h5, h6],'average SARL result', 'std SARL result',...
      'reference viapoint', 'reference viaplane', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
@@ -236,8 +239,8 @@ summary_struct_res = summary_struct;
 pos = zeros(2, length(summary_struct_res.batch_res(1).last_rollout.tool_positions(1,:)),...
     length(summary_struct_res.batch_res));
 
-opt_pos = zeros(2, length(summary_struct_opt.batch_res(1).last_rollout.tool_positions(1,:)),...
-    length(summary_struct_opt.batch_res));
+% opt_pos = zeros(2, length(summary_struct_opt.batch_res(1).last_rollout.tool_positions(1,:)),...
+%     length(summary_struct_opt.batch_res));
 
 t = summary_struct_res.batch_res(1).last_rollout.time;
 
@@ -282,13 +285,13 @@ ylabel('x position end effector [m]');
 
 hold on;
 
-patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
-     'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
+% patch([t, fliplr(t)],[(mean_pos_opt(1,:)+var_pos_opt(1,:))'; flipud((mean_pos_opt(1,:)-var_pos_opt(1,:))')], 1, ...
+%      'FaceColor', [1,0.9,0.9],  'FaceAlpha', 1, 'EdgeColor', 'none');
 
 patch([t, fliplr(t)],[(mean_pos(1,:)+var_pos(1,:))'; flipud((mean_pos(1,:)-var_pos(1,:))')], 1, ...
      'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none'); 
 
-plot(t, mean_pos_opt(1,:), 'r');
+% plot(t, mean_pos_opt(1,:), 'r');
 plot(t, mean_pos(1,:), 'b');
 
 h6 = plot(t_plane, plane, 'k');
@@ -310,12 +313,12 @@ xlabel('time [s]');
 ylabel('y position end effector [m]');
 
 hold on;
-patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
-     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
+% patch([t, fliplr(t)],[(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+%      'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none');
 patch([t, fliplr(t)],[(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
      'FaceColor', [0.9,0.9,1], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
  
-plot(t, mean_pos_opt(2,:), 'r');
+% plot(t, mean_pos_opt(2,:), 'r');
 plot(t, mean_pos(2,:), 'b');
 
 scatter(3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
@@ -335,22 +338,25 @@ xlabel('x position end effector [m]');
 ylabel('y position end effector [m]');
 
 hold on;
-h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
-    [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
-    'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
+% h1 = patch([(mean_pos_opt(1,:))'; flipud((mean_pos_opt(1,:))')], ...
+%     [(mean_pos_opt(2,:)+var_pos_opt(2,:))'; flipud((mean_pos_opt(2,:)-var_pos_opt(2,:))')], 1, ...
+%     'FaceColor', [1,0.9,0.9], 'FaceAlpha', 1, 'EdgeColor', 'none'); % This is the grey area in the plot.
 
 h2 = patch([(mean_pos(1,:))'; flipud((mean_pos(1,:))')], ...
     [(mean_pos(2,:)+var_pos(2,:))'; flipud((mean_pos(2,:)-var_pos(2,:))')], 1, ...
     'FaceColor', [0.9,0.9,1],  'FaceAlpha', 0.5,'EdgeColor', 'none'); % This is the grey area in the plot.
 
-h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
+% h3 = plot(mean_pos_opt(1,:), mean_pos_opt(2,:), 'r');
 h4 = plot(mean_pos(1,:), mean_pos(2,:), 'b');
 
 h5 = scatter(0.3, 0.6, VPMarkerSize, 'Marker', VPMarkerType, ...
     'LineWidth', VPMarkerEdge, 'MarkerEdgeColor', VPMarkerEdgeColor, ...
     'MarkerFaceColor', VPMarkerFaceColor);
 
-legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+% legend([h4, h2, h3, h1, h5, h6],'average SARL result', 'std SARL result', 'average RL result', 'std RL result',...
+%     'reference viapoint', 'reference viaplane', 'Location', 'southwest');
+
+legend([h4, h2, h5, h6],'average SARL result', 'std SARL result',...
     'reference viapoint', 'reference viaplane', 'Location', 'southwest');
 
 suptitle('resulting trajectory');
