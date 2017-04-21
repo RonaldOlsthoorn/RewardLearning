@@ -1,4 +1,4 @@
-classdef GP < handle
+classdef GaussianProcess < handle
     %Gaussian Process class. Basically wrapper for gpml. manual
     %implementations are in this class are obsolote. need to remove.
     

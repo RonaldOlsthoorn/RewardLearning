@@ -1,9 +1,11 @@
-close all; clear all; clc;
+close all; clear; clc;
 
-gp = GP();
+posFig = [1 1 400 250];
 
-gp.cov = cov.squared_exponential;
-gp.mean = mean.zero;
+gp = examples.GaussianProcess();
+
+gp.cov = examples.cov.squared_exponential;
+gp.mean = examples.mean.zero;
 
 gp.hyp.cov = [5; 3];
 gp.hyp.mean = [];
@@ -13,6 +15,11 @@ gp.x_measured = [1; 2; 3];
 gp.y_measured = [-15.6; -9.1; -3.5] + 30;
 
 figID = figure;
+
+set(gcf,'WindowStyle','normal')
+set(gcf, 'Position', posFig);
+set(gcf, 'PaperPositionMode','auto');
+
 gp.print(figID);
 
 xlabel('phi');
@@ -20,13 +27,17 @@ ylabel('Return');
 
 c = get(gca, 'Children');
 legend([c(2), c(3), c(1)], 'Mean function', 'Variance', ...
-    'Rated demonstrations', 'Location', 'southeast')
-
+    'Rated demonstrations', 'Location', 'southeast');
 
 gp.x_measured = [1; 2; 3; 4];
 gp.y_measured = [-15.6; -9.1; -3.5; -4] + 30;
 
 figID2 = figure;
+
+set(gcf,'WindowStyle','normal')
+set(gcf, 'Position', posFig);
+set(gcf, 'PaperPositionMode','auto');
+
 gp.print(figID2);
 
 set(gca, 'xlim', [-1 5]);
@@ -37,4 +48,4 @@ ylabel('Return');
 
 c = get(gca, 'Children');
 legend([c(2), c(3), c(1)], 'Mean function', 'Variance', ...
-    'Rated demonstrations', 'Location', 'southeast')
+    'Rated demonstrations', 'Location', 'southeast');

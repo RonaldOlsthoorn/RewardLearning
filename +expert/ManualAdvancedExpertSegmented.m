@@ -175,11 +175,11 @@ classdef ManualAdvancedExpertSegmented < expert.Expert
                 'Position',[1800,550,100,25]);
             
             subplot(1,3,1);
-            xlabel('tool position t [s]');
+            xlabel('t [s]');
             ylabel('tool position x [m]');
             
             subplot(1,3,2);
-            xlabel('tool position t [s]');
+            xlabel('t [s]');
             ylabel('tool position y [m]');
             
             subplot(1,3,3);
