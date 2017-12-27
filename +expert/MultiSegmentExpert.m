@@ -1,11 +1,11 @@
 classdef MultiSegmentExpert < expert.Expert
-    % Implements a hard coded expert. Simple square error function is used.
-    
+    % Implements a hard coded expert. Simple square error function is used.    
     properties
         
         std; % rating error 
         n_segments;
         weights  = [1 1 1 1];
+        manual = false;
     end
     
     methods

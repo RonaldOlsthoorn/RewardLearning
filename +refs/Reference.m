@@ -4,14 +4,21 @@ classdef Reference < handle
     
     properties
         
-        r_joints
-        r_joints_d
-        r_tool
-        r_tool_d
+        r_joints;
+        r_joints_d;
+        r_tool;
+        r_tool_d;
         
-        duration
-        Ts
+        init_state;
+        
+        duration;
+        Ts;
         t;      
+    end
+    
+    methods(Abstract)
+       
+        plot_reference_overlay(obj, figure_handle);
     end
     
     methods
@@ -24,4 +31,3 @@ classdef Reference < handle
         end
     end   
 end
-

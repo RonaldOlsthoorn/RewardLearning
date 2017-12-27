@@ -9,24 +9,31 @@ classdef ControllerInvKinPerfect < handle
     
     properties
         
-        par
+        par;
         
         Kd = eye(2);
-        Kp = .10*eye(2);
-        
+        Kp = .10*eye(2);        
     end
     
     methods
         
+        % Constructor.
+        % system: parameters describing the system dynamics. Used for
+        % inverse dynamics equations.
         function obj = ControllerInvKinPerfect(~, system)
             
             obj.par = system.par;
         end
         
-        
+        % Controller for trajectory tracking. Combination of
+        % feed-forward (inverted EoM) and feedback control.
+        % r: reference end effector position
+        % rd: reference end effector velocity
+        % rdd: reference end effector acceleration
+        % x: end effector position
+        % v: end effector velocity
         function [control_input] = control_law(obj, r, rd, rdd, x, v)
-            % Controller for trajectory tracking. Combination of
-            % feed-forward (inverted EoM) and feedback control.
+
             alpha = obj.par.Iz1+obj.par.Iz2+obj.par.m1*obj.par.r1^2 + obj.par.m2*(obj.par.l1^2 + obj.par.r2^2);
             beta = obj.par.m2*obj.par.l1*obj.par.r2;
             delta = obj.par.Iz2 + obj.par.m2*obj.par.r2^2;
@@ -54,6 +61,11 @@ classdef ControllerInvKinPerfect < handle
             control_input = ff+fb;
         end
         
+        % Saturation filter. Sets each control input outside 
+        % -saturation > control_input_raw || saturation < control_input_raw
+        % to saturation value.
+        % control_input_raw: unsaturated control input.
+        % control_input: saturated control input.
         function control_input = saturation(obj, control_input)
             
             for i = 1:length(control_input)
@@ -68,8 +80,8 @@ classdef ControllerInvKinPerfect < handle
             end 
         end 
         
-        function reset(obj)
-            
+        % State-less controller. Nothing to reset.
+        function reset(~)        
         end
     end 
 end

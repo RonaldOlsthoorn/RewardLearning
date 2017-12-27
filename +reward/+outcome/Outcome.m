@@ -11,9 +11,10 @@ classdef Outcome < handle
     
     methods
         
-        function outcomes = batch_compute_outcome(sample_batch)
-            % returns a batch of outcomes, results of the reward
-            % primitives.
+        % Returns a matrix of outcomes, results of the reward primitives.
+        % sample_batch: set of trajectories for which the outcomes have to
+        % be computed.
+        function outcomes = batch_compute_outcome(sample_batch) 
             
             for i=length(sample_batch)
                 outcomes(i) = compute_outcome(sample_batch);

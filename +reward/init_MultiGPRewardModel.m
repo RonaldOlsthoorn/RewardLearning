@@ -1,5 +1,5 @@
 function [reward_model] = init_MultiGPRewardModel(reference, reward_model_par)
-
+% initialize multi gp reward model for trajectory tracking.
 obj = reward.MultiGPRewardModel();
 obj.feature_block = reward.SimpleOutcomeBlock(reference);
 obj.batch_demonstrations = db.RolloutBatch();

@@ -20,8 +20,8 @@ classdef SystemUR5 < plant.System
             
             obj.Ts = system_par.Ts;
             
-%             obj.arm = UR5.driver.URArm();
-%             obj.init();
+            obj.arm = UR5.driver.URArm();
+            obj.init();
         end
         
         % sets initial state for rollouts (joint positions).
@@ -109,8 +109,7 @@ classdef SystemUR5 < plant.System
             while norm(s) > tol
                 obj.arm.update();
                 pause(0.1)
-                s = obj.arm.getJointsSpeeds();
-                
+                s = obj.arm.getJointsSpeeds();             
             end
         end
     end

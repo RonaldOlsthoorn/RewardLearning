@@ -1,5 +1,5 @@
 classdef MultiGPRewardModel < reward.RewardModel
-    
+    % MULTIGPREWARDMODEL: Multi gp reward model for trajectory tracking. 
     
     properties
         
@@ -13,6 +13,7 @@ classdef MultiGPRewardModel < reward.RewardModel
     
     methods
         
+        % Initialize segment start and end time indices.
         function init_segments(obj)
             
             segment = floor(obj.n/obj.n_segments);
@@ -23,6 +24,7 @@ classdef MultiGPRewardModel < reward.RewardModel
             obj.segment_end = [obj.segment_end obj.n];
         end
         
+        % Add feature function outcomes to rollout.
         function rollout = add_outcomes(obj, rollout)
             
             outcomes = obj.feature_block.compute_outcomes(rollout);
@@ -35,6 +37,7 @@ classdef MultiGPRewardModel < reward.RewardModel
             end
         end
         
+        % Add reward to rollout.
         function rollout = add_reward(obj, rollout)
             
             R = zeros(obj.n_segments,1);
@@ -47,24 +50,37 @@ classdef MultiGPRewardModel < reward.RewardModel
             rollout.R = sum(R);
         end
         
+        % GP inference on segment. Assume rollout already has features 
+        % outcomes.
+        function [m, s2] = assess(obj, rollout, segment)
+            
+            [m, s2] = obj.gps(segment).assess(rollout.sum_out(segment));            
+        end
+        
+        % Add rated demonstration rollout to reward model gps.
         function add_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.append_rollout(demonstration);
             obj.update_gps();
         end
         
+        % Remove rated demonstration rollout from reward model gps.
         function remove_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.delete(demonstration);
             obj.update_gps();
         end
         
+        % Add batch of demonstrations to reward model (used i.e.
+        % initialization).
         function add_batch_demonstrations(obj, batch_demonstrations)
             
             obj.batch_demonstrations.append_batch(batch_demonstrations)
             obj.update_gps();
         end
         
+        % Synchronize training points gp with demonstration objects in
+        % batch_demonstrations.        
         function update_gps(obj)
             
             for i = 1:obj.n_segments

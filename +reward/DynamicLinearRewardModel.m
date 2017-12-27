@@ -1,5 +1,5 @@
 classdef DynamicLinearRewardModel < reward.RewardModel
-    % DYNAMICLINEARREWARDMODEL: simple reward model based on the squared
+    % DYNAMICLINEARREWARDMODEL: Simple reward model based on the squared
     % tracking error of the trajectory.
     
     properties
@@ -10,30 +10,38 @@ classdef DynamicLinearRewardModel < reward.RewardModel
     
     methods
         
+        % Add reward to rollout.
         function rollout = add_reward(obj, rollout)
             
+            % assume the outcomes contain squared error.
             reward = obj.gp.assess(sum(rollout.outcomes));
             rollout.R = reward;
         end
         
+        % Add rated demonstration to reward model.
         function add_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.append_rollout(demonstration);
             obj.update_gps();
         end
         
+        % Remove rated demonstration to reward model.
         function remove_demonstration(obj, demonstration)
             
             obj.batch_demonstrations.delete(demonstration);
             obj.update_gps();
         end
         
+        % Add batch of demonstrations to reward model (used i.e.
+        % initialization).
         function add_batch_demonstrations(obj, batch_demonstrations)
             
             obj.batch_demonstrations.append_batch(batch_demonstrations)
             obj.update_gps();
         end
         
+        % Synchronize training points gp with demonstration objects in
+        % batch_demonstrations.
         function update_gps(obj)
             
             x_meas = zeros(obj.batch_demonstrations.size, 1);
@@ -49,6 +57,8 @@ classdef DynamicLinearRewardModel < reward.RewardModel
             obj.gp.y_measured = y_meas;
         end
         
+        % Print gp mean and variance if possible (number of inputs must not
+        % exceed 2).
         function print(obj)
             
             obj.gp.print(obj.figID);

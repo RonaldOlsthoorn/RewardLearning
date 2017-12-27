@@ -45,7 +45,7 @@ policy_par.duration = 8;
 policy_par.Ts =  plant_par.Ts;
 
 env_par.dyn = true;
-env_par.acquisition = 'epd';
+env_par.acquisition = 'epd_multi';
 env_par.expert = 'multi_segment_expert';
 env_par.expert_std = 1e-3;
 % env_par.expert_std = 0;

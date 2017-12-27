@@ -55,9 +55,8 @@ hyp.cov = [0.03; 5e-3];
 hyp.mean = [1;0];
 hyp.lik = log(0.002);
 
-gp_par.likfunc = @likGauss;
-gp_par.meanfunc = {@meanSum, {@meanLinear, @meanConst}};
-gp_par.covfunc = @covSEard;
+gp_par.mean = 'zero';
+gp_par.cov = 'squared_error';
 gp_par.hyp = hyp;
 
 reward_model.gp_par = gp_par;

@@ -1,5 +1,5 @@
 function [agent] = init_agent(agent_par, policy)
-% create and initialise the RL agent.
+% Create and initialize the RL agent.
 % policy: agents policy parameterization.
 % agent_par: tuning parameters agent.
 

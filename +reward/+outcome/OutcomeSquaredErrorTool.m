@@ -13,8 +13,9 @@ classdef OutcomeSquaredErrorTool < reward.outcome.Outcome
             obj.ref = ref;
         end
         
-        function outcome = compute_outcome(obj, rollout)
-            % returns the squared tracking error as a reward primitive.
+        % Returns the squared tracking error of the end effector (tool) 
+        % as a reward primitive.
+        function outcome = compute_outcome(obj, rollout)  
       
             outcome  = -sum((rollout.tool_positions'-obj.ref.r_tool').^2, 2);           
         end
